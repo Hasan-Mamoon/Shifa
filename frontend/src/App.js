@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import React from 'react'
+import { Route, Routes } from 'react-router-dom'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Doctors from './pages/Doctors'
+import MyAppointments from './pages/MyAppointments'
+import Contact from './pages/Contact'
+import About from './pages/About'
+import MyProfile from './pages/MyProfile'
+import Appointment from './pages/Appointment'
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='mx-4 sm:mx-[10%'>
+     <Routes>
+      <Route path='/' element={<Home/>}>
+      <Route path='/doctors' element={<Doctors/>}></Route>
+      <Route path='/doctors/:speciality' element={<Doctors/>}></Route>
+      <Route path='/login' element={<Login/>}></Route>
+      <Route path='/about' element={<About/>}></Route>
+      <Route path='/contact' element={<Contact/>}></Route>
+      <Route path='/my-profile' element={<MyProfile/>}></Route>
+      <Route path='/my-appointments' element={<MyAppointments/>}></Route>
+      <Route path='/appointment/:docId' element={<Appointment/>}></Route>
+      </Route>
+     </Routes>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
