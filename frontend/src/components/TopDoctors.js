@@ -22,7 +22,7 @@ const TopDoctors = () => {
         </div>
 
       ))}</div>
-      <button>more</button>
+      <button className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10'>more</button>
     </div>
   )
 }
