@@ -14,7 +14,7 @@ const App = () => {
     <div className='mx-4 sm:mx-[10%]'>
       <Navbar/>
      <Routes>
-      <Route path='/' element={<Home/>}>
+      <Route path='/' element={<Home/>}></Route>
       <Route path='/doctors' element={<Doctors/>}></Route>
       <Route path='/doctors/:speciality' element={<Doctors/>}></Route>
       <Route path='/login' element={<Login/>}></Route>
@@ -23,7 +23,7 @@ const App = () => {
       <Route path='/my-profile' element={<MyProfile/>}></Route>
       <Route path='/my-appointments' element={<MyAppointments/>}></Route>
       <Route path='/appointment/:docId' element={<Appointment/>}></Route>
-      </Route>
+     
      </Routes>
     </div>
   )
