@@ -7,7 +7,7 @@ const Navbar = () => {
     const [showMenu, setShowMenu]=useState(false);
     const[token,setToken]=useState(true);
   return (
-    <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 h-20'>
+    <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 max-h-23'>
       <img src={assets.logo} alt="" className='w-44 cursor-pointer'/>
       <ul className='hidden md:flex items-start gap-5 font-medium'>
         <NavLink to='/'>
