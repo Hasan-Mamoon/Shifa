@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaTachometerAlt, FaCalendarCheck, FaUser } from "react-icons/fa"; // Importing icons from react-icons
 
 const Sidebar = () => {
   return (
@@ -18,7 +19,7 @@ const Sidebar = () => {
               to="/docDashboard"
               className="flex items-center px-6 py-3 space-x-4 hover:bg-blue-100 hover:shadow-sm hover:scale-105 transform transition duration-200 rounded-md"
             >
-              <span className="text-xl">🏠</span>
+              <FaTachometerAlt className="text-xl text-blue-500" />
               <span>Dashboard</span>
             </Link>
           </li>
@@ -27,7 +28,7 @@ const Sidebar = () => {
               to="/docAppointments"
               className="flex items-center px-6 py-3 space-x-4 hover:bg-blue-100 hover:shadow-sm hover:scale-105 transform transition duration-200 rounded-md"
             >
-              <span className="text-xl">📅</span>
+              <FaCalendarCheck className="text-xl text-green-500" />
               <span>Appointments</span>
             </Link>
           </li>
@@ -36,7 +37,7 @@ const Sidebar = () => {
               to="/docProfile"
               className="flex items-center px-6 py-3 space-x-4 hover:bg-blue-100 hover:shadow-sm hover:scale-105 transform transition duration-200 rounded-md"
             >
-              <span className="text-xl">👤</span>
+              <FaUser className="text-xl text-gray-700" />
               <span>Profile</span>
             </Link>
           </li>
