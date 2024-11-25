@@ -1,6 +1,7 @@
 import React from "react";
 import Layout from "../DoctorComponents/Layout";
-import { FaCalendarAlt, FaDollarSign } from 'react-icons/fa';
+import { FaCalendarAlt, FaDollarSign,FaUserFriends } from 'react-icons/fa';
+import  currencySymbol  from "../context/AppContext";
 
  // Icons for visual enhancement
 
@@ -50,14 +51,14 @@ const Dashboard = () => {
             <div className="text-gray-600">
               <p className="mb-2">
                 Total Earnings:{" "}
-                <span className="font-bold text-green-500">$12,340</span>
+                <span className="font-bold text-green-500">12,340</span>
               </p>
               <p className="mb-2">
-                This Month: <span className="font-bold text-gray-800">$2,500</span>
+                This Month: <span className="font-bold text-gray-800">2,500</span>
               </p>
               <p className="mb-2">
                 Pending Payments:{" "}
-                <span className="font-bold text-red-500">$500</span>
+                <span className="font-bold text-red-500">500</span>
               </p>
             </div>
             <div className="mt-4">
@@ -74,6 +75,31 @@ const Dashboard = () => {
             </div>
             <button className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
               View Earnings Details
+            </button>
+          </div>
+                    {/* Patient Count Card */}
+                    <div className="bg-gradient-to-r from-purple-50 to-purple-100 shadow-md rounded-lg p-6 hover:shadow-lg transition">
+            <div className="flex items-center space-x-4 mb-4">
+              <FaUserFriends className="text-purple-500 text-3xl" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Patient Count
+              </h2>
+            </div>
+            <div className="text-gray-600">
+              <p className="mb-2">
+                Total Patients:{" "}
+                <span className="font-bold text-purple-500">120</span>
+              </p>
+              <p className="mb-2">
+                New Patients: <span className="font-bold text-green-500">8</span>
+              </p>
+              <p className="mb-2">
+                Active Patients:{" "}
+                <span className="font-bold text-gray-800">100</span>
+              </p>
+            </div>
+            <button className="mt-4 w-full bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition">
+              View Patient Details
             </button>
           </div>
         </div>
