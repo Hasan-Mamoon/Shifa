@@ -48,14 +48,14 @@ const App = () => {
 
 
 
-
+{/* 
       <DoctorNavbar/>
-      {/* //<DoctorSidebar/> */}
+      
       <Routes>
         <Route path="/docDashboard" element={<Dashboard />} />
         <Route path="/docAppointments" element={<Appointments />} />
         <Route path="/docProfile" element={<Profile />} />
-      </Routes>
+      </Routes> */}
 
 
 
