@@ -8,9 +8,7 @@ const Layout = ({ children }) => {
       <Sidebar />
 
       {/* Main Content */}
-      <main className="flex-grow p-6 bg-gray-100">
-        {children}
-      </main>
+      <main className="flex-grow p-6 bg-gray-100">{children}</main>
     </div>
   );
 };

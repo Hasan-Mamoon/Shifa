@@ -1,9 +1,9 @@
 import React from "react";
 import Layout from "../DoctorComponents/Layout";
-import { FaCalendarAlt, FaDollarSign,FaUserFriends } from 'react-icons/fa';
-import  currencySymbol  from "../context/AppContext";
+import { FaCalendarAlt, FaDollarSign, FaUserFriends } from "react-icons/fa";
+import currencySymbol from "../context/AppContext";
 
- // Icons for visual enhancement
+// Icons for visual enhancement
 
 const Dashboard = () => {
   return (
@@ -11,9 +11,8 @@ const Dashboard = () => {
       <div className="flex flex-col flex-grow p-6 bg-gray-50">
         {/* Dashboard Title */}
         <h1 className="text-3xl font-bold text-gray-500 mb-6 border border-gray-400 rounded-full px-6 py-2 shadow-md">
-  Dashboard
-</h1>
-
+          Dashboard
+        </h1>
 
         {/* Grid Container */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
@@ -57,7 +56,8 @@ const Dashboard = () => {
                 <span className="font-bold text-green-500">12,340</span>
               </p>
               <p className="mb-2">
-                This Month: <span className="font-bold text-gray-800">2,500</span>
+                This Month:{" "}
+                <span className="font-bold text-gray-800">2,500</span>
               </p>
               <p className="mb-2">
                 Pending Payments:{" "}
@@ -80,8 +80,8 @@ const Dashboard = () => {
               View Earnings Details
             </button>
           </div>
-                    {/* Patient Count Card */}
-                    <div className="bg-gradient-to-r from-purple-50 to-purple-100 shadow-md rounded-lg p-6 hover:shadow-lg transition">
+          {/* Patient Count Card */}
+          <div className="bg-gradient-to-r from-purple-50 to-purple-100 shadow-md rounded-lg p-6 hover:shadow-lg transition">
             <div className="flex items-center space-x-4 mb-4">
               <FaUserFriends className="text-purple-500 text-3xl" />
               <h2 className="text-xl font-semibold text-gray-800">
@@ -94,7 +94,8 @@ const Dashboard = () => {
                 <span className="font-bold text-purple-500">120</span>
               </p>
               <p className="mb-2">
-                New Patients: <span className="font-bold text-green-500">8</span>
+                New Patients:{" "}
+                <span className="font-bold text-green-500">8</span>
               </p>
               <p className="mb-2">
                 Active Patients:{" "}

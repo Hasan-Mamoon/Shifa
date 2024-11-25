@@ -44,6 +44,11 @@ const App = () => {
 
       <Footer /> */}
 
+
+
+
+
+
       <DoctorNavbar/>
       {/* //<DoctorSidebar/> */}
       <Routes>
