@@ -29,12 +29,19 @@ const userSchema = new Schema({
 // static signup method
 userSchema.statics.signup = async function(email, password, role, pid) {
 
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   //validation
   if (!email || !password || !role) {
     throw Error('All fields must be filled')
   }
   if (role=== 'docotr' && !pid) {
     throw Error('PID is required for doctors');
+  }
+  if (!email || !emailPattern.test(email)) {
+    throw Error('Email is not valid');
+  }
+  if (email.includes(".com.com") || email.includes(".co.uk.co")) {
+    throw Error('Invalid email domain');
   }
   if (!validator.isEmail(email)) {
     throw Error('Email is not valid')
