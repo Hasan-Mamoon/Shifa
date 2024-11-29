@@ -1,25 +1,22 @@
 import express from 'express'
+import dotenv from 'dotenv'
 import cors from 'cors'
-import 'dotenv/config'
-import connectDB from './config/mongodb.js'
-import connectCloudinary from './config/cloudinary.js'
+import Connection from './config/mongodb.js'
+import { doctorRouter } from './routes/doctor-routes.js'
 
-const app= express()
-const port=process.env.PORT || 4000
-connectDB()
-connectCloudinary()
+const app = express()
+dotenv.config();
 
-//middlewares
+Connection();  
 
-app.use(express.json())
+// Middleware
+app.use(express.json());
+app.use(cors());
 
-app.use(cors())
-
-//api endpoints
-
-app.get('/',(req,res)=>{
-    res.send('API Working')
-})
+// Routes
+app.use("/doctor", doctorRouter);
 
 
-app.listen(port,()=> console.log("Server Started ",port))
+app.listen(process.env.PORT, () => {
+  console.log(`Server Started on port ${process.env.PORT}`);
+});
