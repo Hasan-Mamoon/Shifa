@@ -5,11 +5,12 @@ const Signup = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('patient');
+  const [pid, setPid] = useState('');
   const {signup, error, isLoading} = useSignup()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await signup(email, password, role)
+    await signup(email, password, role, pid)
   }
 
   return (
@@ -45,6 +46,21 @@ const Signup = () => {
         <option value="doctor">Doctor</option>
         <option value="admin">Admin</option>
       </select>
+      
+      {role === 'doctor' && (
+          <>
+            <label htmlFor="pid" className="block text-sm font-medium text-gray-700">
+              Doctor ID (PID)
+            </label>
+            <input
+              type="text"
+              required
+              onChange={(e) => setPid(e.target.value)}
+              value={pid}
+              className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </>
+        )}
 
       <button type="submit" disabled={isLoading} className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-300">Sign up</button>
       {error && <div className="mt-2 text-sm text-red-600">{error}</div>}

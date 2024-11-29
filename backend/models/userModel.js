@@ -18,22 +18,32 @@ const userSchema = new Schema({
     type: String,
     enum: ['admin', 'doctor', 'patient'], 
     required: true
+  },
+  pid : {
+    type: String, 
+    unique: true, 
+    sparse: true
   }
 })
 
 // static signup method
-userSchema.statics.signup = async function(email, password, role) {
+userSchema.statics.signup = async function(email, password, role, pid) {
 
   //validation
-  if (!email || !password || !role)
-  {
+  if (!email || !password || !role) {
     throw Error('All fields must be filled')
+  }
+  if (role=== 'docotr' && !pid) {
+    throw Error('PID is required for doctors');
   }
   if (!validator.isEmail(email)) {
     throw Error('Email is not valid')
   }
   if(!validator.isStrongPassword(password)){
     throw Error('Password is not strong enough')
+  }
+  if (role === 'doctor' && await this.findOne({ pid })) {
+    throw Error('PID already in use');
   }
   if (!['admin', 'doctor', 'patient'].includes(role)) {
     throw Error('Invalid role');
@@ -48,8 +58,7 @@ userSchema.statics.signup = async function(email, password, role) {
   const salt = await bcrypt.genSalt(10)
   const hash = await bcrypt.hash(password, salt)
 
-  const user = await this.create({ email, password: hash, role })
-
+  const user = await this.create({ email, password: hash, role, pid })
   return user
 }
 
