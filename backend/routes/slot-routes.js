@@ -3,7 +3,7 @@ import { slotModel } from "../models/timeslots.js";
 
 const router = express.Router();
 
-router.post("/slots/add", async (req, res) => {
+router.post("/add", async (req, res) => {
     const { doctorId, date, slots } = req.body;
   
     try {
@@ -22,7 +22,7 @@ router.post("/slots/add", async (req, res) => {
   });
   
 
-  router.post("/slots/book", async (req, res) => {
+  router.post("/book", async (req, res) => {
     const { doctorId, date, time, patientEmail } = req.body;
   
     try {
@@ -56,7 +56,7 @@ router.post("/slots/add", async (req, res) => {
     }
   });
 
-  router.get("/slots/booked", async (req, res) => {
+  router.get("/booked", async (req, res) => {
     const { doctorId, date } = req.query;
   
     try {
@@ -76,7 +76,7 @@ router.post("/slots/add", async (req, res) => {
     }
   });
 
-  router.post("/slots/cancel", async (req, res) => {
+  router.post("/cancel", async (req, res) => {
     const { doctorId, date, time } = req.body;
   
     try {
