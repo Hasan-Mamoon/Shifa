@@ -25,7 +25,7 @@ app.post('/add-patient', async (req, res) => {
     }
   });
 
-  app.get("/patients/:email", async (req, res) => {
+  app.get("/:email", async (req, res) => {
     try {
       const { email } = req.params;
       const patient = await patientModel.findOne({ email });
@@ -58,7 +58,7 @@ app.post('/add-patient', async (req, res) => {
     }
   });
 
-  app.delete("/patients/:email", async (req, res) => {
+  app.delete("/:email", async (req, res) => {
     try {
       const { email } = req.params;
       const deletedPatient = await patientModel.findOneAndDelete({ email });
