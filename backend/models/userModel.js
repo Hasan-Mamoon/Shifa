@@ -28,27 +28,66 @@ const userSchema = new Schema({
 
 // static signup method
 userSchema.statics.signup = async function(email, password, role, pid) {
-
-  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  //validation
+const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
+  //validate fields
   if (!email || !password || !role) {
     throw Error('All fields must be filled')
   }
-  if (role=== 'docotr' && !pid) {
+  if (role=== 'doctor' && !pid) {
     throw Error('PID is required for doctors');
   }
-  if (!email || !emailPattern.test(email)) {
-    throw Error('Email is not valid');
+
+  // validate email format
+  if (!emailPattern.test(email)) {
+    throw Error('Email format is not valid');
   }
-  if (email.includes(".com.com") || email.includes(".co.uk.co")) {
-    throw Error('Invalid email domain');
+
+  // Split and check email domain parts
+  const emailParts = email.split('@');
+  if (emailParts.length !== 2) {
+    throw Error('Invalid email structure');
   }
+
+  const [localPart, domain] = emailParts;
+  const domainParts = domain.split('.');
+
+  // check for invalid domain
+  const domainString = domainParts.join('.');
+  if (/(\.\w+)\1/.test(domainString)) {
+    throw Error('Email contains repetitive domain patterns like .com.com');
+  }
+
+  // Check local part length
+  if (localPart.length < 2 || localPart.length > 64) {
+    throw Error('Email local part must be between 2 and 64 characters long');
+  }
+
+  // Check domain parts length and number
+  if (
+    domainParts.length < 2 || 
+    domainParts.some(part => part.length < 2 || part.length > 63)
+  ) {
+    throw Error('Invalid email domain structure');
+  }
+
+  // Stronger email validations for TLD and subdomains
+  const tld = domainParts[domainParts.length - 1];
+  if (!/^[a-zA-Z]{2,}$/.test(tld)) {
+    throw Error('Invalid top-level domain in email');
+  }
+
+  // Additional checks using validator
   if (!validator.isEmail(email)) {
     throw Error('Email is not valid')
   }
+
+  // Password strength validation
   if(!validator.isStrongPassword(password)){
     throw Error('Password is not strong enough')
   }
+
+  //unique constraints
   if (role === 'doctor' && await this.findOne({ pid })) {
     throw Error('PID already in use');
   }
