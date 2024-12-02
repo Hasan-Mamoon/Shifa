@@ -72,6 +72,8 @@ router.post('/add-patient', async (req, res) => {
       res.status(500).json({ message: "Error deleting patient", error: err.message });
     }
   });
+
+  export {router as patientRouter}
   
   
 
