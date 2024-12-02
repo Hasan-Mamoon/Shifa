@@ -1,25 +1,85 @@
 import express from "express";
 import { doctormodel } from "../models/doctor.js";
+import multer from "multer";
+import crypto from 'crypto'
+import sharp from "sharp";
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand  } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 
 const router = express.Router();
 
-router.post("/add-doctor", async (req, res) => {
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKey = process.env.ACCESS_KEY;
+const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: accessKey,
+    secretAccessKey: secretAccessKey,
+  },
+  region: bucketRegion,
+});
+
+const randomImageName = (bytes =32)=> crypto.randomBytes(bytes).toString('hex') 
+
+router.get("/image", async (req, res) => {
+  const speciality = req.params;
+  const client = new S3Client(clientParams);
+  const command = new GetObjectCommand(getObjectParams);
+  const doctors = await doctormodel.find({ speciality: speciality });
+  const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+
+ 
+  
+  if (doctors.length === 0) {
+    return res.status(404).json({ message: "No doctors found with this speciality" });
+  }
+
+  res.send();
+});
+
+router.post("/add-doctor", upload.single("image"), async (req, res) => {
+  let address = req.body.address;
+    if (typeof address === "string") {
+      address = JSON.parse(address);
+    }
+  console.log("req.body",req.body)
+  console.log("req.file",req.file)
+
+  const imageName = randomImageName()
+  const buffer = await sharp(req.file.buffer).resize({height:1920,width:1080,fit:"contain"}).toBuffer()
+  const params = {
+    Bucket: bucketName,
+    Key: imageName,
+    Body: buffer,
+    ContentType: req.file.mimetype,
+  };
+
+  const command = new PutObjectCommand(params);
+  await s3.send(command);
+
+  
+  
   try {
     const {
+      email,
       name,
-      image,
       speciality,
       degree,
       experience,
       about,
       fees,
-      address,
     } = req.body;
 
     const newDoctor = new doctormodel({
       email,
-      name,
-      image,
+      name ,
+      image : imageName,
       speciality,
       degree,
       experience,
@@ -41,16 +101,64 @@ router.post("/add-doctor", async (req, res) => {
 
 router.get("/doctors-all", async (req, res) => {
   try {
-    const doctordata = await doctormodel.find({});
+    const doctors = await doctormodel.find({});
+    console.log('doc', doctors)
+   
 
-    if (!doctordata) {
+    for(const doctor of doctors){
+      const getObjectParams = {
+        
+        Bucket:bucketName,
+        Key:doctor.image
+      } 
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+      doctor.image = url
+
+    }
+
+    if (!doctors) {
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    return res.status(200).json(doctordata);
+    return res.status(200).json(doctors);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.get("/:speciality", async (req, res) => {
+  try {
+    const {speciality}  = req.params;
+    console.log("sp", speciality)
+    const doctors = await doctormodel.find({ speciality: speciality.toString() });
+
+    console.log('doc', doctors)
+   
+
+    for(const doctor of doctors){
+      const getObjectParams = {
+        
+        Bucket:bucketName,
+        Key:doctor.image
+      } 
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+      doctor.image = url
+
+    }
+
+   
+
+    if (doctors.length === 0) {
+      return res.status(404).json({ message: "No doctors found with this speciality" });
+    }
+
+    return res.status(200).json(doctors);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Error retrieving doctors", error: err });
   }
 });
 
@@ -115,16 +223,32 @@ router.delete("/:email", async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    const deletedDoctor = await doctormodel.findOneAndDelete({ email });
+    const doctorToDelete = await doctormodel.find({ email });
 
-    if (!deletedDoctor) {
+
+    if (!doctorToDelete) {
       return res.status(404).json({ message: "Doctor not found" });
     }
+    
+    const params = {
+      Bucket: bucketName,
+      Key:doctorToDelete[0].image
+    }
 
-    return res.status(200).json({ message: "Doctor deleted successfully", doctor: deletedDoctor });
+    const command = new DeleteObjectCommand(params)
+    await s3.send(command)
+
+    const deletedDoctor = await doctormodel.findOneAndDelete({ email });
+
+
+    return res
+      .status(200)
+      .json({ message: "Doctor deleted successfully", doctor: deletedDoctor });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error deleting doctor", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Error deleting doctor", error: err.message });
   }
 });
 
