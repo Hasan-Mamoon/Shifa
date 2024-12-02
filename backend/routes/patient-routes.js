@@ -4,7 +4,7 @@ import { patientModel } from "../models/patient.js";
 const router = express.Router();
 
 
-app.post('/add-patient', async (req, res) => {
+router.post('/add-patient', async (req, res) => {
     try {
       const patient = new patientModel(req.body);
       await patient.save();
@@ -15,7 +15,7 @@ app.post('/add-patient', async (req, res) => {
     }
   });
 
-  app.get("/patients-all", async (req, res) => {
+  router.get("/patients-all", async (req, res) => {
     try {
       const patients = await patientModel.find({});
       res.status(200).json(patients);
@@ -25,7 +25,7 @@ app.post('/add-patient', async (req, res) => {
     }
   });
 
-  app.get("/:email", async (req, res) => {
+  router.get("/:email", async (req, res) => {
     try {
       const { email } = req.params;
       const patient = await patientModel.findOne({ email });
@@ -39,7 +39,7 @@ app.post('/add-patient', async (req, res) => {
     }
   });
 
-  app.put("/update/:email", async (req, res) => {
+  router.put("/update/:email", async (req, res) => {
     try {
       const { email } = req.params;
       const updatedPatient = await patientModel.findOneAndUpdate(
@@ -58,7 +58,7 @@ app.post('/add-patient', async (req, res) => {
     }
   });
 
-  app.delete("/:email", async (req, res) => {
+  router.delete("/:email", async (req, res) => {
     try {
       const { email } = req.params;
       const deletedPatient = await patientModel.findOneAndDelete({ email });
