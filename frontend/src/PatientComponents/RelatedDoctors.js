@@ -8,13 +8,21 @@ const RelatedDoctors = ({ speciality, docId }) => {
   const [relDoc, setRelDocs] = useState([]);
 
   useEffect(() => {
-    if (doctors.length > 0 && speciality) {
-      const doctorsData = doctors.filter(
-        (doc) => doc.speciality === speciality && doc._id !== docId
-      );
-      setRelDocs(doctorsData);
+    const fetchRelatedDoctors = async () => {
+      try {
+        const response = await fetch(`http://localhost:3080/doctor/${speciality}`);
+        const data = await response.json();
+        setRelDocs(data.filter(doc => doc._id !== docId));
+      } catch (error) {
+        console.error("Error fetching related doctors:", error);
+      }
+    };
+
+    if (speciality) {
+      fetchRelatedDoctors();
     }
-  }, [doctors, speciality, docId]);
+  }, [speciality, docId]);
+
   return (
     <div className="flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10">
       <h1 className="text-3xl font-medium">Related Doctors</h1>
