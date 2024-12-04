@@ -101,6 +101,7 @@ const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     throw Error('Email already in use')
   }
 
+  // Hash password and create user
   const salt = await bcrypt.genSalt(10)
   const hash = await bcrypt.hash(password, salt)
 
