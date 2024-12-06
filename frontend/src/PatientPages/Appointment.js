@@ -9,66 +9,81 @@ const Appointment = () => {
   const { doctors, currencySymbol } = useContext(AppContext);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const [docInfo, setDocInfo] = useState(null);
-  const [docSlots, setDocSlots] = useState([]);
+  const [availableDates, setAvailableDates] = useState([]); // Store available dates
+  const [docSlots, setDocSlots] = useState([]); // Store slots for the selected date
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
 
+  // Fetch doctor info
   const fetchDocInfo = async () => {
     const docInfo = doctors.find((doc) => doc._id === docId);
     setDocInfo(docInfo);
     console.log(docInfo);
   };
-  const getAvailableSlots = async () => {
-    setDocSlots([]); // Reset slots
 
-    let today = new Date();
-
-    for (let i = 0; i < 7; i++) {
-      let currentDate = new Date(today); // Clone today's date
-      currentDate.setDate(today.getDate() + i);
-
-      let endTime = new Date(currentDate); // Define `endTime` for the day
-      endTime.setHours(21, 0, 0, 0); // End of working hours
-
-      if (today.getDate() === currentDate.getDate()) {
-        // Adjust for today
-        currentDate.setHours(
-          currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10
-        );
-        currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
-      } else {
-        currentDate.setHours(10); // Start at 10 AM
-        currentDate.setMinutes(0);
+  // Fetch available dates for the doctor
+  const getAvailableDates = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3080/slot/dates?doctorId=${docId}`
+      );
+      const datesFromDB = await response.json();
+      if (!response.ok) {
+        console.error("Error:", datesFromDB.message);
+        return;
       }
-
-      let timeSlots = [];
-      while (currentDate < endTime) {
-        // Generate slots
-        let formattedTime = currentDate.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        timeSlots.push({
-          datetime: new Date(currentDate), // Correctly reference `currentDate`
-          time: formattedTime,
-        });
-
-        currentDate.setMinutes(currentDate.getMinutes() + 30); // Increment by 30 minutes
-      }
-
-      setDocSlots((prev) => [...prev, timeSlots]); // Add slots for the day
+      setAvailableDates(datesFromDB); // Set available dates
+    } catch (error) {
+      console.error("Error fetching available dates:", error);
     }
   };
 
+  // Fetch slots for the selected date
+  const getAvailableSlots = async (date) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3080/slot/appointments?doctorId=${docId}&date=${date}`
+      );
+      const slotsFromDB = await response.json();
+  
+      if (!response.ok) {
+        console.error("Error:", slotsFromDB.message);
+        return;
+      }
+  
+      const groupedSlots = [];
+      slotsFromDB.forEach((slot) => {
+        groupedSlots.push({
+          time: slot.time,
+          isBooked: slot.isBooked,
+        });
+      });
+  
+      setDocSlots(groupedSlots); // Set slots for selected date
+    } catch (error) {
+      console.error("Error fetching slots:", error);
+    }
+  };
+
+  // Effect to fetch doctor information
   useEffect(() => {
     fetchDocInfo();
   }, [doctors, docId]);
 
+  // Effect to fetch available dates when the doctor changes
   useEffect(() => {
-    getAvailableSlots();
+    if (docInfo) {
+      getAvailableDates();
+    }
   }, [docInfo]);
 
-  useEffect(() => {}, [docSlots]);
+  // Effect to update slots when a date is selected
+  useEffect(() => {
+    if (availableDates.length) {
+      getAvailableSlots(availableDates[0]); // Load the first date's slots initially
+    }
+  }, [availableDates]);
+
   return (
     docInfo && (
       <div>
@@ -115,31 +130,36 @@ const Appointment = () => {
 
         <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700">
           <p>Booking Slots</p>
-          <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4">
-            {docSlots.length &&
-              docSlots.map((item, index) => (
+          {/* Horizontal Scroll for Dates */}
+          <div className="flex gap-3 items-center w-full overflow-x-auto mt-4">
+            {availableDates.length &&
+              availableDates.map((date, index) => (
                 <div
-                  onClick={() => setSlotIndex(index)}
-                  className={`text-center py-6 min-w-16 rounded-full cursor-pinter ${
+                  onClick={() => {
+                    setSlotIndex(index);
+                    getAvailableSlots(date);
+                  }}
+                  className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
                     slotIndex === index
                       ? "bg-primary text-white"
                       : "border border-gray-200"
                   }`}
                   key={index}
                 >
-                  <p>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</p>
-                  <p>{item[0] && item[0].datetime.getDate()}</p>
+                  <p>{new Date(date).toLocaleDateString()}</p>
                 </div>
               ))}
           </div>
-          <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
+
+          {/* Horizontal Scroll for Times */}
+          <div className="flex items-center gap-3 w-full overflow-x-auto mt-4">
             {docSlots.length &&
-              docSlots[slotIndex].map((item, index) => (
+              docSlots.map((item, index) => (
                 <p
                   onClick={() => setSlotTime(item.time)}
                   className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${
                     item.time === slotTime
-                      ? "bg-primary textwhite"
+                      ? "bg-primary text-white"
                       : "text-gray-400 border border-gray-300"
                   }`}
                   key={index}
@@ -148,6 +168,7 @@ const Appointment = () => {
                 </p>
               ))}
           </div>
+
           <button className="bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6">
             Book an appointment
           </button>

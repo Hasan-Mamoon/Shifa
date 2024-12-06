@@ -18,7 +18,7 @@ const Sidebar = () => {
         <ul className="space-y-2">
           <li>
             <Link
-              to="/docDashboard"
+              to="/"
               className={`flex items-center px-6 py-3 space-x-4 hover:bg-blue-100 hover:shadow-sm hover:scale-105 transform transition duration-200 rounded-md ${
                 isActive("/docDashboard") ? "border-l-4 border-blue-500 text-blue-700" : "text-gray-700"
               }`}
