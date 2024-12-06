@@ -9,6 +9,7 @@ import DoctorHome from "./pages/DoctorHome";
 import AdminHome from "./pages/AdminHome";
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import AdminApproval from './pages/AdminApproval';
 
 
 function App() {
@@ -47,7 +48,10 @@ function App() {
               path="/admin" 
               element={user?.role === 'admin' ? <AdminHome /> : <Navigate to="/login" />} 
             />
-
+            <Route 
+              path="/admin/approve" 
+              element={user?.role === 'admin' ? <AdminApproval /> : <Navigate to="/login" />} 
+            />
           </Routes>
         </div>
       </BrowserRouter>

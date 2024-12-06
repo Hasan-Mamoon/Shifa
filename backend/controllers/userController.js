@@ -1,4 +1,5 @@
 const User = require('../models/userModel')
+const PendingDoctor = require('../models/pendingDoctorModel')
 const jwt = require ('jsonwebtoken')
 
 
@@ -23,15 +24,21 @@ const loginUser = async (req, res) => {
 
 // signup a user
 const signupUser = async (req, res) => {
-  const {email, password, role, pid} = req.body
+  const {email, password, role, licenseNo, licensePicture} = req.body
 
   try {
-    const user = await User.signup(email, password, role, pid)
-
+    if (role === 'doctor') {
+      // Save to PendingDoctor collection
+      const pendingDoctor = new PendingDoctor({ email, password, role, licenseNo, licensePicture });
+      await pendingDoctor.save();
+      return res.status(200).json({ message: 'Registration pending admin approval' });
+    }
+    
+    const user = await User.signup(email, password, role, licenseNo)
     //create a token
     const token = createToken(user._id, user.role)
     //token=header(algo)+payload(id)+secret
-    res.status(200).json({email,role:user.role,pid:user.pid, token})
+    res.status(200).json({email,role:user.role,licenseNo:user.licenseNo, token})
   } catch (error) {
     res.status(400).json({error: error.message})
   }

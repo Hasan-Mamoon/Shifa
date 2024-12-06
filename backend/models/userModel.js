@@ -19,7 +19,7 @@ const userSchema = new Schema({
     enum: ['admin', 'doctor', 'patient'], 
     required: true
   },
-  pid : {
+  licenseNo: {
     type: String, 
     unique: true, 
     sparse: true
@@ -27,15 +27,15 @@ const userSchema = new Schema({
 })
 
 // static signup method
-userSchema.statics.signup = async function(email, password, role, pid) {
+userSchema.statics.signup = async function(email, password, role, licenseNo) {
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   
   //validate fields
   if (!email || !password || !role) {
     throw Error('All fields must be filled')
   }
-  if (role=== 'doctor' && !pid) {
-    throw Error('PID is required for doctors');
+  if (role=== 'doctor' && !licenseNo) {
+    throw Error('licenseNo is required for doctors');
   }
 
   // validate email format
@@ -88,8 +88,8 @@ const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   }
 
   //unique constraints
-  if (role === 'doctor' && await this.findOne({ pid })) {
-    throw Error('PID already in use');
+  if (role === 'doctor' && await this.findOne({ licenseNo })) {
+    throw Error('licenseNo already in use');
   }
   if (!['admin', 'doctor', 'patient'].includes(role)) {
     throw Error('Invalid role');
@@ -105,7 +105,7 @@ const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const salt = await bcrypt.genSalt(10)
   const hash = await bcrypt.hash(password, salt)
 
-  const user = await this.create({ email, password: hash, role, pid })
+  const user = await this.create({ email, password: hash, role, licenseNo})
   return user
 }
 

@@ -5,13 +5,22 @@ const Signup = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('patient');
-  const [pid, setPid] = useState('');
+  const [licenseNo, setlicenseNo] = useState('');
+  const [licenseImage, setLicenseImage] = useState(null);
   const {signup, error, isLoading} = useSignup()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await signup(email, password, role, pid)
+    console.log({ email, password, role, licenseNo, licenseImage });
+    await signup(email, password, role, licenseNo, licenseImage)
   }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLicenseImage(file);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -49,14 +58,24 @@ const Signup = () => {
       
       {role === 'doctor' && (
           <>
-            <label htmlFor="pid" className="block text-sm font-medium text-gray-700">
-              Doctor ID (PID)
+            <label htmlFor="licenseNo" className="block text-sm font-medium text-gray-700">
+            licenseNo
             </label>
             <input
               type="text"
               required
-              onChange={(e) => setPid(e.target.value)}
-              value={pid}
+              onChange={(e) => setlicenseNo(e.target.value)}
+              value={licenseNo}
+              className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+            <label htmlFor="licenseImage" className="block text-sm font-medium text-gray-700">
+              Upload License Picture
+            </label>
+            <input
+              type="file"
+              required
+              accept="image/*"
+              onChange={handleFileChange}
               className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </>
