@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useAuthContext } from './useAuthContext';
+import { useState } from "react";
+import { useAuthContext } from "./useAuthContext";
 
 export const useSignup = () => {
   const [error, setError] = useState(null);
@@ -12,7 +12,7 @@ export const useSignup = () => {
 
     // Build the request body
     const body = { email, password, role };
-    if (role === 'doctor') {
+    if (role === "doctor") {
       body.licenseNo = licenseNo;
 
       // Optionally handle the license image (if required to send)
@@ -32,10 +32,10 @@ export const useSignup = () => {
 
   const sendRequest = async (body) => {
     try {
-      const response = await fetch('/api/user/signup', {
-        method: 'POST',
+      const response = await fetch("/api/user/signup", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       });
@@ -47,17 +47,17 @@ export const useSignup = () => {
         setError(json.error);
       } else {
         // Save the user to local storage
-        localStorage.setItem('user', JSON.stringify(json));
+        localStorage.setItem("user", JSON.stringify(json));
 
         // Update the auth context
-        dispatch({ type: 'LOGIN', payload: json });
+        dispatch({ type: "LOGIN", payload: json });
 
         // Update loading state
         setIsLoading(false);
       }
     } catch (err) {
       setIsLoading(false);
-      setError('An error occurred. Please try again.');
+      setError("An error occurred. Please try again.");
     }
   };
 

@@ -1,6 +1,6 @@
-const PendingDoctor = require('../models/pendingDoctorModel');
-const User = require('../models/userModel');
-const bcrypt = require('bcrypt');
+const PendingDoctor = require("../models/pendingDoctorModel");
+const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
 
 // Fetch all pending doctor requests
 const getPendingDoctors = async (req, res) => {
@@ -19,7 +19,7 @@ const approveDoctor = async (req, res) => {
   try {
     const pendingDoctor = await PendingDoctor.findById(id);
     if (!pendingDoctor) {
-      return res.status(404).json({ error: 'Doctor not found' });
+      return res.status(404).json({ error: "Doctor not found" });
     }
 
     // Hash the password and create a new user
@@ -35,7 +35,7 @@ const approveDoctor = async (req, res) => {
 
     // Delete from pending collection
     await pendingDoctor.deleteOne();
-    res.status(200).json({ message: 'Doctor approved successfully' });
+    res.status(200).json({ message: "Doctor approved successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -48,12 +48,12 @@ const rejectDoctor = async (req, res) => {
   try {
     const pendingDoctor = await PendingDoctor.findById(id);
     if (!pendingDoctor) {
-      return res.status(404).json({ error: 'Doctor not found' });
+      return res.status(404).json({ error: "Doctor not found" });
     }
 
     // Delete the pending doctor entry
     await pendingDoctor.deleteOne();
-    res.status(200).json({ message: 'Doctor rejected successfully' });
+    res.status(200).json({ message: "Doctor rejected successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

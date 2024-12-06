@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const pendingDoctorSchema = new mongoose.Schema({
   email: {
@@ -12,7 +12,7 @@ const pendingDoctorSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['doctor'],
+    enum: ["doctor"],
     required: true,
   },
   licenseNo: {
@@ -30,4 +30,4 @@ const pendingDoctorSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('PendingDoctor', pendingDoctorSchema);
+module.exports = mongoose.model("PendingDoctor", pendingDoctorSchema);
