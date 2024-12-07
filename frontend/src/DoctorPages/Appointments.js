@@ -4,7 +4,7 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext";
 
 const Appointment = () => {
-  const { docId } = useParams(); // Get the doctor ID from the URL
+  const { docId ='674cc15ca5aeceee59956c0a'} = useParams(); // Get the doctor ID from the URL
   const { doctors, currencySymbol } = useContext(AppContext); // Get doctors data and currency
   const [docInfo, setDocInfo] = useState(null); // Store doctor info
   const [availableDates, setAvailableDates] = useState([]); // Store available dates
@@ -60,7 +60,7 @@ const Appointment = () => {
       {docInfo && (
         <div>
           <div className="doctor-info">
-            <img src={docInfo.image} alt={docInfo.name} />
+            <img src={docInfo.image} alt={docInfo.name} style={{ width: "150px", height: "150px", objectFit: "cover" }}  />
             <h2>{docInfo.name}</h2>
             <p>{docInfo.degree} - {docInfo.speciality}</p>
             <p>{docInfo.about}</p>
@@ -69,7 +69,7 @@ const Appointment = () => {
 
           {/* Available Dates Section */}
           <div className="available-dates">
-            <h3>Available Dates</h3>
+            <h3>Available Dates </h3>
             <div className="dates-list">
               {availableDates.map((date) => (
                 <button
@@ -77,7 +77,11 @@ const Appointment = () => {
                   onClick={() => handleDateClick(date)}
                   className="date-button"
                 >
-                  {new Date(date).toLocaleDateString()}
+                  {new Date(date).toLocaleDateString("en-US", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
                 </button>
               ))}
             </div>

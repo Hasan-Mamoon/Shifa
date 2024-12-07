@@ -30,20 +30,34 @@ const s3 = new S3Client({
 
 const randomImageName = (bytes =32)=> crypto.randomBytes(bytes).toString('hex') 
 
-router.get("/image", async (req, res) => {
-  const speciality = req.params;
-  const client = new S3Client(clientParams);
-  const command = new GetObjectCommand(getObjectParams);
-  const doctors = await doctormodel.find({ speciality: speciality });
-  const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+router.get("/get-doctor", async (req, res) => {
+  const { id } = req.query;
+  console.log("ID: ",id)
 
- 
-  
-  if (doctors.length === 0) {
-    return res.status(404).json({ message: "No doctors found with this speciality" });
+  try{
+    const doctors = await doctormodel.find({ _id: id });
+  if(!doctors){
+    return res.status(404).json({ message: "Doctor not found" });
   }
 
-  res.send();
+  const getObjectParams = {
+        
+    Bucket:bucketName,
+    Key:doctors[0].image
+  } 
+
+  const command = new GetObjectCommand(getObjectParams);
+  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+  doctors[0].image = url
+  
+  return res.status(200).json(doctors);
+
+    
+  }catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 router.post("/add-doctor", upload.single("image"), async (req, res) => {
