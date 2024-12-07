@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const PendingDoctor = require("../models/pendingDoctorModel");
 const jwt = require("jsonwebtoken");
+const { putObjectURL } = require("../utils/awsutils");
 
 const createToken = (_id, role) => {
   return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
@@ -26,18 +27,24 @@ const signupUser = async (req, res) => {
 
   try {
     if (role === "doctor") {
+      const uploadURL = await putObjectURL(
+        `license-${Date.now()}.jpeg`,
+        "image/jpeg"
+      );
+
       // Save to PendingDoctor collection
       const pendingDoctor = new PendingDoctor({
         email,
         password,
         role,
         licenseNo,
-        licensePicture,
+        licensePicture: uploadURL,
       });
       await pendingDoctor.save();
-      return res
-        .status(200)
-        .json({ message: "Registration pending admin approval" });
+      return res.status(200).json({
+        message: "Registration pending admin approval",
+        uploadURL,
+      });
     }
 
     const user = await User.signup(email, password, role, licenseNo);

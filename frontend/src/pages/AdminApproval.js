@@ -42,54 +42,54 @@ const AdminApproval = () => {
   }, [token]); // Runs whenever token changes
 
   // Handle Approve
-  function handleApprove(doctorId) {
-    // Implement approval logic here, make API call
-    fetch(`/api/admin/approve-doctor/${doctorId}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to approve doctor");
-        }
-        setPendingDoctors((prevDoctors) =>
-          prevDoctors.filter((doctor) => doctor._id !== doctorId)
-        );
-        alert("Doctor approved successfully");
-      })
-      .catch((err) => {
-        console.error("Approval error:", err);
-        alert("Error approving doctor");
+  const handleApprove = async (doctorId) => {
+    try {
+      const response = await fetch(`/api/admin/approve-doctor/${doctorId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-  }
+
+      if (!response.ok) {
+        throw new Error("Approval failed");
+      }
+
+      setPendingDoctors((prev) =>
+        prev.filter((doctor) => doctor._id !== doctorId)
+      );
+
+      alert("Doctor approved successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Error approving doctor");
+    }
+  };
 
   // Handle Delete
-  function handleDelete(doctorId) {
-    // Implement delete logic here, make API call
-    fetch(`/api/admin/reject-doctor/${doctorId}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to delete doctor");
-        }
-        setPendingDoctors((prevDoctors) =>
-          prevDoctors.filter((doctor) => doctor._id !== doctorId)
-        );
-        alert("Doctor deleted successfully");
-      })
-      .catch((err) => {
-        console.error("Delete error:", err);
-        alert("Error deleting doctor");
+  const handleReject = async (doctorId) => {
+    try {
+      const response = await fetch(`/api/admin/reject-doctor/${doctorId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-  }
+
+      if (!response.ok) {
+        throw new Error("Rejection failed");
+      }
+
+      setPendingDoctors((prev) =>
+        prev.filter((doctor) => doctor._id !== doctorId)
+      );
+
+      alert("Doctor rejected successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Error rejecting doctor");
+    }
+  };
 
   return (
     <div className="admin-approval-container">
@@ -105,7 +105,7 @@ const AdminApproval = () => {
               className="doctor-card border rounded p-4 shadow-md hover:shadow-lg"
             >
               <img
-                src={doctor.licensePicture || "/default-avatar.png"}
+                src={doctor.licensePictureURL}
                 alt={doctor.email}
                 className="doctor-image w-full h-40 object-cover rounded mb-4"
               />
@@ -124,7 +124,7 @@ const AdminApproval = () => {
                 </button>
                 <button
                   className="delete-button bg-red-500 text-white p-2 rounded hover:bg-red-600"
-                  onClick={() => handleDelete(doctor._id)}
+                  onClick={() => handleReject(doctor._id)}
                 >
                   Delete
                 </button>

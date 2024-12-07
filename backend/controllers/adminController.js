@@ -1,12 +1,25 @@
 const PendingDoctor = require("../models/pendingDoctorModel");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const { getObjectURL } = require("../utils/awsutils");
 
 // Fetch all pending doctor requests
 const getPendingDoctors = async (req, res) => {
   try {
     const pendingDoctors = await PendingDoctor.find({});
-    res.status(200).json(pendingDoctors);
+
+    const doctorsWithURLs = await Promise.all(
+      pendingDoctors.map(async (doctor) => {
+        const fullURL = doctor.licensePicture;
+        const licensePictureKey = fullURL.split(".com/")[1].split("?")[0]; // Get the path before '?'
+
+        return {
+          ...doctor._doc,
+          licensePictureURL: await getObjectURL(licensePictureKey),
+        };
+      })
+    );
+    res.status(200).json(doctorsWithURLs);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

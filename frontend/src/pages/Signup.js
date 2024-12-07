@@ -11,7 +11,6 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, password, role, licenseNo, licenseImage });
     await signup(email, password, role, licenseNo, licenseImage);
   };
 
