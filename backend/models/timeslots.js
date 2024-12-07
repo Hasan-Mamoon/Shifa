@@ -12,6 +12,8 @@ const slotSchema = new mongoose.Schema({
   ]
 });
 
+slotSchema.index({ doctorId: 1, date: 1 });
+
 const slotModel = mongoose.model("AppointmentSlots", slotSchema);
 
 export { slotModel };
