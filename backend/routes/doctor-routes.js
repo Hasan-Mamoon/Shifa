@@ -47,9 +47,9 @@ router.get("/image", async (req, res) => {
 });
 
 router.post("/add-doctor", upload.single("image"), async (req, res) => {
-  let address = req.body.address;
-    if (typeof address === "string") {
-      address = JSON.parse(address);
+  let address1 = req.body.address;
+    if (typeof address1 === "string") {
+      address1 = JSON.parse(address1);
     }
   console.log("req.body",req.body)
   console.log("req.file",req.file)
@@ -76,8 +76,7 @@ router.post("/add-doctor", upload.single("image"), async (req, res) => {
       degree,
       experience,
       about,
-      fees,
-      address,
+      fees
     } = req.body;
 
     const newDoctor = new doctormodel({
@@ -89,7 +88,7 @@ router.post("/add-doctor", upload.single("image"), async (req, res) => {
       experience,
       about,
       fees,
-      address
+      address:address1
     });
 
     const savedDoctor = await newDoctor.save();

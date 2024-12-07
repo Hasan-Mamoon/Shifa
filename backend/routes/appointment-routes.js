@@ -5,96 +5,6 @@ import mongoose from 'mongoose';
 
 const router = express.Router() 
 
-// router.post('/book-appointment', async (req, res) => {
-//   console.log("request: ", req.body)
-//   const { doctorId, patientId, slotId, date, time } = req.body;
-
-//     // Check if the slot exists and is available
-//     // const slot = await slotModel.findOne({
-//     //   _id: slotId,
-//     //   doctorId,
-//     //   date,
-//     //   "slots.time": time,
-//     //   "slots.isBooked": false,
-//     // });
-
-//     // if (!slot) {
-//     //   return res.status(400).json({ message: "Slot not available or already booked." });
-//     // }
-
-//     // // Book the slot
-//     // await slotModel.updateOne(
-//     //   { _id: slotId, "slots.time": time },
-//     //   { $set: { "slots.$.isBooked": true, "slots.$.patient": patientId } }
-//     // );
-
-//     const slotDocument = await slotModel.findOne({ doctorId, date });
-
-//     if (!slotDocument) {
-//       return res.status(404).json({ message: "No slots found for the selected doctor and date." });
-//     }
-
-//     // Find the specific slot by its ID
-//     const slotToBook = slotDocument.slots.id(slotId);
-
-//     if (!slotToBook) {
-//       return res.status(404).json({ message: "Slot not found." });
-//     }
-
-//     // Check if the slot is already booked
-//     if (slotToBook.isBooked) {
-//       return res.status(400).json({ message: "Slot is already booked." });
-//     }
-
-//     // // Update the slot's status and assign the patient
-//     // slotToBook.isBooked = true;
-//     // slotToBook.patient = patientId;
-//     console.log('slot',slotToBook)
-
-//     // Save the updated document
-//     const session = await mongoose.startSession();
-
-//     try {
-//       session.startTransaction();
-    
-//       // Check if slot is still available
-//       const existingSlot = await slotModel.findOne({ _id: slotId, isBooked: false }).session(session);
-//       if (!existingSlot) {
-//         throw new Error("Slot is no longer available.");
-//       }
-    
-//       // Update slot status
-//       existingSlot.isBooked = true;
-//       const savedSlot = await existingSlot.save({ session });
-//       if (!savedSlot) {
-//         throw new Error("Failed to update slot status.");
-//       }
-    
-//       // Create the appointment
-//       const newAppointment = new appointmentModel({
-//         doctorId,
-//         patientId,
-//         slotId,
-//         date,
-//         time,
-//         status: "Booked",
-//         notes:''
-//       });
-    
-//       await newAppointment.save({ session });
-    
-//       // Commit the transaction
-//       await session.commitTransaction();
-//     } catch (error) {
-//       // Rollback the transaction
-//       await session.abortTransaction();
-//       console.error("Error during booking:", error);
-//       throw error; // or return an error response
-//     } finally {
-//       session.endSession();
-//     }
-// });
-
 router.post('/book-appointment', async (req, res) => {
   console.log("request: ", req.body);
   const { doctorId, patientId, slotId, date, time } = req.body;
@@ -169,25 +79,25 @@ router.post('/book-appointment', async (req, res) => {
 });
 
 
-router.get('/:email', async (req, res) => {
-    try {
-      const { email } = req.params;
+// router.get('/:email', async (req, res) => {
+//     try {
+//       const { email } = req.params;
   
-      const appointments = await appointmentModel.find({ email})
-        .populate("patientId", "name email") // Populate patient details
-        .populate("slotId", "time date")    // Populate slot details
-        .exec();
+//       const appointments = await appointmentModel.find({ email})
+//         .populate("patientId", "name email") // Populate patient details
+//         .populate("slotId", "time date")    // Populate slot details
+//         .exec();
   
-      if (!appointments.length) {
-        return res.status(404).json({ message: "No appointments found for this doctor" });
-      }
+//       if (!appointments.length) {
+//         return res.status(404).json({ message: "No appointments found for this doctor" });
+//       }
   
-      return res.status(200).json(appointments);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Error retrieving appointments", error });
-    }
-  });
+//       return res.status(200).json(appointments);
+//     } catch (error) {
+//       console.error(error);
+//       return res.status(500).json({ message: "Error retrieving appointments", error });
+//     }
+//   });
 
   router.patch("/:appointmentId", async (req, res) => {
     try {
@@ -233,44 +143,26 @@ router.delete("/:appointmentId", async (req, res) => {
   }
 });
 
-router.post("/tempbk",async(req,res)=>{
-  const { doctorId, date, slotId, patientId } = req.body;
+router.get("/appointments", async (req, res) => {
+  const { userId } = req.query;
+  console.log("uid: ", userId)
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required." });
+  }
 
   try {
-    // Find the document for the given doctor and date
-    const slotDocument = await slotModel.findOne({ doctorId, date });
+    const appointments = await appointmentModel
+      .find({ patientId: userId })
+      .populate("doctorId", "name speciality image address")
+      .populate("slotId", "time date");
 
-    if (!slotDocument) {
-      return res.status(404).json({ message: "No slots found for the selected doctor and date." });
-    }
-
-    // Find the specific slot by its ID
-    const slotToBook = slotDocument.slots.id(slotId);
-
-    if (!slotToBook) {
-      return res.status(404).json({ message: "Slot not found." });
-    }
-
-    // Check if the slot is already booked
-    if (slotToBook.isBooked) {
-      return res.status(400).json({ message: "Slot is already booked." });
-    }
-
-    // Update the slot's status and assign the patient
-    slotToBook.isBooked = true;
-    slotToBook.patient = patientId;
-
-    // Save the updated document
-    await slotDocument.save();
-
-    const appointment = new appointmentModel
-
-    res.status(200).json({ message: "Appointment booked successfully." });
+    res.status(200).json(appointments);
   } catch (error) {
-    console.error("Error booking appointment:", error);
-    res.status(500).json({ message: "Failed to book appointment. Please try again later." });
+    console.error("Error fetching appointments:", error);
+    res.status(500).json({ message: "Failed to fetch appointments." });
   }
-})
+});
 
 
 export {router as appointmentRouter}

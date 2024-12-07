@@ -3,13 +3,14 @@ import mongoose from "mongoose";
 const patientSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  image: { type: String, required: true },
   phone: { type: String, required: true },
   age: { type: Number }, // Existing field
   gender: { type: String }, // Existing field
   medicalHistory: { type: String }, // Existing field
-  address: { // New field added
+  address: {
     line1: { type: String, required: true },
-    line2: { type: String, required: true },
+    line2: { type: String, required: true }
   },
   dob: { type: Date }, // New field added
 });
