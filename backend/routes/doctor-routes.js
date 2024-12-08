@@ -269,4 +269,58 @@ router.delete("/:email", async (req, res) => {
   }
 });
 
+
+router.put("/update/:id", async (req, res) => {
+  try {
+    const { id } = req.params; // Get the ID from route parameters
+    const {
+      name,
+      image,
+      speciality,
+      degree,
+      experience,
+      about,
+      fees,
+      address,
+    } = req.body;
+
+    const updatedData = {
+      name,
+      image,
+      speciality,
+      degree,
+      experience,
+      about,
+      fees,
+      address,
+    };
+
+    // Remove undefined or null fields to prevent updating with empty values
+    Object.keys(updatedData).forEach((key) => {
+      if (updatedData[key] === undefined || updatedData[key] === null) {
+        delete updatedData[key];
+      }
+    });
+
+    const updatedDoctor = await doctormodel.findByIdAndUpdate(
+      id, // Use doctorId instead of email
+      updatedData, // Fields to update
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedDoctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Doctor updated successfully", doctor: updatedDoctor });
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ message: "Error updating doctor", error: err.message });
+  }
+});
+
 export { router as doctorRouter };

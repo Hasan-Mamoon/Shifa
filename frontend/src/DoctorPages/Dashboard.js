@@ -6,7 +6,7 @@ const Dashboard = () => {
   const [slots, setSlots] = useState([]);
   const [date, setDate] = useState("");
   const [newSlot, setNewSlot] = useState("");
-  const [doctorId] = useState("674cc15ca5aeceee59956c0a"); // Replace with actual doctor ID
+  const [doctorId] = useState("674cc15ca5aeceee59956c0a");
   const [message, setMessage] = useState("");
 
   // Helper function for API calls
@@ -25,28 +25,24 @@ const Dashboard = () => {
     }
   };
 
-// Fetch slots for the selected date
-const fetchSlots = async () => {
-  if (!date) {
-    setSlots([]); // Clear slots if no date is selected
-    return;
-  }
-  try {
-    const data = await apiCall(
-      "http://localhost:3080/slot/appointments",
-      "get",
-      { doctorId, date }
-    );
+  const fetchSlots = async () => {
+    if (!date) {
+      setSlots([]);
+      return;
+    }
+    try {
+      const data = await apiCall(
+        "http://localhost:3080/slot/appointments",
+        "get",
+        { doctorId, date }
+      );
+      setSlots(data.length > 0 ? data : []);
+    } catch (error) {
+      setMessage("No slots available for this date");
+      setSlots([]);
+    }
+  };
 
-    // Update slots; if no data is available, set an empty array
-    setSlots(data.length > 0 ? data : []);
-  } catch (error) {
-    setMessage("No slots available for this date");
-    setSlots([]); // Clear slots on error
-  }
-};
-
-  // Add a new slot
   const handleAddSlot = async (e) => {
     e.preventDefault();
     if (!newSlot) {
@@ -65,13 +61,12 @@ const fetchSlots = async () => {
       });
       setMessage("New slot added successfully!");
       setNewSlot("");
-      fetchSlots(); // Refresh slots after addition
+      fetchSlots();
     } catch (error) {
       setMessage("Error adding new slot. Please try again.");
     }
   };
 
-  // Clear message after a few seconds
   useEffect(() => {
     if (message) {
       const timeout = setTimeout(() => setMessage(""), 3000);
@@ -79,19 +74,20 @@ const fetchSlots = async () => {
     }
   }, [message]);
 
-  // Fetch slots whenever the date changes
   useEffect(() => {
     fetchSlots();
   }, [date]);
 
   return (
     <Layout>
-      <div className="p-6 bg-gray-50">
-        <h1 className="text-3xl font-bold text-gray-500 mb-6">Dashboard</h1>
+      <div className="max-w-5xl mx-auto p-10 bg-gray-100 shadow-2xl rounded-xl">
+        <h1 className="text-5xl font-bold text-gray-800 mb-8 text-center">
+          Doctor Dashboard
+        </h1>
 
         {/* Date Selection */}
-        <div>
-          <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+        <div className="mb-10">
+          <label htmlFor="date" className="block text-lg font-semibold text-gray-700">
             Select Date
           </label>
           <input
@@ -99,41 +95,48 @@ const fetchSlots = async () => {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="border border-gray-300 p-2 rounded w-full mb-4"
+            className="w-full p-4 border border-gray-300 rounded-lg mt-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Available Slots */}
-        <div>
-          <h2 className="text-xl font-semibold">Available Slots</h2>
+        <div className="mb-10">
+          <h2 className="text-3xl font-semibold text-gray-700 mb-4">Available Slots</h2>
           {slots.length > 0 ? (
-            <ul className="mt-4">
+            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {slots.map((slot, index) => (
-                <li key={index} className="flex justify-between py-2">
-                  <span>{slot.time}</span>
-                  <span>{slot.isBooked ? "Booked" : "Available"}</span>
+                <li
+                  key={index}
+                  className={`flex justify-between items-center p-4 rounded-lg shadow-md transition-transform transform hover:scale-105 ${
+                    slot.isBooked
+                      ? "bg-red-50 text-red-700 border border-red-200"
+                      : "bg-green-50 text-green-700 border border-green-200"
+                  }`}
+                >
+                  <span className="text-lg">{slot.time}</span>
+                  <span className="text-sm">{slot.isBooked ? "Booked" : "Available"}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-4">No slots available for the selected date.</p>
+            <p className="text-gray-500 italic">No slots available for the selected date.</p>
           )}
         </div>
 
         {/* Add Slot */}
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold">Add New Slot</h2>
-          <form onSubmit={handleAddSlot} className="flex flex-col gap-4 mt-4">
+        <div className="mb-10">
+          <h2 className="text-3xl font-semibold text-gray-700 mb-4">Add New Slot</h2>
+          <form onSubmit={handleAddSlot} className="flex flex-wrap gap-4">
             <input
               type="time"
               value={newSlot}
               onChange={(e) => setNewSlot(e.target.value)}
-              className="border border-gray-300 p-2 rounded"
+              className="flex-1 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-primary text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition"
             >
               Add Slot
             </button>
@@ -141,7 +144,17 @@ const fetchSlots = async () => {
         </div>
 
         {/* User Feedback */}
-        {message && <p className="text-green-500 mt-4">{message}</p>}
+        {message && (
+          <div
+            className={`mt-6 p-4 rounded-lg text-center shadow-lg ${
+              message.includes("success")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {message}
+          </div>
+        )}
       </div>
     </Layout>
   );

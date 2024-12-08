@@ -53,74 +53,96 @@ const Appointment = () => {
 
   return (
     <Layout>
-    <div className="max-w-4xl mx-auto mt-10 p-4 bg-gray-100 rounded-lg shadow-lg">
-      {docInfo && (
-        <div>
-          {/* Doctor Info */}
-          <div className="doctor-info flex flex-col items-center text-center">
-            <img
-              src={docInfo.image}
-              alt={docInfo.name}
-              className="w-32 h-32 rounded-full object-cover shadow-md"
-            />
-            <h2 className="text-2xl font-semibold mt-4">{docInfo.name}</h2>
-            <p className="text-gray-600">{docInfo.degree} - {docInfo.speciality}</p>
-            <p className="text-gray-700 mt-2">{docInfo.about}</p>
-            <p className="text-indigo-600 font-medium mt-2">
-              Appointment Fee: {currencySymbol} {docInfo.fees}
-            </p>
-          </div>
-
-          {/* Available Dates */}
-          <div className="available-dates mt-8">
-            <h3 className="text-xl font-semibold text-center">Available Dates</h3>
-            <div className="flex flex-wrap justify-center gap-4 mt-4">
-              {availableDates.map((date) => (
-                <button
-                  key={date}
-                  onClick={() => handleDateClick(date)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-                >
-                  {new Date(date).toLocaleDateString("en-US", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </button>
-              ))}
+      <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        {docInfo && (
+          <div>
+            {/* Doctor Info */}
+            <div className="doctor-info flex flex-col items-center text-center bg-gray-50 p-6 rounded-lg shadow-md">
+              <img
+                src={docInfo.image}
+                alt={docInfo.name}
+                className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-primary"
+              />
+              <h2 className="text-2xl font-bold mt-4 text-gray-600">
+                {docInfo.name}
+              </h2>
+              <p className="text-gray-500 mt-2">
+                {docInfo.degree} - {docInfo.speciality}
+              </p>
+              <p className="text-gray-500 mt-2 text-sm">{docInfo.about}</p>
+              <p className="text-primary font-semibold mt-4 text-lg">
+                Appointment Fee: {currencySymbol}
+                {docInfo.fees}
+              </p>
             </div>
-          </div>
 
-          {/* Appointments */}
-          {selectedDate && (
-            <div className="appointments mt-8">
-              <h3 className="text-xl font-semibold text-center">
-                Appointments for {new Date(selectedDate).toLocaleDateString()}
+            {/* Available Dates */}
+            <div className="available-dates mt-10">
+              <h3 className="text-xl font-bold text-gray-800 text-center">
+                Select an Appointment Date
               </h3>
-              <div className="flex flex-col items-center gap-4 mt-4">
-                {appointments.length > 0 ? (
-                  appointments.map((slot) => (
-                    <div
-                      key={slot._id}
-                      className={`p-4 w-full max-w-sm rounded-lg shadow-md ${
-                        slot.isBooked ? "bg-red-200" : "bg-green-200"
-                      }`}
-                    >
-                      <p className="text-gray-700">Time: {slot.time}</p>
-                      <p className={`font-semibold ${slot.isBooked ? "text-red-600" : "text-green-600"}`}>
-                        Status: {slot.isBooked ? "Booked" : "Available"}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600">No appointments available for this date.</p>
-                )}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+                {availableDates.map((date) => (
+                  <button
+                    key={date}
+                    onClick={() => handleDateClick(date)}
+                    className={`py-3 px-4 text-center rounded-lg shadow-lg transition-all ${
+                      selectedDate === date
+                        ? "bg-primary text-white"
+                        : "bg-gray-100 text-gray-800 hover:bg-primary hover:text-white"
+                    }`}
+                  >
+                    {new Date(date).toLocaleDateString("en-US", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </button>
+                ))}
               </div>
             </div>
-          )}
-        </div>
-      )}
-    </div>
+
+            {/* Appointments */}
+            {selectedDate && (
+              <div className="appointments mt-10">
+                <h3 className="text-xl font-bold text-gray-800 text-center">
+                  Appointments for{" "}
+                  {new Date(selectedDate).toLocaleDateString()}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                  {appointments.length > 0 ? (
+                    appointments.map((slot) => (
+                      <div
+                        key={slot._id}
+                        className={`p-6 rounded-lg shadow-lg transition-all ${
+                          slot.isBooked
+                            ? "bg-red-100 border-red-400"
+                            : "bg-green-100 border-green-400"
+                        } border-2`}
+                      >
+                        <p className="text-lg font-medium text-gray-700">
+                          Time: {slot.time}
+                        </p>
+                        <p
+                          className={`text-lg font-bold mt-2 ${
+                            slot.isBooked ? "text-red-600" : "text-green-600"
+                          }`}
+                        >
+                          {slot.isBooked ? "Booked" : "Available"}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-600 text-center col-span-full">
+                      No appointments available for this date.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </Layout>
   );
 };
