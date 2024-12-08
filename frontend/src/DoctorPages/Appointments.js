@@ -2,16 +2,16 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
+import Layout from "../DoctorComponents/Layout";
 
 const Appointment = () => {
-  const { docId ='674cc15ca5aeceee59956c0a'} = useParams(); // Get the doctor ID from the URL
-  const { doctors, currencySymbol } = useContext(AppContext); // Get doctors data and currency
-  const [docInfo, setDocInfo] = useState(null); // Store doctor info
-  const [availableDates, setAvailableDates] = useState([]); // Store available dates
-  const [appointments, setAppointments] = useState([]); // Store appointments for selected date
-  const [selectedDate, setSelectedDate] = useState(null); // Store the selected date
+  const { docId = "674cc15ca5aeceee59956c0a" } = useParams();
+  const { doctors, currencySymbol } = useContext(AppContext);
+  const [docInfo, setDocInfo] = useState(null);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  // Fetch doctor info from the context or API
   useEffect(() => {
     const fetchDoctorInfo = async () => {
       const doc = doctors.find((doc) => doc._id === docId);
@@ -21,14 +21,12 @@ const Appointment = () => {
     fetchDoctorInfo();
   }, [docId, doctors]);
 
-  // Fetch all available dates for the doctor
   useEffect(() => {
     const fetchAvailableDates = async () => {
       try {
         const response = await axios.get(
           `http://localhost:3080/slot/dates?doctorId=${docId}`
         );
-        console.log("Available Dates:", response.data); // Log the data to verify
         setAvailableDates(response.data);
       } catch (error) {
         console.error("Error fetching available dates:", error);
@@ -40,15 +38,13 @@ const Appointment = () => {
     }
   }, [docId]);
 
-  // Handle date click to fetch available slots for that date
   const handleDateClick = async (date) => {
-    setSelectedDate(date); // Set selected date
+    setSelectedDate(date);
 
     try {
       const response = await axios.get(
         `http://localhost:3080/slot/appointments?doctorId=${docId}&date=${date}`
       );
-      console.log("Available Slots for Date:", response.data); // Log the data to verify
       setAppointments(response.data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
@@ -56,51 +52,68 @@ const Appointment = () => {
   };
 
   return (
-    <div>
+    <Layout>
+    <div className="max-w-4xl mx-auto mt-10 p-4 bg-gray-100 rounded-lg shadow-lg">
       {docInfo && (
         <div>
-          <div className="doctor-info">
-            <img src={docInfo.image} alt={docInfo.name} style={{ width: "150px", height: "150px", objectFit: "cover" }}  />
-            <h2>{docInfo.name}</h2>
-            <p>{docInfo.degree} - {docInfo.speciality}</p>
-            <p>{docInfo.about}</p>
-            <p>Appointment fee: {currencySymbol} {docInfo.fees}</p>
+          {/* Doctor Info */}
+          <div className="doctor-info flex flex-col items-center text-center">
+            <img
+              src={docInfo.image}
+              alt={docInfo.name}
+              className="w-32 h-32 rounded-full object-cover shadow-md"
+            />
+            <h2 className="text-2xl font-semibold mt-4">{docInfo.name}</h2>
+            <p className="text-gray-600">{docInfo.degree} - {docInfo.speciality}</p>
+            <p className="text-gray-700 mt-2">{docInfo.about}</p>
+            <p className="text-indigo-600 font-medium mt-2">
+              Appointment Fee: {currencySymbol} {docInfo.fees}
+            </p>
           </div>
 
-          {/* Available Dates Section */}
-          <div className="available-dates">
-            <h3>Available Dates </h3>
-            <div className="dates-list">
+          {/* Available Dates */}
+          <div className="available-dates mt-8">
+            <h3 className="text-xl font-semibold text-center">Available Dates</h3>
+            <div className="flex flex-wrap justify-center gap-4 mt-4">
               {availableDates.map((date) => (
                 <button
                   key={date}
                   onClick={() => handleDateClick(date)}
-                  className="date-button"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
                 >
                   {new Date(date).toLocaleDateString("en-US", {
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                })}
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Appointments for the selected date */}
+          {/* Appointments */}
           {selectedDate && (
-            <div className="appointments-list">
-              <h3>Appointments for {new Date(selectedDate).toLocaleDateString()}</h3>
-              <div className="appointments">
+            <div className="appointments mt-8">
+              <h3 className="text-xl font-semibold text-center">
+                Appointments for {new Date(selectedDate).toLocaleDateString()}
+              </h3>
+              <div className="flex flex-col items-center gap-4 mt-4">
                 {appointments.length > 0 ? (
                   appointments.map((slot) => (
-                    <div key={slot._id} className="appointment">
-                      <p>Time: {slot.time}</p>
-                      <p>Status: {slot.isBooked ? "Booked" : "Available"}</p>
+                    <div
+                      key={slot._id}
+                      className={`p-4 w-full max-w-sm rounded-lg shadow-md ${
+                        slot.isBooked ? "bg-red-200" : "bg-green-200"
+                      }`}
+                    >
+                      <p className="text-gray-700">Time: {slot.time}</p>
+                      <p className={`font-semibold ${slot.isBooked ? "text-red-600" : "text-green-600"}`}>
+                        Status: {slot.isBooked ? "Booked" : "Available"}
+                      </p>
                     </div>
                   ))
                 ) : (
-                  <p>No appointments available for this date.</p>
+                  <p className="text-gray-600">No appointments available for this date.</p>
                 )}
               </div>
             </div>
@@ -108,6 +121,7 @@ const Appointment = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

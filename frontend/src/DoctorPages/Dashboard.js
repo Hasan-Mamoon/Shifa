@@ -14,7 +14,7 @@ const Dashboard = () => {
   const fetchSlots = async () => {
     if (!date) return;
     try {
-      const response = await axios.get(`http://localhost:3080/slot/all?doctorId=${doctorId}&date=${date}`);
+      const response = await axios.get(`http://localhost:3080/slot/appointments?doctorId=${doctorId}&date=${date}`);
       setSlots(response.data);
     } catch (error) {
       console.error("Error fetching slots:", error);
