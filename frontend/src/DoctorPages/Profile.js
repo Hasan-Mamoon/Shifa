@@ -262,13 +262,13 @@ const Profile = () => {
             <div className="mt-6 flex justify-end space-x-4">
               <button
                 onClick={toggleEditMode}
-                className="px-6 py-3 bg-gray-400 text-white rounded-lg shadow-md hover:bg-gray-500 transition"
+                className="px-6 py-3 bg-gray-400 text-white rounded-full shadow-md hover:bg-gray-500 transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
+                className="px-6 py-3 bg-blue-600 text-white rounded-full shadow-md hover:bg-primary transition"
               >
                 Save Changes
               </button>
