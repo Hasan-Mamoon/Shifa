@@ -6,60 +6,82 @@ const Dashboard = () => {
   const [slots, setSlots] = useState([]);
   const [date, setDate] = useState("");
   const [newSlot, setNewSlot] = useState("");
-  const [updateSlot, setUpdateSlot] = useState({ oldTime: "", newTime: "" });
   const [doctorId] = useState("674cc15ca5aeceee59956c0a"); // Replace with actual doctor ID
   const [message, setMessage] = useState("");
 
-  // Fetch all slots for the doctor
-  const fetchSlots = async () => {
-    if (!date) return;
+  // Helper function for API calls
+  const apiCall = async (url, method, data = {}) => {
     try {
-      const response = await axios.get(`http://localhost:3080/slot/appointments?doctorId=${doctorId}&date=${date}`);
-      setSlots(response.data);
+      const response = await axios({
+        url,
+        method,
+        data,
+        params: method === "get" ? data : {},
+      });
+      return response.data;
     } catch (error) {
-      console.error("Error fetching slots:", error);
+      console.error(`Error with ${method.toUpperCase()} ${url}:`, error);
+      throw error;
     }
   };
 
-  // Handle adding a new slot
+// Fetch slots for the selected date
+const fetchSlots = async () => {
+  if (!date) {
+    setSlots([]); // Clear slots if no date is selected
+    return;
+  }
+  try {
+    const data = await apiCall(
+      "http://localhost:3080/slot/appointments",
+      "get",
+      { doctorId, date }
+    );
+
+    // Update slots; if no data is available, set an empty array
+    setSlots(data.length > 0 ? data : []);
+  } catch (error) {
+    setMessage("No slots available for this date");
+    setSlots([]); // Clear slots on error
+  }
+};
+
+  // Add a new slot
   const handleAddSlot = async (e) => {
     e.preventDefault();
+    if (!newSlot) {
+      setMessage("Please enter a valid time for the new slot.");
+      return;
+    }
+    if (slots.some((slot) => slot.time === newSlot)) {
+      setMessage("This slot is already added.");
+      return;
+    }
     try {
-      await axios.post("http://localhost:3080/slot/add", {
+      await apiCall("http://localhost:3080/slot/add", "post", {
         doctorId,
         date,
-        slots: [newSlot],
+        slots: [...slots.map((slot) => slot.time), newSlot],
       });
       setMessage("New slot added successfully!");
-      fetchSlots(); // Refresh slots after adding
       setNewSlot("");
+      fetchSlots(); // Refresh slots after addition
     } catch (error) {
-      console.error("Error adding slot:", error);
-      setMessage("Error adding slot");
+      setMessage("Error adding new slot. Please try again.");
     }
   };
 
-  // Handle updating an existing slot
-  const handleUpdateSlot = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put("http://localhost:3080/slot/update", {
-        doctorId,
-        date,
-        oldTime: updateSlot.oldTime,
-        newTime: updateSlot.newTime,
-      });
-      setMessage("Slot updated successfully!");
-      fetchSlots(); // Refresh slots after updating
-      setUpdateSlot({ oldTime: "", newTime: "" });
-    } catch (error) {
-      console.error("Error updating slot:", error);
-      setMessage("Error updating slot");
-    }
-  };
-
+  // Clear message after a few seconds
   useEffect(() => {
-    fetchSlots(); // Fetch slots whenever date changes
+    if (message) {
+      const timeout = setTimeout(() => setMessage(""), 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [message]);
+
+  // Fetch slots whenever the date changes
+  useEffect(() => {
+    fetchSlots();
   }, [date]);
 
   return (
@@ -67,6 +89,7 @@ const Dashboard = () => {
       <div className="p-6 bg-gray-50">
         <h1 className="text-3xl font-bold text-gray-500 mb-6">Dashboard</h1>
 
+        {/* Date Selection */}
         <div>
           <label htmlFor="date" className="block text-sm font-medium text-gray-700">
             Select Date
@@ -80,6 +103,7 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* Available Slots */}
         <div>
           <h2 className="text-xl font-semibold">Available Slots</h2>
           {slots.length > 0 ? (
@@ -96,6 +120,7 @@ const Dashboard = () => {
           )}
         </div>
 
+        {/* Add Slot */}
         <div className="mt-6">
           <h2 className="text-xl font-semibold">Add New Slot</h2>
           <form onSubmit={handleAddSlot} className="flex flex-col gap-4 mt-4">
@@ -115,34 +140,7 @@ const Dashboard = () => {
           </form>
         </div>
 
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold">Update Existing Slot</h2>
-          <form onSubmit={handleUpdateSlot} className="flex flex-col gap-4 mt-4">
-            <input
-              type="time"
-              placeholder="Old Slot Time"
-              value={updateSlot.oldTime}
-              onChange={(e) => setUpdateSlot({ ...updateSlot, oldTime: e.target.value })}
-              className="border border-gray-300 p-2 rounded"
-              required
-            />
-            <input
-              type="time"
-              placeholder="New Slot Time"
-              value={updateSlot.newTime}
-              onChange={(e) => setUpdateSlot({ ...updateSlot, newTime: e.target.value })}
-              className="border border-gray-300 p-2 rounded"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Update Slot
-            </button>
-          </form>
-        </div>
-
+        {/* User Feedback */}
         {message && <p className="text-green-500 mt-4">{message}</p>}
       </div>
     </Layout>

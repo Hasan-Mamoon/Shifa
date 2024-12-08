@@ -3,25 +3,42 @@ import express from "express";
 import { slotModel } from "../models/timeslots.js";
 
 const router = express.Router();
-
 router.post("/add", async (req, res) => {
-    const { doctorId, date, slots } = req.body;
-  
-    try {
+  const { doctorId, date, slots } = req.body;
+
+  try {
+    // Check if a record already exists for the doctor and date
+    const existingRecord = await slotModel.findOne({ doctorId, date });
+
+    if (existingRecord) {
+      // Add new slots to the existing record
+      const newSlots = slots.map((slot) => ({ time: slot }));
+      const updatedSlots = [
+        ...existingRecord.slots,
+        ...newSlots.filter(
+          (newSlot) =>
+            !existingRecord.slots.some((existingSlot) => existingSlot.time === newSlot.time)
+        ),
+      ];
+      existingRecord.slots = updatedSlots;
+      await existingRecord.save();
+      res.status(200).json({ message: "Slots updated successfully!" });
+    } else {
+      // Create a new record if it doesn't exist
       const newSlots = new slotModel({
         doctorId,
         date,
-        slots: slots.map(slot => ({ time: slot }))
+        slots: slots.map((slot) => ({ time: slot })),
       });
-  
       await newSlots.save();
       res.status(201).json({ message: "Slots added successfully!" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Error adding slots", error: err.message });
     }
-  });
-  
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error adding slots", error: err.message });
+  }
+});
+
 
   router.post("/book", async (req, res) => {
     const { doctorId, date, time, patientEmail } = req.body;
