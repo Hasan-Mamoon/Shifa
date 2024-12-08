@@ -148,6 +148,7 @@ router.post("/add-patient", upload.single("image"), async (req, res) => {
   
       // Handle optional image upload
       if (req.file) {
+        // Generate a random image name
         imageName = randomImageName();
   
         // Resize the image using sharp
@@ -191,6 +192,8 @@ router.post("/add-patient", upload.single("image"), async (req, res) => {
       return res.status(500).json({ message: "Error updating patient", error: err });
     }
   });
+  
+  
   
   router.delete("/:email", async (req, res) => {
     try {

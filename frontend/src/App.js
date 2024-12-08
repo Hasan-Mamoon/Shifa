@@ -29,7 +29,7 @@ import Profile from "./DoctorPages/Profile";
 const App = () => {
   return (
      <div className="mx-4 sm:mx-[10%]">
-     {/* <Navbar />
+     <Navbar />
      <Routes>
        <Route path="/" element={<Home />}></Route>
        <Route path="/doctors" element={<Doctors />}></Route>
@@ -42,18 +42,18 @@ const App = () => {
        <Route path="/appointment/:docId" element={<Appointment />}></Route>
       </Routes>
 
-     <Footer /> */}
+     <Footer />
 
 
 
-
+{/* 
       <DoctorNavbar/>
       
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/docAppointments" element={<Appointments />} />
         <Route path="/docProfile" element={<Profile />} />
-      </Routes>  
+      </Routes>   */}
 
 
 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { assets } from "../assets/assets";
@@ -21,24 +20,36 @@ const MyProfile = () => {
     }
   };
 
-  // Update user data
+  // Handle the image change when a new file is selected
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUserData((prev) => ({ ...prev, image: file }));  // Update state with the file
+      setImagePreview(URL.createObjectURL(file));  // Preview image
+    }
+  };
+  // Update user data, including the image
   const updateUserData = async () => {
     try {
       const formData = new FormData();
+      
+      // Add user data to FormData
       Object.entries(userData).forEach(([key, value]) => {
         if (key === "address") {
           formData.append("address[line1]", value.line1 || "");
           formData.append("address[line2]", value.line2 || "");
-        } else {
-          formData.append(key, value);
+        } else if (key !== "image") {
+          formData.append(key, value);  // Don't include image here yet
         }
       });
-
+  
+      // If a new image is selected, append it to FormData
       if (userData.image instanceof File) {
-        formData.append("image", userData.image);
+        formData.append("image", userData.image);  // Add image as file
       }
-
-      await axios.put(`http://localhost:3080/patient/update/${userData.email}`, formData, {
+  
+      // Send the updated data to the backend
+      await axios.put(`http://localhost:3080/patient/edit-patient/${userData.email}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setIsEdit(false);
@@ -47,7 +58,6 @@ const MyProfile = () => {
       console.error("Error updating user data:", error);
     }
   };
-
   const handleInputChange = (field, value) => {
     setUserData((prev) => ({ ...prev, [field]: value }));
   };
@@ -57,14 +67,6 @@ const MyProfile = () => {
       ...prev,
       address: { ...prev.address, [field]: value },
     }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUserData((prev) => ({ ...prev, image: file }));
-      setImagePreview(URL.createObjectURL(file));
-    }
   };
 
   const cancelEdit = () => {
@@ -120,7 +122,6 @@ const MyProfile = () => {
             <p className="text-neutral-500 underline mt-3">CONTACT INFORMATION</p>
             <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700">
               <p className="font-medium">Email id:</p>
-              {console.log(userData.email)}
               <p className="text-blue-500">{userData.email}</p>
               <p className="font-medium">Phone:</p>
               {isEdit ? (
