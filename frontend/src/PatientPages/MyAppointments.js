@@ -1,8 +1,6 @@
-
-
 import React, { useEffect, useState } from "react";
 
-const MyAppointments = ({ userId='675033864d1158e5c2b3e4e0' }) => {
+const MyAppointments = ({ userId = '675033864d1158e5c2b3e4e0' }) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,7 +9,7 @@ const MyAppointments = ({ userId='675033864d1158e5c2b3e4e0' }) => {
       const response = await fetch(`http://localhost:3080/appointment/appointments?userId=${userId}`);
       const data = await response.json();
 
-      console.log("appoint: ", data)
+      console.log("appointments: ", data);
 
       if (!response.ok) {
         console.error("Error fetching appointments:", data.message);
@@ -44,41 +42,40 @@ const MyAppointments = ({ userId='675033864d1158e5c2b3e4e0' }) => {
         My Appointments
       </p>
       <div>
-        {appointments.map((appointment) => (
-          <div
-            className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
-            key={appointment._id}
-          >
-            <div>
-              <img
-                className="w-32 bg-indigo-50"
-                src={appointment.doctorId.image}
-                alt={appointment.doctorId.name}
-              />
+        {appointments.map((appointment) => {
+          // Handle invalid or missing doctor image URL without encoding
+          const imageUrl = appointment.doctorId.image || ''; // No decodeURIComponent
+
+          // Fallback image if the doctor image URL is unavailable or invalid
+          const maxImageUrlLength = 1024;
+          const finalImageUrl = imageUrl && imageUrl.length <= maxImageUrlLength 
+            ? imageUrl 
+            : '/path/to/default/image.jpg'; // Replace with your fallback image path
+
+          return (
+            <div
+              className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
+              key={appointment._id}
+            >
+              <div>
+                {/* Display the image with fallback to a default image */}
+                <img 
+                  src={finalImageUrl} 
+                  alt={appointment.doctorId.name} 
+                  style={{ width: '100px', height: '100px', borderRadius: '50%' }} 
+                />
+              </div>
+              <div className="flex-1 text-sm text-zinc-600">
+                <p className="text-neutral-800 font-semibold">{appointment.doctorId.name}</p>
+                <p>{appointment.doctorId.speciality}</p>
+                <p className="text-zinc-700 font-medium mt-1">Address:</p>
+                <p className="text-xs">{appointment.doctorId.address?.line1}</p>
+                <p className="text-xs">{appointment.doctorId.address?.line2}</p>
+                {/* Add other appointment details here */}
+              </div>
             </div>
-            <div className="flex-1 text-sm text-zinc-600">
-              <p className="text-neutal-800 font-semibold">{appointment.doctorId.name}</p>
-              <p>{appointment.doctorId.speciality}</p>
-              <p className="text-zinc-700 font-medium mt-1">Address:</p>
-              <p className="text-xs">{appointment.doctorId.address?.line1}</p>
-              <p className="text-xs">{appointment.doctorId.address?.line2}</p>
-              <p className="text-xs mt-1">
-                <span className="text-sm text-netural-700 font-medium">
-                  Date & Time:
-                </span>{" "}
-                {appointment.date} at {appointment.time}
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 justify-end">
-              <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300">
-                Pay Online
-              </button>
-              <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300">
-                Cancel Appointment
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -179,23 +179,161 @@ router.get("/:speciality", async (req, res) => {
   }
 });
 
+// router.put("/update/:email", async (req, res) => {
+//   try {
+//     const { email } = req.params; // Get the email from route parameters
+//     const {
+//       name,
+//       image,
+//       speciality,
+//       degree,
+//       experience,
+//       about,
+//       fees,
+//       address,
+//     } = req.body;
+
+//     const updatedData = {
+//       name,
+//       image, // Assuming image is a URL or file path, otherwise handle separately
+//       speciality,
+//       degree,
+//       experience,
+//       about,
+//       fees,
+//       address,
+//     };
+
+//     // Remove undefined or null fields to prevent updating with empty values
+//     Object.keys(updatedData).forEach((key) => {
+//       if (updatedData[key] === undefined || updatedData[key] === null) {
+//         delete updatedData[key];
+//       }
+//     });
+
+//     // Update the doctor information using email as the unique identifier
+//     const updatedDoctor = await doctormodel.findOneAndUpdate(
+//       { email }, // Search for the doctor by email
+//       updatedData, // Fields to update
+//       { new: true, runValidators: true } // Return the updated document, and validate updated data
+//     );
+
+//     if (!updatedDoctor) {
+//       return res.status(404).json({ message: "Doctor not found" });
+//     }
+
+//     return res
+//       .status(200)
+//       .json({ message: "Doctor updated successfully", doctor: updatedDoctor });
+//   } catch (err) {
+//     console.error(err);
+//     return res
+//       .status(500)
+//       .json({ message: "Error updating doctor", error: err.message });
+//   }
+// });
+
+
+// router.put("/update/:email", async (req, res) => {
+//   try {
+//     const { email } = req.params;
+//     const {
+//       name,
+//       image, // image can be a URL or file name
+//       speciality,
+//       degree,
+//       experience,
+//       about,
+//       fees,
+//       address,
+//     } = req.body;
+
+//     const updatedData = {
+//       name,
+//       speciality,
+//       degree,
+//       experience,
+//       about,
+//       fees,
+//       address,
+//     };
+
+//     // Only update the image if it's present
+//     if (image) {
+//       updatedData.image = image;
+//     }
+
+//     // Remove undefined or null fields
+//     Object.keys(updatedData).forEach((key) => {
+//       if (updatedData[key] === undefined || updatedData[key] === null) {
+//         delete updatedData[key];
+//       }
+//     });
+
+//     console.log("Address update hua wa:",updatedData.address);
+
+//     const updatedDoctor = await doctormodel.findOneAndUpdate(
+//       { email },
+//       updatedData,
+//       { new: true, runValidators: true }
+//     );
+
+//     if (!updatedDoctor) {
+//       return res.status(404).json({ message: "Doctor not found" });
+//     }
+
+//     return res.status(200).json({ message: "Doctor updated successfully", doctor: updatedDoctor });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ message: "Error updating doctor", error: err.message });
+//   }
+// });
+
+
+// router.delete("/:email", async (req, res) => {
+//   try {
+//     const { email } = req.params;
+
+//     if (!email) {
+//       return res.status(400).json({ message: "Email is required" });
+//     }
+
+//     const doctorToDelete = await doctormodel.find({ email });
+
+
+//     if (!doctorToDelete) {
+//       return res.status(404).json({ message: "Doctor not found" });
+//     }
+    
+//     const params = {
+//       Bucket: bucketName,
+//       Key:doctorToDelete[0].image
+//     }
+
+//     const command = new DeleteObjectCommand(params)
+//     await s3.send(command)
+
+//     const deletedDoctor = await doctormodel.findOneAndDelete({ email });
+
+
+//     return res
+//       .status(200)
+//       .json({ message: "Doctor deleted successfully", doctor: deletedDoctor });
+//   } catch (err) {
+//     console.error(err);
+//     return res
+//       .status(500)
+//       .json({ message: "Error deleting doctor", error: err.message });
+//   }
+// });
+
 router.put("/update/:email", async (req, res) => {
   try {
-    const { email } = req.params; // Get the email from route parameters
-    const {
-      name,
-      image,
-      speciality,
-      degree,
-      experience,
-      about,
-      fees,
-      address,
-    } = req.body;
+    const { email } = req.params;
+    const { name, image, speciality, degree, experience, about, fees, address } = req.body;
 
     const updatedData = {
       name,
-      image,
       speciality,
       degree,
       experience,
@@ -204,70 +342,34 @@ router.put("/update/:email", async (req, res) => {
       address,
     };
 
-    // Remove undefined or null fields to prevent updating with empty values
-    // Object.keys(updatedData).forEach((key) => {
-    //   if (updatedData[key] === undefined || updatedData[key] === null) {
-    //     delete updatedData[key];
-    //   }
-    // });
+    if (image) {
+      updatedData.image = image; // Only update if image is present
+    }
+
+    // Remove undefined or null fields
+    Object.keys(updatedData).forEach((key) => {
+      if (updatedData[key] === undefined || updatedData[key] === null) {
+        delete updatedData[key];
+      }
+    });
 
     const updatedDoctor = await doctormodel.findOneAndUpdate(
-      { email }, // Search for the doctor by email
-      updatedData, // Fields to update
-      { new: true } // Return the updated document
+      { email },
+      updatedData,
+      { new: true, runValidators: true }
     );
 
     if (!updatedDoctor) {
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Doctor updated successfully", doctor: updatedDoctor });
+    return res.status(200).json({ message: "Doctor updated successfully", doctor: updatedDoctor });
   } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Error updating doctor", error: err.message });
+    return res.status(500).json({ message: "Error updating doctor", error: err.message });
   }
 });
 
-router.delete("/:email", async (req, res) => {
-  try {
-    const { email } = req.params;
-
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
-    const doctorToDelete = await doctormodel.find({ email });
-
-
-    if (!doctorToDelete) {
-      return res.status(404).json({ message: "Doctor not found" });
-    }
-    
-    const params = {
-      Bucket: bucketName,
-      Key:doctorToDelete[0].image
-    }
-
-    const command = new DeleteObjectCommand(params)
-    await s3.send(command)
-
-    const deletedDoctor = await doctormodel.findOneAndDelete({ email });
-
-
-    return res
-      .status(200)
-      .json({ message: "Doctor deleted successfully", doctor: deletedDoctor });
-  } catch (err) {
-    console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Error deleting doctor", error: err.message });
-  }
-});
 
 
 router.put("/update/:id", async (req, res) => {
@@ -322,5 +424,6 @@ router.put("/update/:id", async (req, res) => {
       .json({ message: "Error updating doctor", error: err.message });
   }
 });
+
 
 export { router as doctorRouter };
