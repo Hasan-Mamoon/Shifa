@@ -20,6 +20,7 @@ import DoctorSidebar from './DoctorComponents/DoctorSidebar'
 import Dashboard from "./DoctorPages/Dashboard"
 import Appointments from "./DoctorPages/Appointments";
 import Profile from "./DoctorPages/Profile";
+import Signup from "./PatientPages/Signup";
 
 
 
@@ -29,9 +30,11 @@ import Profile from "./DoctorPages/Profile";
 const App = () => {
   return (
      <div className="mx-4 sm:mx-[10%]">
-     {/* <Navbar />
+     <Navbar />
      <Routes>
-       <Route path="/" element={<Home />}></Route>
+
+       <Route path="/" element={<Signup />}></Route>
+       <Route path="/dashboard" element={<Home />}></Route>
        <Route path="/doctors" element={<Doctors />}></Route>
        <Route path="/doctors/:speciality" element={<Doctors />}></Route>
        <Route path="/login" element={<Login />}></Route>
@@ -42,12 +45,12 @@ const App = () => {
        <Route path="/appointment/:docId" element={<Appointment />}></Route>
       </Routes>
 
-     <Footer /> */}
+     <Footer /> 
 
 
 
 
-      <DoctorNavbar/>
+      {/* <DoctorNavbar/>
       
       <Routes>
         <Route path="/" element={<Dashboard />} />
@@ -55,7 +58,7 @@ const App = () => {
         <Route path="/docProfile" element={<Profile />} />
       </Routes>  
 
-
+*/}
 
       
     </div>

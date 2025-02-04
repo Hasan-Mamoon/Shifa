@@ -1,5 +1,7 @@
 import express from "express";
 import multer from "multer";
+
+import bcrypt from "bcryptjs";
 import sharp from "sharp";
 import crypto from "crypto";
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand  } from "@aws-sdk/client-s3";
@@ -25,25 +27,21 @@ const s3 = new S3Client({
 
 const randomImageName = (bytes =32)=> crypto.randomBytes(bytes).toString('hex') 
 
-
 router.post("/add-patient", upload.single("image"), async (req, res) => {
-  let address1 = req.body.address;
+  const { name, email, phone, gender, medicalHistory, address, dob, password } = req.body;
 
-  // if (typeof address === "string") {
-  //   address = JSON.parse(address);
-  // }
-  if (typeof address1 === "string") {
-    try {
-      address1 = JSON.parse(address1);
-    } catch (error) {
-      return res.status(400).json({ message: "Invalid address format" });
-    }
+  if (!name || !email || !phone || !dob || !address || !address.line1 || !address.line2 || !password) {
+    return res.status(400).json({ message: "Missing required fields" });
   }
-  console.log("req.body",req.body)
-  console.log("req.file",req.file)
 
-  const imageName = randomImageName()
-  const buffer = await sharp(req.file.buffer).resize({height:144,width:144,fit:"contain"}).toBuffer()
+  const existingPatient = await patientModel.findOne({ email });
+  if (existingPatient) {
+    return res.status(400).json({ message: "Email is already registered" });
+  }
+
+  const imageName = randomImageName();
+  const buffer = await sharp(req.file.buffer).resize({ height: 144, width: 144, fit: "contain" }).toBuffer();
+
   const params = {
     Bucket: bucketName,
     Key: imageName,
@@ -52,37 +50,120 @@ router.post("/add-patient", upload.single("image"), async (req, res) => {
   };
 
   const command = new PutObjectCommand(params);
-  await s3.send(command);
 
-  try{
-
-    const { email, name, gender, dob, phone, age, medicalHistory } = req.body;
+  try {
+    await s3.send(command);
 
     const newPatient = new patientModel({
-      email,
       name,
-      gender,
-      dob,
+      email,
       phone,
-      age,
-      image: imageName, // Save the image name or URL
-      address:address1,
-      medicalHistory
+      gender,
+      medicalHistory,
+      address,
+      dob,
+      image: imageName,
+      password,  // Add password to the new patient document
     });
 
     const savedPatient = await newPatient.save();
-
-    return res
-      .status(201)
-      .json({ message: "Patient added successfully", patient: savedPatient });
-  }
-
-    
-  catch (err) {
+    return res.status(201).json({ message: "Patient added successfully", patient: savedPatient });
+  } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error adding patient", error: err });
+    return res.status(500).json({ message: "Error adding patient", error: err.message });
   }
 });
+
+
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
+
+  try {
+    const patient = await patientModel.findOne({ email });
+
+    if (!patient) {
+      return res.status(400).json({ message: "Email not registered" });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, patient.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
+
+    // Generate a token (for example, using JWT) and send back to the client
+    const token = "generated_token_here"; // Replace with actual token generation logic
+    return res.status(200).json({ message: "Login successful", token });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Error logging in", error: err.message });
+  }
+});
+
+
+
+
+// router.post("/add-patient", upload.single("image"), async (req, res) => {
+//   let address1 = req.body.address;
+
+//   // if (typeof address === "string") {
+//   //   address = JSON.parse(address);
+//   // }
+//   if (typeof address1 === "string") {
+//     try {
+//       address1 = JSON.parse(address1);
+//     } catch (error) {
+//       return res.status(400).json({ message: "Invalid address format" });
+//     }
+//   }
+//   console.log("req.body",req.body)
+//   console.log("req.file",req.file)
+
+//   const imageName = randomImageName()
+//   const buffer = await sharp(req.file.buffer).resize({height:144,width:144,fit:"contain"}).toBuffer()
+//   const params = {
+//     Bucket: bucketName,
+//     Key: imageName,
+//     Body: buffer,
+//     ContentType: req.file.mimetype,
+//   };
+
+//   const command = new PutObjectCommand(params);
+//   await s3.send(command);
+
+//   try{
+
+//     const { email, name, gender, dob, phone, age, medicalHistory } = req.body;
+
+//     const newPatient = new patientModel({
+//       email,
+//       name,
+//       gender,
+//       dob,
+//       phone,
+//       age,
+//       image: imageName, // Save the image name or URL
+//       address:address1,
+//       medicalHistory
+//     });
+
+//     const savedPatient = await newPatient.save();
+
+//     return res
+//       .status(201)
+//       .json({ message: "Patient added successfully", patient: savedPatient });
+//   }
+
+    
+//   catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ message: "Error adding patient", error: err });
+//   }
+// });
 
   router.get("/:email", async (req, res) => {
     try {

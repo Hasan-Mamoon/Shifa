@@ -6,7 +6,7 @@ const MyProfile = () => {
   const [userData, setUserData] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [imagePreview, setImagePreview] = useState(null); // Preview for image editing
-  const email = "ali@gmail.com"; // Replace with the actual email of the logged-in patient
+  const email = localStorage.getItem("userEmail");  // Replace with the actual email of the logged-in patient
 
   // Fetch user data from the backend
   const fetchUserData = async () => {
