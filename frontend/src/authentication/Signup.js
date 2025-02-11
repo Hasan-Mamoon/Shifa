@@ -1,0 +1,308 @@
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+
+const Signup = () => {
+  const [userType, setUserType] = useState("patient");
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    phone: "",
+    gender: "Male",
+    medicalHistory: "",
+    address: { line1: "", line2: "" },
+    dob: "",
+    speciality: "",
+    experience: "",
+    about: "",
+    fees: "",
+    degree: null,
+    image: null,
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name.startsWith("address.")) {
+      const field = name.split(".")[1];
+      setFormData((prevData) => ({
+        ...prevData,
+        address: { ...prevData.address, [field]: value },
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleFileChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.files[0],
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (
+      !formData.email ||
+      !formData.password ||
+      !formData.name ||
+      !formData.image ||
+      !formData.address.line1 ||
+      !formData.address.line2
+    ) {
+      setError("Please fill all required fields.");
+      return;
+    }
+
+    if (
+      userType === "doctor" &&
+      (!formData.speciality ||
+        !formData.degree ||
+        !formData.experience ||
+        !formData.about ||
+        !formData.fees)
+    ) {
+      setError("Please fill all required fields for doctor signup.");
+      return;
+    }
+
+    const form = new FormData();
+
+    form.append("email", formData.email);
+    form.append("password", formData.password);
+    form.append("name", formData.name);
+    form.append("image", formData.image);
+
+    form.append("address[line1]", formData.address.line1);
+    form.append("address[line2]", formData.address.line2);
+
+    if (userType === "patient") {
+      form.append("phone", formData.phone);
+      form.append("gender", formData.gender);
+      form.append("medicalHistory", formData.medicalHistory);
+      form.append("dob", formData.dob);
+    }
+
+    if (userType === "doctor") {
+      form.append("speciality", formData.speciality);
+      form.append("experience", formData.experience);
+      form.append("about", formData.about);
+      form.append("fees", formData.fees);
+      form.append("degree", formData.degree);
+    }
+
+    try {
+      const url =
+        userType === "doctor"
+          ? "http://localhost:3080/doctor/add-doctor"
+          : "http://localhost:3080/patient/add-patient";
+
+      await axios.post(url, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert(
+        `${
+          userType.charAt(0).toUpperCase() + userType.slice(1)
+        } registered successfully`
+      );
+
+      navigate("/login");
+    } catch (error) {
+      setError(`Error registering ${userType}. Please try again.`);
+    }
+  };
+
+  return (
+    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        {userType === "doctor" ? "Doctor" : "Patient"} Signup
+      </h2>
+      {error && <p className="text-red-500 text-center">{error}</p>}
+
+      <select
+        className="w-full p-2 border rounded mb-4"
+        value={userType}
+        onChange={(e) => setUserType(e.target.value)}
+      >
+        <option value="patient">Patient Signup</option>
+        <option value="doctor">Doctor Signup</option>
+      </select>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded"
+        />
+
+        <input
+          type="text"
+          name="address.line1"
+          placeholder="Address Line 1"
+          value={formData.address.line1}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          name="address.line2"
+          placeholder="Address Line 2"
+          value={formData.address.line2}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded"
+        />
+
+        {userType === "patient" && (
+          <>
+            <input
+              type="text"
+              name="phone"
+              placeholder="Phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            />
+
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <input
+              type="text"
+              name="medicalHistory"
+              placeholder="Medical History"
+              value={formData.medicalHistory}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="date"
+              name="dob"
+              value={formData.dob}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            />
+          </>
+        )}
+
+        {userType === "doctor" && (
+          <>
+            <input
+              type="text"
+              name="speciality"
+              placeholder="Speciality"
+              value={formData.speciality}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="experience"
+              placeholder="Experience (years)"
+              value={formData.experience}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            />
+            <textarea
+              name="about"
+              placeholder="About Yourself"
+              value={formData.about}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="number"
+              name="fees"
+              placeholder="Consultation Fees"
+              value={formData.fees}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="file"
+              name="degree"
+              accept=".pdf,.jpg,.png"
+              onChange={handleFileChange}
+              required
+              className="w-full p-2 border rounded"
+            />
+          </>
+        )}
+
+        <input
+          type="file"
+          name="image"
+          accept="image/*"
+          onChange={handleFileChange}
+          required
+          className="w-full p-2 border rounded"
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
+          Register
+        </button>
+      </form>
+      <p className="text-center mt-4">
+        Already have an account?{" "}
+        <Link to="/login" className="text-blue-600 underline">
+          Login here
+        </Link>
+      </p>
+    </div>
+  );
+};
+
+export default Signup;

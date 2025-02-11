@@ -1,16 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AppContext } from "../context/AppContext"; // Import AppContext
+import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 const Doctors = () => {
-  const { speciality } = useParams(); // Get speciality from URL
+  const { speciality } = useParams();
   const navigate = useNavigate();
-  const { doctors } = useContext(AppContext); // Get doctors data from context
-  const [filterDoc, setFilterDoc] = useState([]); // State for filtered doctors
-  const [showFilter, setShowFilter] = useState(false); // Toggle filter visibility
+  const { doctors } = useContext(AppContext);
+  const [filterDoc, setFilterDoc] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
 
-  // Apply filter based on speciality
   const applyFilter = () => {
     if (speciality) {
       setFilterDoc(doctors.filter((doc) => doc.speciality === speciality));
@@ -19,7 +18,6 @@ const Doctors = () => {
     }
   };
 
-  // Apply filter whenever doctors or speciality changes
   useEffect(() => {
     applyFilter();
   }, [doctors, speciality]);

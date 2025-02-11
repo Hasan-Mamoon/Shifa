@@ -1,66 +1,48 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
-import Home from "./PatientPages/Home";
-import Login from "./PatientPages/Login";
-import Doctors from "./PatientPages/Doctors";
-import MyAppointments from "./PatientPages/MyAppointments";
-import Contact from "./PatientPages/Contact";
-import About from "./PatientPages/About";
-import MyProfile from "./PatientPages/MyProfile";
-import Appointment from "./PatientPages/Appointment";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import Navbar from "./PatientComponents/Navbar";
 import Footer from "./PatientComponents/Footer";
-
-
-
-
-
-import DoctorNavbar from "./DoctorComponents/DoctorNavbar"
-import DoctorSidebar from './DoctorComponents/DoctorSidebar'
-import Dashboard from "./DoctorPages/Dashboard"
-import Appointments from "./DoctorPages/Appointments";
-import Profile from "./DoctorPages/Profile";
-import Signup from "./PatientPages/Signup";
-
-
-
-
-
+import DoctorNavbar from "./DoctorComponents/DoctorNavbar";
+import Login from "./authentication/Login";
+import Signup from "./authentication/Signup";
+import { useAuth } from "../src/context/AuthContext";
+import PatientRoutes from "./routes/PatientRoutes";
+import DoctorRoutes from "./routes/DoctorRoutes";
 
 const App = () => {
-  return (
-     <div className="mx-4 sm:mx-[10%]">
-     <Navbar />
-     <Routes>
+  const location = useLocation();
+  const { user } = useAuth();
 
-       <Route path="/" element={<Signup />}></Route>
-       <Route path="/dashboard" element={<Home />}></Route>
-       <Route path="/doctors" element={<Doctors />}></Route>
-       <Route path="/doctors/:speciality" element={<Doctors />}></Route>
-       <Route path="/login" element={<Login />}></Route>
-       <Route path="/about" element={<About />}></Route>
-       <Route path="/contact" element={<Contact />}></Route>
-       <Route path="/my-profile" element={<MyProfile />}></Route>
-       <Route path="/my-appointments" element={<MyAppointments />}></Route>
-       <Route path="/appointment/:docId" element={<Appointment />}></Route>
+  const hideNavbarFooter = ["/login", "/signup"].includes(location.pathname);
+
+  const isDoctorRoute = location.pathname.startsWith("/doctor/");
+
+  return (
+    <div className="mx-4 sm:mx-[10%]">
+      {!hideNavbarFooter &&
+        (isDoctorRoute ? (
+          user?.role === "doctor" ? (
+            <DoctorNavbar />
+          ) : null
+        ) : (
+          <Navbar />
+        ))}
+
+      <Routes>
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/*" element={<PatientRoutes />} />
+
+        <Route path="/doctor/*" element={<DoctorRoutes />} />
       </Routes>
 
-     <Footer /> 
-
-
-
-
-      {/* <DoctorNavbar/>
-      
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/docAppointments" element={<Appointments />} />
-        <Route path="/docProfile" element={<Profile />} />
-      </Routes>  
-
-*/}
-
-      
+      {!hideNavbarFooter && !isDoctorRoute && <Footer />}
     </div>
   );
 };

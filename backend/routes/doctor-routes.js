@@ -1,13 +1,19 @@
 import express from "express";
 import { doctormodel } from "../models/doctor.js";
 import multer from "multer";
-import crypto from 'crypto'
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+import path from "path";
 import sharp from "sharp";
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand  } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-
-
 
 const router = express.Router();
 
@@ -19,7 +25,6 @@ const bucketRegion = process.env.BUCKET_REGION;
 const accessKey = process.env.ACCESS_KEY;
 const secretAccessKey = process.env.SECRET_ACCESS_KEY;
 
-
 const s3 = new S3Client({
   credentials: {
     accessKeyId: accessKey,
@@ -28,110 +33,171 @@ const s3 = new S3Client({
   region: bucketRegion,
 });
 
-const randomImageName = (bytes =32)=> crypto.randomBytes(bytes).toString('hex') 
+const randomImageName = (bytes = 32) =>
+  crypto.randomBytes(bytes).toString("hex");
 
 router.get("/get-doctor", async (req, res) => {
-  const { id } = req.query;
-  console.log("ID: ",id)
+  const { email } = req.query;
+  console.log("email: ", email);
 
-  try{
-    const doctors = await doctormodel.find({ _id: id });
-  if(!doctors){
-    return res.status(404).json({ message: "Doctor not found" });
-  }
+  try {
+    const doctors = await doctormodel.find({ email: email });
+    if (!doctors) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
 
-  const getObjectParams = {
-        
-    Bucket:bucketName,
-    Key:doctors[0].image
-  } 
+    const getObjectParams = {
+      Bucket: bucketName,
+      Key: doctors[0].image,
+    };
 
-  const command = new GetObjectCommand(getObjectParams);
-  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    const command = new GetObjectCommand(getObjectParams);
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-  doctors[0].image = url
-  
-  return res.status(200).json(doctors);
+    doctors[0].image = url;
 
-    
-  }catch (err) {
+    return res.status(200).json(doctors);
+  } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-router.post("/add-doctor", upload.single("image"), async (req, res) => {
-  let address1 = req.body.address;
-    if (typeof address1 === "string") {
-      address1 = JSON.parse(address1);
-    }
-  console.log("req.body",req.body)
-  console.log("req.file",req.file)
-
-  const imageName = randomImageName()
-  const buffer = await sharp(req.file.buffer).resize({height:1920,width:1080,fit:"contain"}).toBuffer()
-  const params = {
-    Bucket: bucketName,
-    Key: imageName,
-    Body: buffer,
-    ContentType: req.file.mimetype,
-  };
-
-  const command = new PutObjectCommand(params);
-  await s3.send(command);
-
-  
-  
+router.post("/login", async (req, res) => {
   try {
-    const {
-      email,
-      name,
-      speciality,
-      degree,
-      experience,
-      about,
-      fees
-    } = req.body;
+    const { email, password } = req.body;
 
-    const newDoctor = new doctormodel({
-      email,
-      name ,
-      image : imageName,
-      speciality,
-      degree,
-      experience,
-      about,
-      fees,
-      address:address1
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
+    const doctor = await doctormodel.findOne({ email });
+
+    if (!doctor) {
+      return res.status(400).json({ message: "Email not registered" });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, doctor.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
+
+    const token = jwt.sign(
+      { id: doctor._id, role: "doctor" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      userId: doctor._id,
+      email: doctor.email,
     });
-
-    const savedDoctor = await newDoctor.save();
-
-    return res
-      .status(201)
-      .json({ message: "Doctor added successfully", doctor: savedDoctor });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Error adding doctor", error: err });
+    console.error("Doctor Login Error:", err);
+    return res
+      .status(500)
+      .json({ message: "Error logging in", error: err.message });
   }
 });
+
+router.post(
+  "/add-doctor",
+  upload.fields([
+    { name: "degree", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      let address1 = req.body.address;
+      if (typeof address1 === "string") {
+        address1 = JSON.parse(address1);
+      }
+
+      console.log("req.body", req.body);
+      console.log("req.files", req.files);
+
+      if (!req.files || !req.files.image || !req.files.degree) {
+        return res
+          .status(400)
+          .json({ message: "Image and Degree files are required" });
+      }
+
+      const imageName = randomImageName();
+      const buffer = await sharp(req.files.image[0].buffer)
+        .resize({ height: 1920, width: 1080, fit: "contain" })
+        .toBuffer();
+
+      const imageParams = {
+        Bucket: bucketName,
+        Key: imageName,
+        Body: buffer,
+        ContentType: req.files.image[0].mimetype,
+      };
+
+      const imageCommand = new PutObjectCommand(imageParams);
+      await s3.send(imageCommand);
+
+      const degreeName = randomImageName();
+      const degreeBuffer = req.files.degree[0].buffer;
+
+      const degreeParams = {
+        Bucket: bucketName,
+        Key: degreeName,
+        Body: degreeBuffer,
+        ContentType: req.files.degree[0].mimetype,
+      };
+
+      const degreeCommand = new PutObjectCommand(degreeParams);
+      await s3.send(degreeCommand);
+
+      const { email, password, name, speciality, experience, about, fees } =
+        req.body;
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const newDoctor = new doctormodel({
+        email,
+        password: hashedPassword,
+        name,
+        image: imageName,
+        speciality,
+        degree: degreeName,
+        experience,
+        about,
+        fees,
+        address: address1,
+      });
+
+      const savedDoctor = await newDoctor.save();
+      return res
+        .status(201)
+        .json({ message: "Doctor added successfully", doctor: savedDoctor });
+    } catch (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ message: "Error adding doctor", error: err });
+    }
+  }
+);
 
 router.get("/doctors-all", async (req, res) => {
   try {
     const doctors = await doctormodel.find({});
-    console.log('doc', doctors)
-   
+    console.log("doc", doctors);
 
-    for(const doctor of doctors){
+    for (const doctor of doctors) {
       const getObjectParams = {
-        
-        Bucket:bucketName,
-        Key:doctor.image
-      } 
+        Bucket: bucketName,
+        Key: doctor.image,
+      };
       const command = new GetObjectCommand(getObjectParams);
       const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-      doctor.image = url
-
+      doctor.image = url;
     }
 
     if (!doctors) {
@@ -147,190 +213,44 @@ router.get("/doctors-all", async (req, res) => {
 
 router.get("/:speciality", async (req, res) => {
   try {
-    const {speciality}  = req.params;
-    console.log("sp", speciality)
-    const doctors = await doctormodel.find({ speciality: speciality.toString() });
+    const { speciality } = req.params;
+    console.log("sp", speciality);
+    const doctors = await doctormodel.find({
+      speciality: speciality.toString(),
+    });
 
-    console.log('doc', doctors)
-   
+    console.log("doc", doctors);
 
-    for(const doctor of doctors){
+    for (const doctor of doctors) {
       const getObjectParams = {
-        
-        Bucket:bucketName,
-        Key:doctor.image
-      } 
+        Bucket: bucketName,
+        Key: doctor.image,
+      };
       const command = new GetObjectCommand(getObjectParams);
       const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-      doctor.image = url
-
+      doctor.image = url;
     }
 
-   
-
     if (doctors.length === 0) {
-      return res.status(404).json({ message: "No doctors found with this speciality" });
+      return res
+        .status(404)
+        .json({ message: "No doctors found with this speciality" });
     }
 
     return res.status(200).json(doctors);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error retrieving doctors", error: err });
+    return res
+      .status(500)
+      .json({ message: "Error retrieving doctors", error: err });
   }
 });
 
-// router.put("/update/:email", async (req, res) => {
-//   try {
-//     const { email } = req.params; // Get the email from route parameters
-//     const {
-//       name,
-//       image,
-//       speciality,
-//       degree,
-//       experience,
-//       about,
-//       fees,
-//       address,
-//     } = req.body;
-
-//     const updatedData = {
-//       name,
-//       image, // Assuming image is a URL or file path, otherwise handle separately
-//       speciality,
-//       degree,
-//       experience,
-//       about,
-//       fees,
-//       address,
-//     };
-
-//     // Remove undefined or null fields to prevent updating with empty values
-//     Object.keys(updatedData).forEach((key) => {
-//       if (updatedData[key] === undefined || updatedData[key] === null) {
-//         delete updatedData[key];
-//       }
-//     });
-
-//     // Update the doctor information using email as the unique identifier
-//     const updatedDoctor = await doctormodel.findOneAndUpdate(
-//       { email }, // Search for the doctor by email
-//       updatedData, // Fields to update
-//       { new: true, runValidators: true } // Return the updated document, and validate updated data
-//     );
-
-//     if (!updatedDoctor) {
-//       return res.status(404).json({ message: "Doctor not found" });
-//     }
-
-//     return res
-//       .status(200)
-//       .json({ message: "Doctor updated successfully", doctor: updatedDoctor });
-//   } catch (err) {
-//     console.error(err);
-//     return res
-//       .status(500)
-//       .json({ message: "Error updating doctor", error: err.message });
-//   }
-// });
-
-
-// router.put("/update/:email", async (req, res) => {
-//   try {
-//     const { email } = req.params;
-//     const {
-//       name,
-//       image, // image can be a URL or file name
-//       speciality,
-//       degree,
-//       experience,
-//       about,
-//       fees,
-//       address,
-//     } = req.body;
-
-//     const updatedData = {
-//       name,
-//       speciality,
-//       degree,
-//       experience,
-//       about,
-//       fees,
-//       address,
-//     };
-
-//     // Only update the image if it's present
-//     if (image) {
-//       updatedData.image = image;
-//     }
-
-//     // Remove undefined or null fields
-//     Object.keys(updatedData).forEach((key) => {
-//       if (updatedData[key] === undefined || updatedData[key] === null) {
-//         delete updatedData[key];
-//       }
-//     });
-
-//     console.log("Address update hua wa:",updatedData.address);
-
-//     const updatedDoctor = await doctormodel.findOneAndUpdate(
-//       { email },
-//       updatedData,
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!updatedDoctor) {
-//       return res.status(404).json({ message: "Doctor not found" });
-//     }
-
-//     return res.status(200).json({ message: "Doctor updated successfully", doctor: updatedDoctor });
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ message: "Error updating doctor", error: err.message });
-//   }
-// });
-
-
-// router.delete("/:email", async (req, res) => {
-//   try {
-//     const { email } = req.params;
-
-//     if (!email) {
-//       return res.status(400).json({ message: "Email is required" });
-//     }
-
-//     const doctorToDelete = await doctormodel.find({ email });
-
-
-//     if (!doctorToDelete) {
-//       return res.status(404).json({ message: "Doctor not found" });
-//     }
-    
-//     const params = {
-//       Bucket: bucketName,
-//       Key:doctorToDelete[0].image
-//     }
-
-//     const command = new DeleteObjectCommand(params)
-//     await s3.send(command)
-
-//     const deletedDoctor = await doctormodel.findOneAndDelete({ email });
-
-
-//     return res
-//       .status(200)
-//       .json({ message: "Doctor deleted successfully", doctor: deletedDoctor });
-//   } catch (err) {
-//     console.error(err);
-//     return res
-//       .status(500)
-//       .json({ message: "Error deleting doctor", error: err.message });
-//   }
-// });
-
-router.put("/update/:email", async (req, res) => {
+router.put("/update/:email", upload.single("image"), async (req, res) => {
   try {
     const { email } = req.params;
-    const { name, image, speciality, degree, experience, about, fees, address } = req.body;
+    const { name, speciality, degree, experience, about, fees, address } =
+      req.body;
 
     const updatedData = {
       name,
@@ -339,16 +259,29 @@ router.put("/update/:email", async (req, res) => {
       experience,
       about,
       fees,
-      address,
+      address: address ? JSON.parse(address) : undefined,
     };
 
-    if (image) {
-      updatedData.image = image; // Only update if image is present
+    if (req.file) {
+      const imageName = randomImageName();
+      const buffer = await sharp(req.file.buffer)
+        .resize({ height: 1920, width: 1080, fit: "contain" })
+        .toBuffer();
+
+      const imageParams = {
+        Bucket: bucketName,
+        Key: imageName,
+        Body: buffer,
+        ContentType: req.file.mimetype,
+      };
+
+      await s3.send(new PutObjectCommand(imageParams));
+
+      updatedData.image = imageName;
     }
 
-    // Remove undefined or null fields
     Object.keys(updatedData).forEach((key) => {
-      if (updatedData[key] === undefined || updatedData[key] === null) {
+      if (updatedData[key] === undefined) {
         delete updatedData[key];
       }
     });
@@ -363,18 +296,31 @@ router.put("/update/:email", async (req, res) => {
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    return res.status(200).json({ message: "Doctor updated successfully", doctor: updatedDoctor });
+    if (updatedDoctor.image) {
+      const getObjectParams = {
+        Bucket: bucketName,
+        Key: updatedDoctor.image,
+      };
+      const command = new GetObjectCommand(getObjectParams);
+      updatedDoctor.image = await getSignedUrl(s3, command, {
+        expiresIn: 3600,
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Doctor updated successfully", doctor: updatedDoctor });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error updating doctor", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Error updating doctor", error: err.message });
   }
 });
 
-
-
 router.put("/update/:id", async (req, res) => {
   try {
-    const { id } = req.params; // Get the ID from route parameters
+    const { id } = req.params;
     const {
       name,
       image,
@@ -397,18 +343,15 @@ router.put("/update/:id", async (req, res) => {
       address,
     };
 
-    // Remove undefined or null fields to prevent updating with empty values
     Object.keys(updatedData).forEach((key) => {
       if (updatedData[key] === undefined || updatedData[key] === null) {
         delete updatedData[key];
       }
     });
 
-    const updatedDoctor = await doctormodel.findByIdAndUpdate(
-      id, // Use doctorId instead of email
-      updatedData, // Fields to update
-      { new: true } // Return the updated document
-    );
+    const updatedDoctor = await doctormodel.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
 
     if (!updatedDoctor) {
       return res.status(404).json({ message: "Doctor not found" });
@@ -424,6 +367,5 @@ router.put("/update/:id", async (req, res) => {
       .json({ message: "Error updating doctor", error: err.message });
   }
 });
-
 
 export { router as doctorRouter };

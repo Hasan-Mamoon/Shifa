@@ -13,10 +13,9 @@ const patientSchema = new mongoose.Schema({
     line2: { type: String, required: true },
   },
   dob: { type: Date },
-  password: { type: String, required: true },  // New password field
+  password: { type: String, required: true },
 });
 
-// Password hashing middleware
 patientSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
@@ -25,7 +24,6 @@ patientSchema.pre("save", async function (next) {
   next();
 });
 
-// Method to compare password during login
 patientSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
@@ -39,6 +37,7 @@ patientSchema.set("toJSON", {
   },
 });
 
-const patientModel = mongoose.models.Patient || mongoose.model("Patient", patientSchema);
+const patientModel =
+  mongoose.models.Patient || mongoose.model("Patient", patientSchema);
 
 export { patientModel };

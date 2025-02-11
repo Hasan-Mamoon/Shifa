@@ -1,11 +1,25 @@
+
+
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { AiOutlineHome, AiOutlineCalendar, AiOutlineUser } from "react-icons/ai"; // Importing appropriate icons
+import { Link, useLocation, useNavigate } from "react-router-dom"; 
+import { AiOutlineHome, AiOutlineCalendar, AiOutlineUser } from "react-icons/ai";
+import { useAuth } from "../context/AuthContext";
 
 const Sidebar = () => {
-  const location = useLocation(); 
+  const location = useLocation();
+  const navigate = useNavigate(); 
+  const { setUser } = useAuth();
 
   const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    
+    localStorage.clear();
+    setUser(null);
+   
+    navigate("/");
+  };
+  
 
   return (
     <aside className="w-64 h-screen bg-white text-gray-600 flex flex-col shadow-md">
@@ -18,9 +32,9 @@ const Sidebar = () => {
         <ul className="space-y-2">
           <li>
             <Link
-              to="/"
+              to="/doctor/dashboard"
               className={`flex items-center px-6 py-3 space-x-4 hover:bg-blue-100 hover:shadow-sm hover:scale-105 transform transition duration-200 rounded-md ${
-                isActive("/docDashboard") ? "border-l-4 border-blue-500 text-blue-700" : "text-gray-700"
+                isActive("/doctor/dashboard") ? "border-l-4 border-blue-500 text-blue-700" : "text-gray-700"
               }`}
             >
               <AiOutlineHome className="text-xl" />
@@ -29,9 +43,9 @@ const Sidebar = () => {
           </li>
           <li>
             <Link
-              to="/docAppointments"
+              to="/doctor/appointments"
               className={`flex items-center px-6 py-3 space-x-4 hover:bg-blue-100 hover:shadow-sm hover:scale-105 transform transition duration-200 rounded-md ${
-                isActive("/docAppointments") ? "border-l-4 border-green-500 text-green-700" : "text-gray-700"
+                isActive("/doctor/appointments") ? "border-l-4 border-green-500 text-green-700" : "text-gray-700"
               }`}
             >
               <AiOutlineCalendar className="text-xl" />
@@ -40,9 +54,9 @@ const Sidebar = () => {
           </li>
           <li>
             <Link
-              to="/docProfile"
+              to="/doctor/profile"
               className={`flex items-center px-6 py-3 space-x-4 hover:bg-blue-100 hover:shadow-sm hover:scale-105 transform transition duration-200 rounded-md ${
-                isActive("/docProfile") ? "border-l-4 border-gray-700 text-gray-800" : "text-gray-700"
+                isActive("/doctor/profile") ? "border-l-4 border-gray-700 text-gray-800" : "text-gray-700"
               }`}
             >
               <AiOutlineUser className="text-xl" />
@@ -52,8 +66,12 @@ const Sidebar = () => {
         </ul>
       </nav>
 
+   
       <div className="px-6 py-4 border-t border-gray-200">
-        <button className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600">
+        <button 
+          onClick={handleLogout} 
+          className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
+        >
           Logout
         </button>
       </div>

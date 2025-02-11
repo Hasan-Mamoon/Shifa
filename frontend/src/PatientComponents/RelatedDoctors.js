@@ -10,9 +10,11 @@ const RelatedDoctors = ({ speciality, docId }) => {
   useEffect(() => {
     const fetchRelatedDoctors = async () => {
       try {
-        const response = await fetch(`http://localhost:3080/doctor/${speciality}`);
+        const response = await fetch(
+          `http://localhost:3080/doctor/${speciality}`
+        );
         const data = await response.json();
-        setRelDocs(data.filter(doc => doc._id !== docId));
+        setRelDocs(data.filter((doc) => doc._id !== docId));
       } catch (error) {
         console.error("Error fetching related doctors:", error);
       }

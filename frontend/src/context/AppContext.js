@@ -1,44 +1,40 @@
-
-
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 
 export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
-    const [doctors, setDoctors] = useState([]);
-    const [patientId, setPatientId] = useState(null); // Store patient ID
-    const [slotId, setSlotId] = useState(null); // Store slot ID
-    const currencySymbol = "Rs";
+  const [doctors, setDoctors] = useState([]);
+  const [patientId, setPatientId] = useState(null);
+  const [slotId, setSlotId] = useState(null);
+  const currencySymbol = "Rs";
 
-    // Fetch all doctors on component mount
-    useEffect(() => {
-        const fetchDoctors = async () => {
-            try {
-                const response = await axios.get("http://localhost:3080/doctor/doctors-all"); // Update with your backend URL
-                setDoctors(response.data);
-            } catch (error) {
-                console.error("Error fetching doctors:", error);
-            }
-        };
-
-        fetchDoctors();
-    }, []);
-
-
-    const value = {
-        doctors,
-        currencySymbol,
-
-        slotId,
-        setSlotId, // Allow child components to update the slot ID
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3080/doctor/doctors-all"
+        );
+        setDoctors(response.data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
     };
 
-    return (
-        <AppContext.Provider value={value}>
-            {props.children}
-        </AppContext.Provider>
-    );
+    fetchDoctors();
+  }, []);
+
+  const value = {
+    doctors,
+    currencySymbol,
+
+    slotId,
+    setSlotId,
+  };
+
+  return (
+    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+  );
 };
 
 export default AppContextProvider;

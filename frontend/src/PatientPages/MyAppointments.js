@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
-const MyAppointments = ({ userId = '675033864d1158e5c2b3e4e0' }) => {
+const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const userId = user?.id;
+  console.log(userId);
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch(`http://localhost:3080/appointment/appointments?userId=${userId}`);
+      const response = await fetch(
+        `http://localhost:3080/appointment/appointments?userId=${userId}`
+      );
       const data = await response.json();
 
       console.log("appointments: ", data);
@@ -25,7 +31,9 @@ const MyAppointments = ({ userId = '675033864d1158e5c2b3e4e0' }) => {
   };
 
   useEffect(() => {
-    if (userId) fetchAppointments();
+    if (userId) {
+      fetchAppointments();
+    }
   }, [userId]);
 
   if (loading) {
@@ -43,14 +51,13 @@ const MyAppointments = ({ userId = '675033864d1158e5c2b3e4e0' }) => {
       </p>
       <div>
         {appointments.map((appointment) => {
-          // Handle invalid or missing doctor image URL without encoding
-          const imageUrl = appointment.doctorId.image || ''; // No decodeURIComponent
+          const imageUrl = appointment.doctorId.image || "";
 
-          // Fallback image if the doctor image URL is unavailable or invalid
           const maxImageUrlLength = 1024;
-          const finalImageUrl = imageUrl && imageUrl.length <= maxImageUrlLength 
-            ? imageUrl 
-            : '/path/to/default/image.jpg'; // Replace with your fallback image path
+          const finalImageUrl =
+            imageUrl && imageUrl.length <= maxImageUrlLength
+              ? imageUrl
+              : "/path/to/default/image.jpg";
 
           return (
             <div
@@ -58,20 +65,27 @@ const MyAppointments = ({ userId = '675033864d1158e5c2b3e4e0' }) => {
               key={appointment._id}
             >
               <div>
-                {/* Display the image with fallback to a default image */}
-                <img 
-                  src={finalImageUrl} 
-                  alt={appointment.doctorId.name} 
-                  style={{ width: '100px', height: '100px', borderRadius: '50%' }} 
+                <img
+                  src={finalImageUrl}
+                  alt={appointment.doctorId.name}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "50%",
+                  }}
                 />
               </div>
               <div className="flex-1 text-sm text-zinc-600">
-                <p className="text-neutral-800 font-semibold">{appointment.doctorId.name}</p>
+                <p className="text-neutral-800 font-semibold">
+                  {appointment.doctorId.name}
+                </p>
                 <p>{appointment.doctorId.speciality}</p>
                 <p className="text-zinc-700 font-medium mt-1">Address:</p>
                 <p className="text-xs">{appointment.doctorId.address?.line1}</p>
                 <p className="text-xs">{appointment.doctorId.address?.line2}</p>
-                {/* Add other appointment details here */}
+                <p className="text-zinc-700 font-medium mt-1">Time & Date:</p>
+                <p className="text-xs">{appointment.date}</p>
+                <p className="text-xs">{appointment.time}</p>
               </div>
             </div>
           );

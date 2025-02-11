@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { assets } from "../assets/assets";
+import { useAuth } from "../context/AuthContext";
 
 const MyProfile = () => {
   const [userData, setUserData] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null); // Preview for image editing
-  const email = localStorage.getItem("userEmail");  // Replace with the actual email of the logged-in patient
+  const [imagePreview, setImagePreview] = useState(null);
+  const { user } = useAuth();
+  const email = user?.email;
+  console.log(email);
 
-  // Fetch user data from the backend
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`http://localhost:3080/patient/${email}`);
-      console.log("USER DATA: ", response.data[0])
+      const response = await axios.get(
+        `http://localhost:3080/patient/${email}`
+      );
+      console.log("USER DATA: ", response.data[0]);
       setUserData(response.data[0]);
       setImagePreview(response.data[0].image || assets.profile_pic);
     } catch (error) {
@@ -20,40 +24,40 @@ const MyProfile = () => {
     }
   };
 
-  // Handle the image change when a new file is selected
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUserData((prev) => ({ ...prev, image: file }));  // Update state with the file
-      setImagePreview(URL.createObjectURL(file));  // Preview image
+      setUserData((prev) => ({ ...prev, image: file }));
+      setImagePreview(URL.createObjectURL(file));
     }
   };
-  // Update user data, including the image
+
   const updateUserData = async () => {
     try {
       const formData = new FormData();
-      
-      // Add user data to FormData
+
       Object.entries(userData).forEach(([key, value]) => {
         if (key === "address") {
           formData.append("address[line1]", value.line1 || "");
           formData.append("address[line2]", value.line2 || "");
         } else if (key !== "image") {
-          formData.append(key, value);  // Don't include image here yet
+          formData.append(key, value);
         }
       });
-  
-      // If a new image is selected, append it to FormData
+
       if (userData.image instanceof File) {
-        formData.append("image", userData.image);  // Add image as file
+        formData.append("image", userData.image);
       }
-  
-      // Send the updated data to the backend
-      await axios.put(`http://localhost:3080/patient/edit-patient/${userData.email}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+
+      await axios.put(
+        `http://localhost:3080/patient/edit-patient/${userData.email}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       setIsEdit(false);
-      fetchUserData(); // Refresh data after update
+      fetchUserData();
     } catch (error) {
       console.error("Error updating user data:", error);
     }
@@ -71,7 +75,7 @@ const MyProfile = () => {
 
   const cancelEdit = () => {
     setIsEdit(false);
-    fetchUserData(); // Revert to original data
+    fetchUserData();
   };
 
   useEffect(() => {
@@ -82,7 +86,6 @@ const MyProfile = () => {
     <div className="max-w-lg flex flex-col gap-2 text-sm">
       {userData ? (
         <>
-          {/* Profile Image */}
           <div className="relative">
             <img
               className="w-36 rounded"
@@ -101,7 +104,6 @@ const MyProfile = () => {
             )}
           </div>
 
-          {/* Name */}
           {isEdit ? (
             <input
               className="bg-gray-50 text-3xl font-medium max-w-60 mt-4"
@@ -117,9 +119,10 @@ const MyProfile = () => {
 
           <hr className="bg-zinc-400 h-[1px] border-none" />
 
-          {/* Contact Information */}
           <div>
-            <p className="text-neutral-500 underline mt-3">CONTACT INFORMATION</p>
+            <p className="text-neutral-500 underline mt-3">
+              CONTACT INFORMATION
+            </p>
             <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700">
               <p className="font-medium">Email id:</p>
               <p className="text-blue-500">{userData.email}</p>
@@ -141,25 +144,29 @@ const MyProfile = () => {
                     className="bg-gray-50"
                     type="text"
                     value={userData.address?.line1 || ""}
-                    onChange={(e) => handleAddressChange("line1", e.target.value)}
+                    onChange={(e) =>
+                      handleAddressChange("line1", e.target.value)
+                    }
                   />
                   <br />
                   <input
                     className="bg-gray-50"
                     type="text"
                     value={userData.address?.line2 || ""}
-                    onChange={(e) => handleAddressChange("line2", e.target.value)}
+                    onChange={(e) =>
+                      handleAddressChange("line2", e.target.value)
+                    }
                   />
                 </div>
               ) : (
                 <p className="text-gray-500">
-                  {userData.address?.line1 || "N/A"}, {userData.address?.line2 || "N/A"}
+                  {userData.address?.line1 || "N/A"},{" "}
+                  {userData.address?.line2 || "N/A"}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Basic Information */}
           <div>
             <p className="text-neutral-500 underline mt-3">BASIC INFORMATION</p>
             <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700">
@@ -190,7 +197,6 @@ const MyProfile = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="mt-10 flex gap-4">
             {isEdit ? (
               <>

@@ -1,4 +1,3 @@
-
 import express from "express";
 import { slotModel } from "../models/timeslots.js";
 
@@ -7,24 +6,23 @@ router.post("/add", async (req, res) => {
   const { doctorId, date, slots } = req.body;
 
   try {
-    // Check if a record already exists for the doctor and date
     const existingRecord = await slotModel.findOne({ doctorId, date });
 
     if (existingRecord) {
-      // Add new slots to the existing record
       const newSlots = slots.map((slot) => ({ time: slot }));
       const updatedSlots = [
         ...existingRecord.slots,
         ...newSlots.filter(
           (newSlot) =>
-            !existingRecord.slots.some((existingSlot) => existingSlot.time === newSlot.time)
+            !existingRecord.slots.some(
+              (existingSlot) => existingSlot.time === newSlot.time
+            )
         ),
       ];
       existingRecord.slots = updatedSlots;
       await existingRecord.save();
       res.status(200).json({ message: "Slots updated successfully!" });
     } else {
-      // Create a new record if it doesn't exist
       const newSlots = new slotModel({
         doctorId,
         date,
@@ -39,157 +37,169 @@ router.post("/add", async (req, res) => {
   }
 });
 
+router.post("/book", async (req, res) => {
+  const { doctorId, date, time, patientEmail } = req.body;
 
-  router.post("/book", async (req, res) => {
-    const { doctorId, date, time, patientEmail } = req.body;
-  
-    try {
-      const patient = await patientModel.findOne({ email: patientEmail });
-      if (!patient) {
-        return res.status(404).json({ message: "Patient not found" });
-      }
-  
-      const slotRecord = await slotModel.findOne({ doctorId, date });
-      if (!slotRecord) {
-        return res.status(404).json({ message: "No slots available for this doctor and date" });
-      }
-  
-      const slot = slotRecord.slots.find(slot => slot.time === time);
-      if (!slot) {
-        return res.status(404).json({ message: "Slot not found" });
-      }
-  
-      if (slot.isBooked) {
-        return res.status(400).json({ message: "Slot already booked" });
-      }
-  
-      slot.isBooked = true;
-      slot.patient = patient._id;
-  
-      await slotRecord.save();
-      res.status(200).json({ message: "Slot booked successfully!" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Error booking slot", error: err.message });
-    }
-  });
-
-  router.get("/booked", async (req, res) => {
-    const { doctorId, date } = req.query;
-  
-    try {
-      const slotRecord = await slotModel
-        .findOne({ doctorId, date })
-        .populate("slots.patient", "name email"); // Populate patient details (name and email)
-  
-      if (!slotRecord) {
-        return res.status(404).json({ message: "No slots found for this doctor and date" });
-      }
-  
-      const bookedSlots = slotRecord.slots.filter(slot => slot.isBooked);
-      res.status(200).json(bookedSlots);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Error retrieving booked slots", error: err.message });
-    }
-  });
-
-  router.post("/cancel", async (req, res) => {
-    const { doctorId, date, time } = req.body;
-  
-    try {
-      const slotRecord = await slotModel.findOne({ doctorId, date });
-      if (!slotRecord) {
-        return res.status(404).json({ message: "No slots found for this doctor and date" });
-      }
-  
-      const slot = slotRecord.slots.find(slot => slot.time === time);
-      if (!slot) {
-        return res.status(404).json({ message: "Slot not found" });
-      }
-  
-      if (!slot.isBooked) {
-        return res.status(400).json({ message: "Slot is not booked" });
-      }
-  
-      slot.isBooked = false;
-      slot.patient = undefined;
-  
-      await slotRecord.save();
-      res.status(200).json({ message: "Slot booking canceled successfully!" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Error canceling slot", error: err.message });
-    }
-  });
-
-  router.get("/dates", async (req, res) => {
-    const { doctorId } = req.query;
-
-    if (!doctorId) {
-      return res.status(400).json({ message: "Doctor ID is required." });
-    }
-  
-    try {
-      const dates = await slotModel
-        .find({ doctorId })
-        .distinct("date");
-  
-      return res.status(200).json(dates);
-    } catch (error) {
-      return res.status(500).json({ message: "Error fetching dates.", error });
+  try {
+    const patient = await patientModel.findOne({ email: patientEmail });
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
     }
 
-  });
+    const slotRecord = await slotModel.findOne({ doctorId, date });
+    if (!slotRecord) {
+      return res
+        .status(404)
+        .json({ message: "No slots available for this doctor and date" });
+    }
 
-  router.get("/appointments", async(req,res)=>{
-    const { doctorId, date } = req.query;
+    const slot = slotRecord.slots.find((slot) => slot.time === time);
+    if (!slot) {
+      return res.status(404).json({ message: "Slot not found" });
+    }
+
+    if (slot.isBooked) {
+      return res.status(400).json({ message: "Slot already booked" });
+    }
+
+    slot.isBooked = true;
+    slot.patient = patient._id;
+
+    await slotRecord.save();
+    res.status(200).json({ message: "Slot booked successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error booking slot", error: err.message });
+  }
+});
+
+router.get("/booked", async (req, res) => {
+  const { doctorId, date } = req.query;
+
+  try {
+    const slotRecord = await slotModel
+      .findOne({ doctorId, date })
+      .populate("slots.patient", "name email");
+
+    if (!slotRecord) {
+      return res
+        .status(404)
+        .json({ message: "No slots found for this doctor and date" });
+    }
+
+    const bookedSlots = slotRecord.slots.filter((slot) => slot.isBooked);
+    res.status(200).json(bookedSlots);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Error retrieving booked slots", error: err.message });
+  }
+});
+
+router.post("/cancel", async (req, res) => {
+  const { doctorId, date, time } = req.body;
+
+  try {
+    const slotRecord = await slotModel.findOne({ doctorId, date });
+    if (!slotRecord) {
+      return res
+        .status(404)
+        .json({ message: "No slots found for this doctor and date" });
+    }
+
+    const slot = slotRecord.slots.find((slot) => slot.time === time);
+    if (!slot) {
+      return res.status(404).json({ message: "Slot not found" });
+    }
+
+    if (!slot.isBooked) {
+      return res.status(400).json({ message: "Slot is not booked" });
+    }
+
+    slot.isBooked = false;
+    slot.patient = undefined;
+
+    await slotRecord.save();
+    res.status(200).json({ message: "Slot booking canceled successfully!" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Error canceling slot", error: err.message });
+  }
+});
+
+router.get("/dates", async (req, res) => {
+  const { doctorId } = req.query;
+
+  if (!doctorId) {
+    return res.status(400).json({ message: "Doctor ID is required." });
+  }
+
+  try {
+    const dates = await slotModel.find({ doctorId }).distinct("date");
+
+    return res.status(200).json(dates);
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching dates.", error });
+  }
+});
+
+router.get("/appointments", async (req, res) => {
+  const { doctorId, date } = req.query;
 
   if (!doctorId || !date) {
-    return res.status(400).json({ message: "Doctor ID and date are required." });
+    return res
+      .status(400)
+      .json({ message: "Doctor ID and date are required." });
   }
 
   try {
     const slots = await slotModel.findOne({ doctorId, date }, { slots: 1 });
 
     if (!slots) {
-      return res.status(404).json({ message: "No slots found for the given date." });
+      return res
+        .status(404)
+        .json({ message: "No slots found for the given date." });
     }
 
     return res.status(200).json(slots.slots);
   } catch (error) {
     return res.status(500).json({ message: "Error fetching slots.", error });
   }
-  });
+});
 
-  router.get("/slotsbyid",async(req,res)=>{
-    const { doctorId, date } = req.query;
+router.get("/slotsbyid", async (req, res) => {
+  const { doctorId, date } = req.query;
 
   try {
-    // Fetch the slot document for the given doctor and date
-    const slotData = await slotModel.findOne({ doctorId, date }).populate('slots.patient', 'name');
+    const slotData = await slotModel
+      .findOne({ doctorId, date })
+      .populate("slots.patient", "name");
 
     if (!slotData) {
-      return res.status(404).json({ message: "No slots found for the selected doctor and date." });
+      return res
+        .status(404)
+        .json({ message: "No slots found for the selected doctor and date." });
     }
 
-    // Include the _id for each slot
     const slotsWithIds = slotData.slots.map((slot) => ({
-      slotId: slot._id, // Include MongoDB's _id
+      slotId: slot._id,
       time: slot.time,
       isBooked: slot.isBooked,
-      patient: slot.patient ? { id: slot.patient._id, name: slot.patient.name } : null,
+      patient: slot.patient
+        ? { id: slot.patient._id, name: slot.patient.name }
+        : null,
     }));
 
     res.status(200).json(slotsWithIds);
   } catch (error) {
     console.error("Error fetching slots:", error);
-    res.status(500).json({ message: "Failed to fetch slots. Please try again later." });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch slots. Please try again later." });
   }
-  }
-);
+});
 
-
-
-  export {router as slotsRouter}
-  
+export { router as slotsRouter };

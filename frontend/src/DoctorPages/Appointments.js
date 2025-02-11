@@ -3,9 +3,11 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import Layout from "../DoctorComponents/Layout";
+import { useAuth } from "../context/AuthContext";
 
 const Appointment = () => {
-  const { docId = "674cc15ca5aeceee59956c0a" } = useParams();
+  const { user } = useAuth();
+  const { docId = user?.id } = useParams();
   const { doctors, currencySymbol } = useContext(AppContext);
   const [docInfo, setDocInfo] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
@@ -56,7 +58,6 @@ const Appointment = () => {
       <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
         {docInfo && (
           <div>
-            {/* Doctor Info */}
             <div className="doctor-info flex flex-col items-center text-center bg-gray-50 p-6 rounded-lg shadow-md">
               <img
                 src={docInfo.image}
@@ -66,9 +67,7 @@ const Appointment = () => {
               <h2 className="text-2xl font-bold mt-4 text-gray-600">
                 {docInfo.name}
               </h2>
-              <p className="text-gray-500 mt-2">
-                {docInfo.degree} - {docInfo.speciality}
-              </p>
+              <p className="text-gray-500 mt-2">{docInfo.speciality}</p>
               <p className="text-gray-500 mt-2 text-sm">{docInfo.about}</p>
               <p className="text-primary font-semibold mt-4 text-lg">
                 Appointment Fee: {currencySymbol}
@@ -76,7 +75,6 @@ const Appointment = () => {
               </p>
             </div>
 
-            {/* Available Dates */}
             <div className="available-dates mt-10">
               <h3 className="text-xl font-bold text-gray-800 text-center">
                 Select an Appointment Date
@@ -102,12 +100,10 @@ const Appointment = () => {
               </div>
             </div>
 
-            {/* Appointments */}
             {selectedDate && (
               <div className="appointments mt-10">
                 <h3 className="text-xl font-bold text-gray-800 text-center">
-                  Appointments for{" "}
-                  {new Date(selectedDate).toLocaleDateString()}
+                  Appointments for {new Date(selectedDate).toLocaleDateString()}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                   {appointments.length > 0 ? (

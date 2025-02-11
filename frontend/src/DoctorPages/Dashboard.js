@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../DoctorComponents/Layout";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
   const [slots, setSlots] = useState([]);
   const [date, setDate] = useState("");
   const [newSlot, setNewSlot] = useState("");
-  const [doctorId] = useState("674cc15ca5aeceee59956c0a");
+  const { user } = useAuth();
+  const doctorId = user?.id;
+
   const [message, setMessage] = useState("");
 
-  // Helper function for API calls
   const apiCall = async (url, method, data = {}) => {
     try {
       const response = await axios({
@@ -85,9 +87,11 @@ const Dashboard = () => {
           Doctor Dashboard
         </h1>
 
-        {/* Date Selection */}
         <div className="mb-10">
-          <label htmlFor="date" className="block text-lg font-semibold text-gray-700">
+          <label
+            htmlFor="date"
+            className="block text-lg font-semibold text-gray-700"
+          >
             Select Date
           </label>
           <input
@@ -99,9 +103,10 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Available Slots */}
         <div className="mb-10">
-          <h2 className="text-3xl font-semibold text-gray-700 mb-4">Available Slots</h2>
+          <h2 className="text-3xl font-semibold text-gray-700 mb-4">
+            Available Slots
+          </h2>
           {slots.length > 0 ? (
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {slots.map((slot, index) => (
@@ -114,18 +119,23 @@ const Dashboard = () => {
                   }`}
                 >
                   <span className="text-lg">{slot.time}</span>
-                  <span className="text-sm">{slot.isBooked ? "Booked" : "Available"}</span>
+                  <span className="text-sm">
+                    {slot.isBooked ? "Booked" : "Available"}
+                  </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 italic">No slots available for the selected date.</p>
+            <p className="text-gray-500 italic">
+              No slots available for the selected date.
+            </p>
           )}
         </div>
 
-        {/* Add Slot */}
         <div className="mb-10">
-          <h2 className="text-3xl font-semibold text-gray-700 mb-4">Add New Slot</h2>
+          <h2 className="text-3xl font-semibold text-gray-700 mb-4">
+            Add New Slot
+          </h2>
           <form onSubmit={handleAddSlot} className="flex flex-wrap gap-4">
             <input
               type="time"
@@ -143,7 +153,6 @@ const Dashboard = () => {
           </form>
         </div>
 
-        {/* User Feedback */}
         {message && (
           <div
             className={`mt-6 p-4 rounded-lg text-center shadow-lg ${
