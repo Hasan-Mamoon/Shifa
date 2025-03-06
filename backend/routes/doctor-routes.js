@@ -185,6 +185,14 @@ router.post(
   }
 );
 
+
+
+
+
+
+
+
+
 router.get("/doctors-all", async (req, res) => {
   try {
     const doctors = await doctormodel.find({});

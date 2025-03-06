@@ -20,3 +20,6 @@ const doctorSchema = new mongoose.Schema({
 const doctorModel = mongoose.model("Doctor", doctorSchema);
 
 export { doctorModel as doctormodel };
+
+
+
