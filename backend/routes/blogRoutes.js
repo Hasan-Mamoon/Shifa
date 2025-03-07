@@ -87,25 +87,24 @@
 // router.get("/blogs/:id", async (req, res) => {
 //     try {
 //       const blog = await blogModel.findById(req.params.id).populate("author", "name");
-  
+
 //       if (!blog) {
 //         return res.status(404).json({ message: "Blog not found" });
 //       }
-  
+
 //       const getObjectParams = {
 //         Bucket: bucketName,
 //         Key: blog.image,
 //       };
 //       const command = new GetObjectCommand(getObjectParams);
 //       blog.image = await getSignedUrl(s3, command, { expiresIn: 3600 });
-  
+
 //       return res.status(200).json(blog);
 //     } catch (err) {
 //       console.error(err);
 //       return res.status(500).json({ message: "Internal Server Error" });
 //     }
 //   });
-  
 
 // router.put("/update-blog/:id", upload.single("image"), async (req, res) => {
 //   try {
@@ -172,21 +171,18 @@
 
 // export { router as blogRouter };
 
-
-
-
-import express from "express";
-import { blogModel } from "../models/blogModel.js";
-import { doctormodel } from "../models/doctor.js";
-import multer from "multer";
-import crypto from "crypto";
+import express from 'express';
+import { blogModel } from '../models/blogModel.js';
+import { doctormodel } from '../models/doctor.js';
+import multer from 'multer';
+import crypto from 'crypto';
 import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const router = express.Router();
 
@@ -206,15 +202,14 @@ const s3 = new S3Client({
   region: bucketRegion,
 });
 
-const randomImageName = (bytes = 32) =>
-  crypto.randomBytes(bytes).toString("hex");
+const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
 // Add Blog
-router.post("/add-blog", upload.single("image"), async (req, res) => {
+router.post('/add-blog', upload.single('image'), async (req, res) => {
   try {
     const { title, content, category, author } = req.body;
     if (!req.file) {
-      return res.status(400).json({ message: "Image file is required" });
+      return res.status(400).json({ message: 'Image file is required' });
     }
 
     const imageName = randomImageName();
@@ -239,19 +234,19 @@ router.post("/add-blog", upload.single("image"), async (req, res) => {
     });
 
     await newBlog.save();
-    return res.status(201).json({ message: "Blog created successfully" });
+    return res.status(201).json({ message: 'Blog created successfully' });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error adding blog", error: err });
+    return res.status(500).json({ message: 'Error adding blog', error: err });
   }
 });
 
 // Get All Blogs with Optional Category Filter
-router.get("/blogs", async (req, res) => {
+router.get('/blogs', async (req, res) => {
   try {
     const { category } = req.query;
     const query = category ? { category } : {};
-    const blogs = await blogModel.find(query).populate("author", "name");
+    const blogs = await blogModel.find(query).populate('author', 'name');
 
     for (const blog of blogs) {
       const getObjectParams = {
@@ -266,17 +261,17 @@ router.get("/blogs", async (req, res) => {
     return res.status(200).json(blogs);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
 // Get Single Blog by ID
-router.get("/blogs/:id", async (req, res) => {
+router.get('/blogs/:id', async (req, res) => {
   try {
-    const blog = await blogModel.findById(req.params.id).populate("author", "name");
+    const blog = await blogModel.findById(req.params.id).populate('author', 'name');
 
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({ message: 'Blog not found' });
     }
 
     const getObjectParams = {
@@ -289,20 +284,20 @@ router.get("/blogs/:id", async (req, res) => {
     return res.status(200).json(blog);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
 // Update Blog
-router.put("/update-blog/:id", upload.single("image"), async (req, res) => {
+router.put('/update-blog/:id', upload.single('image'), async (req, res) => {
   try {
     const { title, content, category, author } = req.body;
     const blog = await blogModel.findById(req.params.id);
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({ message: 'Blog not found' });
     }
     if (blog.author.toString() !== author) {
-      return res.status(403).json({ message: "Unauthorized to update this blog" });
+      return res.status(403).json({ message: 'Unauthorized to update this blog' });
     }
 
     if (req.file) {
@@ -324,23 +319,23 @@ router.put("/update-blog/:id", upload.single("image"), async (req, res) => {
     blog.category = category;
     await blog.save();
 
-    return res.status(200).json({ message: "Blog updated successfully" });
+    return res.status(200).json({ message: 'Blog updated successfully' });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error updating blog", error: err });
+    return res.status(500).json({ message: 'Error updating blog', error: err });
   }
 });
 
 // Delete Blog
-router.delete("/delete-blog/:id", async (req, res) => {
+router.delete('/delete-blog/:id', async (req, res) => {
   try {
     const { author } = req.body;
     const blog = await blogModel.findById(req.params.id);
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(404).json({ message: 'Blog not found' });
     }
     if (blog.author.toString() !== author) {
-      return res.status(403).json({ message: "Unauthorized to delete this blog" });
+      return res.status(403).json({ message: 'Unauthorized to delete this blog' });
     }
 
     const deleteParams = {
@@ -351,10 +346,10 @@ router.delete("/delete-blog/:id", async (req, res) => {
     await s3.send(deleteCommand);
 
     await blogModel.findByIdAndDelete(req.params.id);
-    return res.status(200).json({ message: "Blog deleted successfully" });
+    return res.status(200).json({ message: 'Blog deleted successfully' });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Error deleting blog", error: err });
+    return res.status(500).json({ message: 'Error deleting blog', error: err });
   }
 });
 

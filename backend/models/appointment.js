@@ -1,31 +1,31 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const appointmentSchema = new mongoose.Schema({
   doctorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Doctor",
+    ref: 'Doctor',
     required: true,
   },
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Patient",
+    ref: 'Patient',
     required: true,
   },
   slotId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "AppointmentSlots",
+    ref: 'AppointmentSlots',
     required: true,
   },
   date: { type: String, required: true },
   time: { type: String, required: true },
   status: {
     type: String,
-    enum: ["Booked", "Completed", "Cancelled"],
-    default: "Booked",
+    enum: ['Booked', 'Completed', 'Cancelled'],
+    default: 'Booked',
   },
   notes: { type: String },
 });
 
-const appointmentModel = mongoose.model("Appointment", appointmentSchema);
+const appointmentModel = mongoose.model('Appointment', appointmentSchema);
 
 export { appointmentModel };
