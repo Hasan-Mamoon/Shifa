@@ -252,25 +252,41 @@ const Signup = () => {
               required
               className="w-full p-2 border rounded"
             />
-            <input
-              type="file"
-              name="degree"
-              accept=".pdf,.jpg,.png"
-              onChange={handleFileChange}
-              required
-              className="w-full p-2 border rounded"
-            />
+            <label className="block text-sm font-medium text-gray-700">
+              Upload Degree Certificate
+            </label>
+            <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
+              <input
+                type="file"
+                name="degree"
+                accept=".pdf, .jpg, .png"
+                onChange={handleFileChange}
+                required
+                className="hidden"
+                id="degreeUpload"
+              />
+              <label htmlFor="degreeUpload" className="cursor-pointer block text-center">
+                Click to upload (PDF, JPG, PNG)
+              </label>
+            </div>
           </>
         )}
 
-        <input
-          type="file"
-          name="image"
-          accept="image/*"
-          onChange={handleFileChange}
-          required
-          className="w-full p-2 border rounded"
-        />
+        <label className="block text-sm font-medium text-gray-700">Upload Profile Picture</label>
+        <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleFileChange}
+            required
+            className="hidden"
+            id="fileUpload"
+          />
+          <label htmlFor="fileUpload" className="cursor-pointer block text-center">
+            Click to upload (PDF, JPG, PNG)
+          </label>
+        </div>
 
         <button
           type="submit"
