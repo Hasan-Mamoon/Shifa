@@ -1,29 +1,27 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { AppContext } from "../context/AppContext";
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
 
-import { assets } from "../assets/assets";
-import RelatedDoctors from "../PatientComponents/RelatedDoctors";
-import { useAuth } from "../context/AuthContext";
+import { assets } from '../assets/assets';
+import RelatedDoctors from '../PatientComponents/RelatedDoctors';
+import { useAuth } from '../context/AuthContext';
 
 const Appointment = () => {
   const { docId } = useParams();
   const { doctors, currencySymbol } = useContext(AppContext);
 
-  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const [docInfo, setDocInfo] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
-  const [slotTime, setSlotTime] = useState("");
-  const [slotId, setSlotId] = useState("");
+  const [slotTime, setSlotTime] = useState('');
+  const [slotId, setSlotId] = useState('');
   const { user } = useAuth();
 
   const bookAppointment = async () => {
     if (!slotTime || !availableDates[slotIndex] || !slotId) {
-      alert(
-        "Please select a date, time slot, and ensure all fields are filled before booking."
-      );
+      alert('Please select a date, time slot, and ensure all fields are filled before booking.');
       return;
     }
 
@@ -37,25 +35,25 @@ const Appointment = () => {
 
     try {
       const response = await fetch(
-        "${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment",
+        '${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment',
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(appointmentData),
-        }
+        },
       );
 
       const result = await response.json();
       if (response.ok) {
-        alert("Appointment booked successfully!");
+        alert('Appointment booked successfully!');
       } else {
         alert(`Error: ${result.message}`);
       }
     } catch (error) {
-      console.error("Error booking appointment:", error);
-      alert("Failed to book appointment. Please try again.");
+      console.error('Error booking appointment:', error);
+      alert('Failed to book appointment. Please try again.');
     }
   };
 
@@ -68,28 +66,28 @@ const Appointment = () => {
   const getAvailableDates = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
+        `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`,
       );
       const datesFromDB = await response.json();
       if (!response.ok) {
-        console.error("Error:", datesFromDB.message);
+        console.error('Error:', datesFromDB.message);
         return;
       }
       setAvailableDates(datesFromDB);
     } catch (error) {
-      console.error("Error fetching available dates:", error);
+      console.error('Error fetching available dates:', error);
     }
   };
 
   const getAvailableSlots = async (date) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
+        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`,
       );
       const slotsFromDB = await response.json();
 
       if (!response.ok) {
-        console.error("Error:", slotsFromDB.message);
+        console.error('Error:', slotsFromDB.message);
         return;
       }
 
@@ -103,7 +101,7 @@ const Appointment = () => {
 
       setDocSlots(filteredSlots);
     } catch (error) {
-      console.error("Error fetching slots:", error);
+      console.error('Error fetching slots:', error);
     }
   };
 
@@ -128,11 +126,7 @@ const Appointment = () => {
       <div>
         <div className="flex flex-col sm:flex-row gap-4">
           <div>
-            <img
-              className="bg-primary w-full sm:max-w-72 rounded-lg"
-              src={docInfo.image}
-              alt=""
-            />
+            <img className="bg-primary w-full sm:max-w-72 rounded-lg" src={docInfo.image} alt="" />
           </div>
           <div className="flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 sm:mx-0 mt-[-80px] sm:mt-0">
             <p className="flex items-center gap-2 text-2xl font-medium text-gray-900">
@@ -153,13 +147,11 @@ const Appointment = () => {
               <p className="flex items-center gap-1 text-sm font-medium text-gray-900 mt-3">
                 About <img src={assets.info_icon} alt="" />
               </p>
-              <p className="text-sm text-gray-500 max-w-[700px] mt-1">
-                {docInfo.about}
-              </p>
+              <p className="text-sm text-gray-500 max-w-[700px] mt-1">{docInfo.about}</p>
             </div>
 
             <p className="text-gray-500 font-medium mt-4">
-              Appointment fee:{" "}
+              Appointment fee:{' '}
               <span className="text-gray-600">
                 {currencySymbol} {docInfo.fees}
               </span>
@@ -179,9 +171,7 @@ const Appointment = () => {
                     getAvailableSlots(date);
                   }}
                   className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
-                    slotIndex === index
-                      ? "bg-primary text-white"
-                      : "border border-gray-200"
+                    slotIndex === index ? 'bg-primary text-white' : 'border border-gray-200'
                   }`}
                   key={index}
                 >
@@ -200,8 +190,8 @@ const Appointment = () => {
                   }}
                   className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${
                     item.time === slotTime
-                      ? "bg-primary text-white"
-                      : "text-gray-400 border border-gray-300"
+                      ? 'bg-primary text-white'
+                      : 'text-gray-400 border border-gray-300'
                   }`}
                   key={item.id}
                 >

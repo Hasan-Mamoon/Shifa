@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -11,20 +11,20 @@ const MyAppointments = () => {
   const fetchAppointments = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/appointment/appointments?userId=${userId}`
+        `${process.env.REACT_APP_SERVER_URL}/appointment/appointments?userId=${userId}`,
       );
       const data = await response.json();
 
-      console.log("appointments: ", data);
+      console.log('appointments: ', data);
 
       if (!response.ok) {
-        console.error("Error fetching appointments:", data.message);
+        console.error('Error fetching appointments:', data.message);
         return;
       }
 
       setAppointments(data);
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      console.error('Error fetching appointments:', error);
     } finally {
       setLoading(false);
     }
@@ -46,18 +46,16 @@ const MyAppointments = () => {
 
   return (
     <div>
-      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
-        My Appointments
-      </p>
+      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">My Appointments</p>
       <div>
         {appointments.map((appointment) => {
-          const imageUrl = appointment.doctorId.image || "";
+          const imageUrl = appointment.doctorId.image || '';
 
           const maxImageUrlLength = 1024;
           const finalImageUrl =
             imageUrl && imageUrl.length <= maxImageUrlLength
               ? imageUrl
-              : "/path/to/default/image.jpg";
+              : '/path/to/default/image.jpg';
 
           return (
             <div
@@ -69,16 +67,14 @@ const MyAppointments = () => {
                   src={finalImageUrl}
                   alt={appointment.doctorId.name}
                   style={{
-                    width: "100px",
-                    height: "100px",
-                    borderRadius: "50%",
+                    width: '100px',
+                    height: '100px',
+                    borderRadius: '50%',
                   }}
                 />
               </div>
               <div className="flex-1 text-sm text-zinc-600">
-                <p className="text-neutral-800 font-semibold">
-                  {appointment.doctorId.name}
-                </p>
+                <p className="text-neutral-800 font-semibold">{appointment.doctorId.name}</p>
                 <p>{appointment.doctorId.speciality}</p>
                 <p className="text-zinc-700 font-medium mt-1">Address:</p>
                 <p className="text-xs">{appointment.doctorId.address?.line1}</p>

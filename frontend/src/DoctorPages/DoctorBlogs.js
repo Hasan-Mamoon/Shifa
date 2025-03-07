@@ -55,13 +55,13 @@
 
 // export default DoctorBlogs;
 
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext";
-import Layout from "../DoctorComponents/Layout";
-import { assets } from "../assets/assets";
-import binIcon from "../assets/img1.png"; // Adjust the path as needed
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import Layout from '../DoctorComponents/Layout';
+import { assets } from '../assets/assets';
+import binIcon from '../assets/img1.png'; // Adjust the path as needed
 
 const DoctorBlogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -72,12 +72,10 @@ const DoctorBlogs = () => {
     axios
       .get(`${process.env.REACT_APP_SERVER_URL}/blog/blogs`)
       .then((response) => {
-        const doctorBlogs = response.data.filter(
-          (blog) => blog.author._id === doctorId
-        );
+        const doctorBlogs = response.data.filter((blog) => blog.author._id === doctorId);
         setBlogs(doctorBlogs);
       })
-      .catch((error) => console.error("Error fetching blogs:", error));
+      .catch((error) => console.error('Error fetching blogs:', error));
   }, [doctorId]);
 
   const handleDelete = async (blogId) => {
@@ -89,7 +87,7 @@ const DoctorBlogs = () => {
       // Remove the deleted blog from the state
       setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog._id !== blogId));
     } catch (error) {
-      console.error("Error deleting blog:", error);
+      console.error('Error deleting blog:', error);
     }
   };
 
@@ -107,11 +105,7 @@ const DoctorBlogs = () => {
                 key={blog._id}
                 className="relative block bg-white shadow-md rounded-lg overflow-hidden transform hover:scale-105 transition duration-300"
               >
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="w-full h-48 object-cover"
-                />
+                <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover" />
                 <div className="p-4 flex items-center justify-between">
                   <Link to={`../blogs/${blog._id}`}>
                     <h2 className="text-lg font-semibold">{blog.title}</h2>

@@ -3,20 +3,20 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family:Outfit;
+* {
+  font-family: Outfit;
 }
 
-.active hr{
-    @apply block
+.active hr {
+  @apply block;
 }
 
-::-webkit-scrollbar{
-    @apply hidden
+::-webkit-scrollbar {
+  @apply hidden;
 }
 
-@media (max-width:740px){
-    .active p{
-        @apply text-white bg-primary
-    }
+@media (max-width: 740px) {
+  .active p {
+    @apply text-white bg-primary;
+  }
 }

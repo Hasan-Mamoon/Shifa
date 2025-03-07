@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
@@ -6,12 +6,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true); // ✅ Add loading state
 
-
   useEffect(() => {
-    const storedToken = localStorage.getItem("token") || null;
-    const storedRole = localStorage.getItem("role") || null;
-    const storedId = localStorage.getItem("id") || null;
-    const storedEmail = localStorage.getItem("email") || null;
+    const storedToken = localStorage.getItem('token') || null;
+    const storedRole = localStorage.getItem('role') || null;
+    const storedId = localStorage.getItem('id') || null;
+    const storedEmail = localStorage.getItem('email') || null;
 
     if (storedToken && storedRole && storedId) {
       setUser({
@@ -34,21 +33,21 @@ export const AuthProvider = ({ children }) => {
 
     setUser(userInfo);
 
-    localStorage.setItem("token", userData.token);
-    localStorage.setItem("role", userData.role);
-    localStorage.setItem("id", userData.id);
-    localStorage.setItem("email", userData.email);
+    localStorage.setItem('token', userData.token);
+    localStorage.setItem('role', userData.role);
+    localStorage.setItem('id', userData.id);
+    localStorage.setItem('email', userData.email);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("id");
-    localStorage.removeItem("email");
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('id');
+    localStorage.removeItem('email');
 
     setTimeout(() => {
-      window.location.href = "/"; // Ensure proper redirection
+      window.location.href = '/'; // Ensure proper redirection
     }, 0);
   };
 

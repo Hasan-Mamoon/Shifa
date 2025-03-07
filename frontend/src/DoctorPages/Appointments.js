@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import { AppContext } from "../context/AppContext";
-import Layout from "../DoctorComponents/Layout";
-import { useAuth } from "../context/AuthContext";
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { AppContext } from '../context/AppContext';
+import Layout from '../DoctorComponents/Layout';
+import { useAuth } from '../context/AuthContext';
 
 const Appointment = () => {
   const { user } = useAuth();
@@ -27,11 +27,11 @@ const Appointment = () => {
     const fetchAvailableDates = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
+          `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`,
         );
         setAvailableDates(response.data);
       } catch (error) {
-        console.error("Error fetching available dates:", error);
+        console.error('Error fetching available dates:', error);
       }
     };
 
@@ -45,11 +45,11 @@ const Appointment = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
+        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`,
       );
       setAppointments(response.data);
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      console.error('Error fetching appointments:', error);
     }
   };
 
@@ -64,9 +64,7 @@ const Appointment = () => {
                 alt={docInfo.name}
                 className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-primary"
               />
-              <h2 className="text-2xl font-bold mt-4 text-gray-600">
-                {docInfo.name}
-              </h2>
+              <h2 className="text-2xl font-bold mt-4 text-gray-600">{docInfo.name}</h2>
               <p className="text-gray-500 mt-2">{docInfo.speciality}</p>
               <p className="text-gray-500 mt-2 text-sm">{docInfo.about}</p>
               <p className="text-primary font-semibold mt-4 text-lg">
@@ -86,14 +84,14 @@ const Appointment = () => {
                     onClick={() => handleDateClick(date)}
                     className={`py-3 px-4 text-center rounded-lg shadow-lg transition-all ${
                       selectedDate === date
-                        ? "bg-primary text-white"
-                        : "bg-gray-100 text-gray-800 hover:bg-primary hover:text-white"
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-100 text-gray-800 hover:bg-primary hover:text-white'
                     }`}
                   >
-                    {new Date(date).toLocaleDateString("en-US", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
+                    {new Date(date).toLocaleDateString('en-US', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
                     })}
                   </button>
                 ))}
@@ -112,19 +110,17 @@ const Appointment = () => {
                         key={slot._id}
                         className={`p-6 rounded-lg shadow-lg transition-all ${
                           slot.isBooked
-                            ? "bg-red-100 border-red-400"
-                            : "bg-green-100 border-green-400"
+                            ? 'bg-red-100 border-red-400'
+                            : 'bg-green-100 border-green-400'
                         } border-2`}
                       >
-                        <p className="text-lg font-medium text-gray-700">
-                          Time: {slot.time}
-                        </p>
+                        <p className="text-lg font-medium text-gray-700">Time: {slot.time}</p>
                         <p
                           className={`text-lg font-bold mt-2 ${
-                            slot.isBooked ? "text-red-600" : "text-green-600"
+                            slot.isBooked ? 'text-red-600' : 'text-green-600'
                           }`}
                         >
-                          {slot.isBooked ? "Booked" : "Available"}
+                          {slot.isBooked ? 'Booked' : 'Available'}
                         </p>
                       </div>
                     ))

@@ -1,7 +1,7 @@
-import React from "react";
-import { assets } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React from 'react';
+import { assets } from '../assets/assets';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Banner = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const Banner = () => {
           <div className="mt-6 space-y-4">
             <button
               onClick={() => {
-                navigate("/signup/patient");
+                navigate('/signup/patient');
                 window.scrollTo(0, 0);
               }}
               className="bg-white text-gray-700 text-lg font-semibold px-6 py-3 rounded-full shadow-md hover:scale-105 transition-transform duration-200"
@@ -34,7 +34,7 @@ const Banner = () => {
             </p>
             <button
               onClick={() => {
-                navigate("/signup/doctor");
+                navigate('/signup/doctor');
                 window.scrollTo(0, 0);
               }}
               className="bg-yellow-500 text-gray-700 text-lg font-semibold px-6 py-3 rounded-full shadow-md hover:scale-105 transition-transform duration-200"
@@ -44,7 +44,7 @@ const Banner = () => {
           </div>
         )}
       </div>
-      
+
       <div className="hidden md:block md:w-1/2 lg:w-[370px] relative animate-slideInRight">
         <img
           className="w-full max-w-md"

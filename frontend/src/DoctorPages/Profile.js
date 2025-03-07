@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { FaEdit, FaSave } from "react-icons/fa";
-import Layout from "../DoctorComponents/Layout";
-import axios from "axios";
-import { useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React, { useState, useEffect } from 'react';
+import { FaEdit, FaSave } from 'react-icons/fa';
+import Layout from '../DoctorComponents/Layout';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
   const location = useLocation();
@@ -19,16 +19,13 @@ const Profile = () => {
 
   const fetchDoctorData = async () => {
     try {
-      const response = await axios.get(
-        "${process.env.REACT_APP_SERVER_URL}/doctor/get-doctor",
-        {
-          params: { email: email },
-        }
-      );
+      const response = await axios.get('${process.env.REACT_APP_SERVER_URL}/doctor/get-doctor', {
+        params: { email: email },
+      });
       setDoctorData(response.data[0]);
       setLoading(false);
     } catch (error) {
-      setError("Failed to fetch doctor data.");
+      setError('Failed to fetch doctor data.');
       setLoading(false);
     }
   };
@@ -75,10 +72,10 @@ const Profile = () => {
         formData.append(key, updatedData[key]);
       });
 
-      formData.append("address", JSON.stringify(address));
+      formData.append('address', JSON.stringify(address));
 
       if (image) {
-        formData.append("image", image);
+        formData.append('image', image);
       }
 
       for (let pair of formData.entries()) {
@@ -89,18 +86,18 @@ const Profile = () => {
         `${process.env.REACT_APP_SERVER_URL}/doctor/update/${doctorData.email}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
       );
 
       if (response.status === 200) {
-        setSuccessMessage("Profile updated successfully.");
+        setSuccessMessage('Profile updated successfully.');
         toggleEditMode();
         fetchDoctorData();
       }
     } catch (error) {
-      console.error("Error updating doctor:", error);
-      setError("Failed to save doctor data.");
+      console.error('Error updating doctor:', error);
+      setError('Failed to save doctor data.');
     }
   };
 
@@ -119,17 +116,14 @@ const Profile = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-6">
               <img
-                src={doctorData.image || "default-image.jpg"}
+                src={doctorData.image || 'default-image.jpg'}
                 alt="Doctor"
                 className="w-32 h-32 rounded-full object-cover shadow-md border-4 border-primary"
               />
               <div>
-                <h1 className="text-3xl font-semibold text-gray-800">
-                  {doctorData.name}
-                </h1>
+                <h1 className="text-3xl font-semibold text-gray-800">{doctorData.name}</h1>
                 <p className="text-xl text-gray-600">
-                  {doctorData.speciality} | {doctorData.experience} Years
-                  Experience
+                  {doctorData.speciality} | {doctorData.experience} Years Experience
                 </p>
               </div>
             </div>
@@ -138,7 +132,7 @@ const Profile = () => {
               className="flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-full shadow-md hover:bg-blue-700 transition"
             >
               <FaEdit />
-              <span>{"Edit"}</span>
+              <span>{'Edit'}</span>
             </button>
           </div>
 
@@ -169,9 +163,7 @@ const Profile = () => {
             </div>
 
             <div>
-              <h3 className="text-2xl font-semibold text-gray-800">
-                Appointment Fee
-              </h3>
+              <h3 className="text-2xl font-semibold text-gray-800">Appointment Fee</h3>
               {isEditing ? (
                 <input
                   type="number"
@@ -192,14 +184,14 @@ const Profile = () => {
                   <input
                     type="text"
                     name="line1"
-                    value={doctorData.address.line1 || ""}
+                    value={doctorData.address.line1 || ''}
                     onChange={handleAddressChange}
                     className="w-full mt-2 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="text"
                     name="line2"
-                    value={doctorData.address.line2 || ""}
+                    value={doctorData.address.line2 || ''}
                     onChange={handleAddressChange}
                     className="w-full mt-2 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
@@ -212,9 +204,7 @@ const Profile = () => {
             </div>
 
             <div>
-              <h3 className="text-2xl font-semibold text-gray-800">
-                Experience
-              </h3>
+              <h3 className="text-2xl font-semibold text-gray-800">Experience</h3>
               {isEditing ? (
                 <input
                   type="number"
@@ -224,18 +214,14 @@ const Profile = () => {
                   className="w-full mt-2 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               ) : (
-                <p className="mt-2 text-gray-600">
-                  {doctorData.experience} Years
-                </p>
+                <p className="mt-2 text-gray-600">{doctorData.experience} Years</p>
               )}
             </div>
           </div>
 
           {isEditing && (
             <div className="mt-4">
-              <h3 className="text-2xl font-semibold text-gray-800">
-                Update Profile Picture
-              </h3>
+              <h3 className="text-2xl font-semibold text-gray-800">Update Profile Picture</h3>
               <input
                 type="file"
                 accept="image/*"

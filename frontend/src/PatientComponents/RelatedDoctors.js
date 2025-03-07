@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
-import { AppContext } from "../context/AppContext";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useContext } from 'react';
+import { AppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const RelatedDoctors = ({ speciality, docId }) => {
   const { doctors } = useContext(AppContext);
@@ -10,13 +10,11 @@ const RelatedDoctors = ({ speciality, docId }) => {
   useEffect(() => {
     const fetchRelatedDoctors = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_SERVER_URL}/doctor/${speciality}`
-        );
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/doctor/${speciality}`);
         const data = await response.json();
         setRelDocs(data.filter((doc) => doc._id !== docId));
       } catch (error) {
-        console.error("Error fetching related doctors:", error);
+        console.error('Error fetching related doctors:', error);
       }
     };
 

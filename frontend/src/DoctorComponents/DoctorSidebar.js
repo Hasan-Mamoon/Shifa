@@ -1,25 +1,22 @@
-
-
 // import React from "react";
-// import { Link, useLocation, useNavigate } from "react-router-dom"; 
+// import { Link, useLocation, useNavigate } from "react-router-dom";
 // import { AiOutlineHome, AiOutlineCalendar, AiOutlineUser } from "react-icons/ai";
 // import { useAuth } from "../context/AuthContext";
 
 // const Sidebar = () => {
 //   const location = useLocation();
-//   const navigate = useNavigate(); 
+//   const navigate = useNavigate();
 //   const { setUser } = useAuth();
 
 //   const isActive = (path) => location.pathname === path;
 
 //   const handleLogout = () => {
-    
+
 //     localStorage.clear();
 //     setUser(null);
-   
+
 //     navigate("/");
 //   };
-  
 
 //   return (
 //     <aside className="w-64 h-screen bg-white text-gray-600 flex flex-col shadow-md">
@@ -87,10 +84,9 @@
 //         </ul>
 //       </nav>
 
-   
 //       <div className="px-6 py-4 border-t border-gray-200">
-//         <button 
-//           onClick={handleLogout} 
+//         <button
+//           onClick={handleLogout}
 //           className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
 //         >
 //           Logout

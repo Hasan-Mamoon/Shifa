@@ -1,6 +1,5 @@
-
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -13,7 +12,7 @@ const BlogDetails = () => {
         const data = await response.json();
         setBlog(data);
       } catch (error) {
-        console.error("Error fetching blog details:", error);
+        console.error('Error fetching blog details:', error);
       }
     };
 
@@ -31,10 +30,10 @@ const BlogDetails = () => {
           alt={blog.title}
           className="w-full h-auto object-cover"
           style={{
-            maxHeight: "600px",
-            width: "100%",
-            borderRadius: "10px",
-            imageRendering: "auto",
+            maxHeight: '600px',
+            width: '100%',
+            borderRadius: '10px',
+            imageRendering: 'auto',
           }}
           loading="lazy"
         />

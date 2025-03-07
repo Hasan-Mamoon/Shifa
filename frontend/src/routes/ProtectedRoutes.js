@@ -1,6 +1,6 @@
-import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ element, allowedRoles }) => {
   const { user } = useAuth();
@@ -10,7 +10,7 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
     return (
       <Navigate
         to="/login"
-        state={{ message: "Please sign in to continue.", from: location }}
+        state={{ message: 'Please sign in to continue.', from: location }}
         replace
       />
     );
@@ -21,7 +21,7 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
       <Navigate
         to="/login"
         state={{
-          message: "You do not have permission to access this page.",
+          message: 'You do not have permission to access this page.',
           from: location,
         }}
         replace

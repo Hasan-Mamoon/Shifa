@@ -1,44 +1,34 @@
-
-
-
-
-
-
-
-
-
-
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const categories = [
-  "Healthy Lifestyle",
-  "Women’s Health",
-  "Skin Care",
-  "Fitness & Exercise",
-  "Health News",
-  "Dental Health",
-  "Sonology",
-  "Mental Well-Being",
-  "Health Fact Check",
-  "New Health Researches",
+  'Healthy Lifestyle',
+  'Women’s Health',
+  'Skin Care',
+  'Fitness & Exercise',
+  'Health News',
+  'Dental Health',
+  'Sonology',
+  'Mental Well-Being',
+  'Health Fact Check',
+  'New Health Researches',
 ];
 
 const HealthBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch("${process.env.REACT_APP_SERVER_URL}/blog/blogs");
+        const response = await fetch('${process.env.REACT_APP_SERVER_URL}/blog/blogs');
         const data = await response.json();
         setBlogs(data);
         setFilteredBlogs(data); // Show all blogs initially
       } catch (error) {
-        console.error("Error fetching blogs:", error);
+        console.error('Error fetching blogs:', error);
       }
     };
 
@@ -69,10 +59,10 @@ const HealthBlogs = () => {
             key={category}
             className={`px-5 py-2 rounded-full border transition-all ${
               selectedCategory === category
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 hover:bg-primary hover:text-white"
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 hover:bg-primary hover:text-white'
             }`}
-            onClick={() => setSelectedCategory(category === selectedCategory ? "" : category)}
+            onClick={() => setSelectedCategory(category === selectedCategory ? '' : category)}
           >
             {category}
           </button>

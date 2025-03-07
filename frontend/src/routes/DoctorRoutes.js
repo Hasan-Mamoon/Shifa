@@ -1,59 +1,41 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Dashboard from "../DoctorPages/Dashboard";
-import Appointments from "../DoctorPages/Appointments";
-import Profile from "../DoctorPages/Profile";
-import ProtectedRoute from "./ProtectedRoutes";
-import BlogList from "../DoctorPages/DoctorBlogDetails";
-import BlogDetail from "../DoctorPages/DoctorBlogs";
-import AddBlog from "../DoctorPages/AddBlog";
-import DoctorBlogs from "../DoctorPages/DoctorBlogs";
-import DoctorBlogDetails from "../DoctorPages/DoctorBlogDetails";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Dashboard from '../DoctorPages/Dashboard';
+import Appointments from '../DoctorPages/Appointments';
+import Profile from '../DoctorPages/Profile';
+import ProtectedRoute from './ProtectedRoutes';
+import BlogList from '../DoctorPages/DoctorBlogDetails';
+import BlogDetail from '../DoctorPages/DoctorBlogs';
+import AddBlog from '../DoctorPages/AddBlog';
+import DoctorBlogs from '../DoctorPages/DoctorBlogs';
+import DoctorBlogDetails from '../DoctorPages/DoctorBlogDetails';
 
 const DoctorRoutes = () => {
   return (
     <Routes>
       <Route
         path="dashboard"
-        element={
-          <ProtectedRoute element={<Dashboard />} allowedRoles={["doctor"]} />
-        }
+        element={<ProtectedRoute element={<Dashboard />} allowedRoles={['doctor']} />}
       />
       <Route
         path="appointments"
-        element={
-          <ProtectedRoute
-            element={<Appointments />}
-            allowedRoles={["doctor"]}
-          />
-        }
+        element={<ProtectedRoute element={<Appointments />} allowedRoles={['doctor']} />}
       />
       <Route
         path="profile"
-        element={
-          <ProtectedRoute element={<Profile />} allowedRoles={["doctor"]} />
-        }
+        element={<ProtectedRoute element={<Profile />} allowedRoles={['doctor']} />}
       />
       <Route
         path="/blogs/list"
-        element={
-          <ProtectedRoute element={<DoctorBlogs />} allowedRoles={["doctor"]} />
-        }
+        element={<ProtectedRoute element={<DoctorBlogs />} allowedRoles={['doctor']} />}
       />
       <Route
         path="/blogs/:id"
-        element={
-          <ProtectedRoute
-            element={<DoctorBlogDetails />}
-            allowedRoles={["doctor"]}
-          />
-        }
+        element={<ProtectedRoute element={<DoctorBlogDetails />} allowedRoles={['doctor']} />}
       />
       <Route
         path="/blogs"
-        element={
-          <ProtectedRoute element={<AddBlog />} allowedRoles={["doctor"]} />
-        }
+        element={<ProtectedRoute element={<AddBlog />} allowedRoles={['doctor']} />}
       />
     </Routes>
   );

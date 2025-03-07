@@ -58,21 +58,16 @@
 
 //REMOVED HIDING OF NAVBAR CAUZ IT WAS NOT NEEDED?-----------------------------------------CHECK!!!!!!!-----------
 
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
-import Navbar from "./PatientComponents/Navbar";
-import Footer from "./PatientComponents/Footer";
-import DoctorNavbar from "./DoctorComponents/DoctorNavbar";
-import Login from "./authentication/Login";
-import Signup from "./authentication/Signup";
-import { useAuth } from "../src/context/AuthContext";
-import PatientRoutes from "./routes/PatientRoutes";
-import DoctorRoutes from "./routes/DoctorRoutes";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import Navbar from './PatientComponents/Navbar';
+import Footer from './PatientComponents/Footer';
+import DoctorNavbar from './DoctorComponents/DoctorNavbar';
+import Login from './authentication/Login';
+import Signup from './authentication/Signup';
+import { useAuth } from '../src/context/AuthContext';
+import PatientRoutes from './routes/PatientRoutes';
+import DoctorRoutes from './routes/DoctorRoutes';
 
 const App = () => {
   const location = useLocation();
@@ -80,19 +75,13 @@ const App = () => {
 
   if (loading) return <div>Loading...</div>;
 
-  const isDoctorRoute = location.pathname.startsWith("/doctor/");
+  const isDoctorRoute = location.pathname.startsWith('/doctor/');
 
-  console.log("Current Path:", location.pathname);
+  console.log('Current Path:', location.pathname);
 
   return (
     <div className="mx-4 sm:mx-[10%]">
-      {isDoctorRoute ? (
-        user?.role === "doctor" ? (
-          <DoctorNavbar />
-        ) : null
-      ) : (
-        <Navbar />
-      )}
+      {isDoctorRoute ? user?.role === 'doctor' ? <DoctorNavbar /> : null : <Navbar />}
 
       <Routes>
         <Route path="/login" element={<Login />} />
