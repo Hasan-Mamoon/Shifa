@@ -1,9 +1,69 @@
+// import { createContext, useContext, useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+
+// const AuthContext = createContext();
+
+// export const AuthProvider = ({ children }) => {
+//   const [user, setUser] = useState(null);
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const storedToken = localStorage.getItem("token");
+//     const storedRole = localStorage.getItem("role");
+//     if (storedToken && storedRole) {
+//       setUser({
+//         token: storedToken,
+//         role: storedRole,
+//       });
+//     }
+//   }, []);
+
+//   const login = (userData) => {
+//     const userInfo = {
+//       id: userData.id,
+//       token: userData.token,
+//       role: userData.role,
+//       email: userData.email,
+//     };
+
+//     setUser(userInfo);
+
+//     localStorage.setItem("token", userData.token);
+//     localStorage.setItem("role", userData.role);
+//   };
+
+//   const logout = () => {
+//     setUser(null);
+
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("role");
+//     navigate("/");
+//   };
+
+//   return (
+//     <AuthContext.Provider value={{ setUser, user, login, logout }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// export const useAuth = () => {
+//   return useContext(AuthContext);
+// };
+
+
+
+
+
+
 import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // ✅ Add loading state
+
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token") || null;
@@ -19,6 +79,7 @@ export const AuthProvider = ({ children }) => {
         email: storedEmail,
       });
     }
+    setLoading(false); // ✅ Set loading to false after checking storage
   }, []);
 
   const login = (userData) => {
@@ -50,7 +111,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ setUser, user, login, logout }}>
+    <AuthContext.Provider value={{ setUser, user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -8,6 +8,8 @@ import About from "../PatientPages/About";
 import MyProfile from "../PatientPages/MyProfile";
 import Appointment from "../PatientPages/Appointment";
 import ProtectedRoute from "./ProtectedRoutes";
+import HealthBlogs from "../PatientPages/HealthBlogs";
+import BlogDetails from "../PatientPages/BlogDetails";
 const PatientRoutes = () => {
   return (
     <Routes>
@@ -16,6 +18,7 @@ const PatientRoutes = () => {
       <Route path="doctors/:speciality" element={<Doctors />} />
       <Route path="about" element={<About />} />
       <Route path="contact" element={<Contact />} />
+      <Route path="/blogs" element={<HealthBlogs />} />
       <Route
         path="my-profile"
         element={
@@ -36,6 +39,26 @@ const PatientRoutes = () => {
         element={
           <ProtectedRoute
             element={<Appointment />}
+            allowedRoles={["patient"]}
+          />
+        }
+      />
+
+      {/* <Route
+        path="/blogs"
+        element={
+          <ProtectedRoute
+            element={<HealthBlogs />}
+            allowedRoles={["patient"]}
+          />
+        }
+      /> */}
+
+      <Route
+        path="/blog/:id"
+        element={
+          <ProtectedRoute
+            element={<BlogDetails />}
             allowedRoles={["patient"]}
           />
         }

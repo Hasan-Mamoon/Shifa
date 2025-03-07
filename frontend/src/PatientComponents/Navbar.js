@@ -64,6 +64,9 @@ const Navbar = () => {
         <NavLink to="/contact">
           <li className="py-1">CONTACT</li>
         </NavLink>
+        <NavLink to="/blogs">
+          <li className="py-1">HEALTH-BLOGS</li>
+        </NavLink>
       </ul>
 
       <div className="flex items-center gap-4">
