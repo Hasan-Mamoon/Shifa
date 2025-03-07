@@ -2,6 +2,7 @@ import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
+  Navigate,
   Route,
   useLocation,
 } from "react-router-dom";
@@ -13,6 +14,9 @@ import Signup from "./authentication/Signup";
 import { useAuth } from "../src/context/AuthContext";
 import PatientRoutes from "./routes/PatientRoutes";
 import DoctorRoutes from "./routes/DoctorRoutes";
+import Doctors from "./PatientPages/Doctors";
+import Appointment from "./PatientPages/Appointment";
+
 
 const App = () => {
   const location = useLocation();
@@ -34,12 +38,14 @@ const App = () => {
         ))}
 
       <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-
+        
+        
+        <Route path="/signup/:userType" element={<Signup />} />
         <Route path="/*" element={<PatientRoutes />} />
 
         <Route path="/doctor/*" element={<DoctorRoutes />} />
+        <Route path="/login" element={<Login />} />
+        
       </Routes>
 
       {!hideNavbarFooter && !isDoctorRoute && <Footer />}

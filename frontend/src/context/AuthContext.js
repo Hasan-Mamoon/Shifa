@@ -1,19 +1,22 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedRole = localStorage.getItem("role");
-    if (storedToken && storedRole) {
+    const storedToken = localStorage.getItem("token") || null;
+    const storedRole = localStorage.getItem("role") || null;
+    const storedId = localStorage.getItem("id") || null;
+    const storedEmail = localStorage.getItem("email") || null;
+
+    if (storedToken && storedRole && storedId) {
       setUser({
+        id: storedId,
         token: storedToken,
         role: storedRole,
+        email: storedEmail,
       });
     }
   }, []);
@@ -30,14 +33,20 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.setItem("token", userData.token);
     localStorage.setItem("role", userData.role);
+    localStorage.setItem("id", userData.id);
+    localStorage.setItem("email", userData.email);
   };
 
   const logout = () => {
     setUser(null);
-
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    navigate("/");
+    localStorage.removeItem("id");
+    localStorage.removeItem("email");
+
+    setTimeout(() => {
+      window.location.href = "/"; // Ensure proper redirection
+    }, 0);
   };
 
   return (

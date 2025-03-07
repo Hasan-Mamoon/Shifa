@@ -12,6 +12,11 @@ const MyProfile = () => {
   console.log(email);
 
   const fetchUserData = async () => {
+    if(email === undefined || email == null){ 
+      console.log("Email is undefined");
+      return;
+
+    };
     try {
       const response = await axios.get(
         `http://localhost:3080/patient/${email}`

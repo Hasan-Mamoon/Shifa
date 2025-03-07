@@ -1,9 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
+  const location = useLocation();
+  const message = location.state?.message || ""; // Get message from state if redirected
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -42,11 +44,8 @@ const Login = () => {
           email: response.data.email,
         });
 
-        if (formData.role === "patient") {
-          navigate("/");
-        } else if (formData.role === "doctor") {
-          navigate("/doctor/dashboard");
-        }
+        // Redirect based on role
+        navigate(formData.role === "doctor" ? "/doctor/dashboard" : "/");
       }
     } catch (error) {
       setError("Failed to login. Please check your credentials.");
@@ -56,6 +55,10 @@ const Login = () => {
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
       <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+
+      {/* Display redirect message if exists */}
+      {message && <p className="text-yellow-600 text-center mb-4">{message}</p>}
+      
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -107,7 +110,7 @@ const Login = () => {
 
       <p className="text-center mt-4">
         Don't have an account?{" "}
-        <Link to="/signup" className="text-blue-600 underline">
+        <Link to={`/signup/${formData.role}`} className="text-blue-600 underline">
           Create an account
         </Link>
       </p>
