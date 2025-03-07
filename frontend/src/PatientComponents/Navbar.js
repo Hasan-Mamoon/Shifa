@@ -16,7 +16,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if(email === undefined || email == null){
+      if (email === undefined || email == null) {
         console.log("Email is undefined");
         return;
       }
@@ -70,32 +70,40 @@ const Navbar = () => {
       </ul>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 cursor-pointer group relative">
-          <img className="w-8 rounded-full" src={imagePreview} alt="User" />
-          <img className="w-2.5" src={assets.dropdown_icon} alt="Dropdown" />
-          <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
-            <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
-              <p
-                onClick={() => navigate("/my-profile")}
-                className="hover:text-black cursor-pointer"
-              >
-                My Profile
-              </p>
-              <p
-                onClick={() => navigate("/my-appointments")}
-                className="hover:text-black cursor-pointer"
-              >
-                My Appointments
-              </p>
-              <p
-                onClick={handleLogout}
-                className="hover:text-black cursor-pointer p-2"
-              >
-                Logout
-              </p>
+        {user ? (
+          <div className="flex items-center gap-2 cursor-pointer group relative">
+            <img className="w-8 rounded-full" src={imagePreview} alt="User" />
+            <img className="w-2.5" src={assets.dropdown_icon} alt="Dropdown" />
+            <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
+              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
+                <p
+                  onClick={() => navigate("/my-profile")}
+                  className="hover:text-black cursor-pointer"
+                >
+                  My Profile
+                </p>
+                <p
+                  onClick={() => navigate("/my-appointments")}
+                  className="hover:text-black cursor-pointer"
+                >
+                  My Appointments
+                </p>
+                <p
+                  onClick={handleLogout}
+                  className="hover:text-black cursor-pointer p-2"
+                >
+                  Logout
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <NavLink to="/login">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-md">
+              Login
+            </button>
+          </NavLink>
+        )}
 
         <img
           onClick={() => setShowMenu(true)}

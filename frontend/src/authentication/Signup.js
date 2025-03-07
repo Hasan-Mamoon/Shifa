@@ -91,7 +91,7 @@ const Signup = () => {
     }
 
     try {
-      const url = userType === "doctor" ? "${process.env.REACT_APP_SERVER_URL}/doctor/add-doctor" : "${process.env.REACT_APP_SERVER_URL}/patient/add-patient";
+      const url = userType === "doctor" ? `${process.env.REACT_APP_SERVER_URL}/doctor/add-doctor` : `${process.env.REACT_APP_SERVER_URL}/patient/add-patient`;
 
       await axios.post(url, form, { headers: { "Content-Type": "multipart/form-data" } });
 
