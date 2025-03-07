@@ -9,7 +9,7 @@ const DoctorBlogDetails = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3080/blog/blogs/${id}`)
+      .get(`${process.env.REACT_APP_SERVER_URL}/blog/blogs/${id}`)
       .then((response) => {
         setBlog(response.data);
       })

@@ -13,7 +13,7 @@ const AppContextProvider = (props) => {
     const fetchDoctors = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3080/doctor/doctors-all"
+          `${process.env.REACT_APP_SERVER_URL}/doctor/doctors-all`
         );
         setDoctors(response.data);
       } catch (error) {

@@ -19,7 +19,7 @@ const MyProfile = () => {
     };
     try {
       const response = await axios.get(
-        `http://localhost:3080/patient/${email}`
+        `${process.env.REACT_APP_SERVER_URL}/patient/${email}`
       );
       console.log("USER DATA: ", response.data[0]);
       setUserData(response.data[0]);
@@ -55,7 +55,7 @@ const MyProfile = () => {
       }
 
       await axios.put(
-        `http://localhost:3080/patient/edit-patient/${userData.email}`,
+        `${process.env.REACT_APP_SERVER_URL}/patient/edit-patient/${userData.email}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

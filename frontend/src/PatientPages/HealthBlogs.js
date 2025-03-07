@@ -33,7 +33,7 @@ const HealthBlogs = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch("http://localhost:3080/blog/blogs");
+        const response = await fetch("${process.env.REACT_APP_SERVER_URL}/blog/blogs");
         const data = await response.json();
         setBlogs(data);
         setFilteredBlogs(data); // Show all blogs initially

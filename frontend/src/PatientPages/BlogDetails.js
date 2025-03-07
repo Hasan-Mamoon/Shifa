@@ -9,7 +9,7 @@ const BlogDetails = () => {
   useEffect(() => {
     const fetchBlogDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:3080/blog/blogs/${id}`);
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/blog/blogs/${id}`);
         const data = await response.json();
         setBlog(data);
       } catch (error) {

@@ -27,7 +27,7 @@ const Appointment = () => {
     const fetchAvailableDates = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3080/slot/dates?doctorId=${docId}`
+          `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
         );
         setAvailableDates(response.data);
       } catch (error) {
@@ -45,7 +45,7 @@ const Appointment = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3080/slot/appointments?doctorId=${docId}&date=${date}`
+        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
       );
       setAppointments(response.data);
     } catch (error) {

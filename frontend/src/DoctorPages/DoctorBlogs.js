@@ -11,7 +11,7 @@
 
 //   useEffect(() => {
 //     axios
-//       .get(`http://localhost:3080/blog/blogs`)
+//       .get(`${process.env.REACT_APP_SERVER_URL}/blog/blogs`)
 //       .then((response) => {
 //         const doctorBlogs = response.data.filter(
 //           (blog) => blog.author._id === doctorId
@@ -70,7 +70,7 @@ const DoctorBlogs = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3080/blog/blogs`)
+      .get(`${process.env.REACT_APP_SERVER_URL}/blog/blogs`)
       .then((response) => {
         const doctorBlogs = response.data.filter(
           (blog) => blog.author._id === doctorId
@@ -82,7 +82,7 @@ const DoctorBlogs = () => {
 
   const handleDelete = async (blogId) => {
     try {
-      await axios.delete(`http://localhost:3080/blog/delete-blog/${blogId}`, {
+      await axios.delete(`${process.env.REACT_APP_SERVER_URL}/blog/delete-blog/${blogId}`, {
         data: { author: doctorId },
       });
 

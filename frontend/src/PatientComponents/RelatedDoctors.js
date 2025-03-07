@@ -11,7 +11,7 @@ const RelatedDoctors = ({ speciality, docId }) => {
     const fetchRelatedDoctors = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3080/doctor/${speciality}`
+          `${process.env.REACT_APP_SERVER_URL}/doctor/${speciality}`
         );
         const data = await response.json();
         setRelDocs(data.filter((doc) => doc._id !== docId));

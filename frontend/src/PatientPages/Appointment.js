@@ -37,7 +37,7 @@ const Appointment = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3080/appointment/book-appointment",
+        "${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment",
         {
           method: "POST",
           headers: {
@@ -68,7 +68,7 @@ const Appointment = () => {
   const getAvailableDates = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3080/slot/dates?doctorId=${docId}`
+        `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
       );
       const datesFromDB = await response.json();
       if (!response.ok) {
@@ -84,7 +84,7 @@ const Appointment = () => {
   const getAvailableSlots = async (date) => {
     try {
       const response = await fetch(
-        `http://localhost:3080/slot/appointments?doctorId=${docId}&date=${date}`
+        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
       );
       const slotsFromDB = await response.json();
 

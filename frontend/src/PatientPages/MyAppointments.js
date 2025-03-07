@@ -11,7 +11,7 @@ const MyAppointments = () => {
   const fetchAppointments = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3080/appointment/appointments?userId=${userId}`
+        `${process.env.REACT_APP_SERVER_URL}/appointment/appointments?userId=${userId}`
       );
       const data = await response.json();
 

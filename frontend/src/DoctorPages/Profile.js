@@ -20,7 +20,7 @@ const Profile = () => {
   const fetchDoctorData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3080/doctor/get-doctor",
+        "${process.env.REACT_APP_SERVER_URL}/doctor/get-doctor",
         {
           params: { email: email },
         }
@@ -86,7 +86,7 @@ const Profile = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:3080/doctor/update/${doctorData.email}`,
+        `${process.env.REACT_APP_SERVER_URL}/doctor/update/${doctorData.email}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

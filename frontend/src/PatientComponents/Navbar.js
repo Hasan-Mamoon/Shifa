@@ -22,7 +22,7 @@ const Navbar = () => {
       }
       try {
         const response = await axios.get(
-          `http://localhost:3080/patient/${email}`
+          `${process.env.REACT_APP_SERVER_URL}/patient/${email}`
         );
 
         setUserData(response.data[0]);

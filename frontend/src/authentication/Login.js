@@ -32,7 +32,7 @@ const Login = () => {
       const endpoint =
         formData.role === "doctor" ? "doctor/login" : "patient/login";
       const response = await axios.post(
-        `http://localhost:3080/${endpoint}`,
+        `${process.env.REACT_APP_SERVER_URL}/${endpoint}`,
         formData
       );
 

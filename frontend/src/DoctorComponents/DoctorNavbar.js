@@ -58,7 +58,7 @@ const DoctorNavbar = () => {
   
       try {
         const response = await axios.get(
-          `http://localhost:3080/doctor/get-doctor?email=${email}`
+          `${process.env.REACT_APP_SERVER_URL}/doctor/get-doctor?email=${email}`
         );
   
         if (response.data && response.data.length > 0) {

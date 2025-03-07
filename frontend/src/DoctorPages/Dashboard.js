@@ -34,7 +34,7 @@ const Dashboard = () => {
     }
     try {
       const data = await apiCall(
-        "http://localhost:3080/slot/appointments",
+        "${process.env.REACT_APP_SERVER_URL}/slot/appointments",
         "get",
         { doctorId, date }
       );
@@ -56,7 +56,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      await apiCall("http://localhost:3080/slot/add", "post", {
+      await apiCall("${process.env.REACT_APP_SERVER_URL}/slot/add", "post", {
         doctorId,
         date,
         slots: [...slots.map((slot) => slot.time), newSlot],
