@@ -18,13 +18,15 @@ const appointmentSchema = new mongoose.Schema({
   },
   date: { type: String, required: true },
   time: { type: String, required: true },
+  type: { type: String, required: true },
   status: {
     type: String,
     enum: ['Booked', 'Completed', 'Cancelled'],
     default: 'Booked',
   },
   notes: { type: String },
-  meetingLink: { type: String },
+  meetingLink: { type: String }
+  
 });
 
 const appointmentModel = mongoose.model('Appointment', appointmentSchema);

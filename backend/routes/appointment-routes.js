@@ -19,7 +19,7 @@ const s3 = new S3Client({
 });
 
 router.post('/book-appointment', async (req, res) => {
-  const { doctorId, patientId, slotId, date, time, meetingLink } = req.body;
+  const { doctorId, patientId, slotId, date, time, type , meetingLink } = req.body;
 
   console.log('Booking Appointment Request:', req.body);
 
@@ -67,6 +67,7 @@ router.post('/book-appointment', async (req, res) => {
       slotId,
       date,
       time,
+      type,
       status: 'Booked',
       notes: '',
       meetingLink
@@ -88,33 +89,83 @@ router.post('/book-appointment', async (req, res) => {
   }
 });
 
+// router.patch('/:appointmentId', async (req, res) => {
+//   try {
+//     const { appointmentId } = req.params;
+
+//     console.log('Cancel Appointment Request:', appointmentId);
+
+//     const updatedAppointment = await appointmentModel.findByIdAndUpdate(
+//       appointmentId,
+//       { status: 'Cancelled' },
+//       { new: true }
+//     );
+
+//     if (!updatedAppointment) {
+//       return res.status(404).json({ message: 'Appointment not found' });
+//     }
+
+//     console.log('Appointment Cancelled:', updatedAppointment);
+
+//     res.status(200).json({
+//       message: 'Appointment cancelled successfully',
+//       appointment: updatedAppointment,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Error cancelling appointment', error });
+//   }
+// });
+
 router.patch('/:appointmentId', async (req, res) => {
   try {
     const { appointmentId } = req.params;
 
     console.log('Cancel Appointment Request:', appointmentId);
 
-    const updatedAppointment = await appointmentModel.findByIdAndUpdate(
+    // Step 1: Find the appointment to get the slotId
+    const appointment = await appointmentModel.findByIdAndUpdate(
       appointmentId,
-      { status: 'Cancelled' },
-      { new: true }
+      { $set: { status: 'Cancelled' } },
+      { new: true, runValidators: true }
     );
 
-    if (!updatedAppointment) {
+    if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
-    console.log('Appointment Cancelled:', updatedAppointment);
+    // Step 2: Update the appointment status to "Cancelled"
+
+    console.log('Appointment Cancelled:', appointment);
+
+    // Step 3: If the appointment has a slotId, update the specific slot in the slot array
+    if (appointment.slotId) {
+      const updatedSlot = await slotModel.findOneAndUpdate(
+        { 'slots._id': appointment.slotId }, // Find the slot containing the slotId
+        {
+          $set: { 'slots.$.isBooked': false }, // Set isBooked to false
+          $unset: { 'slots.$.patient': '' }    // Remove patient field from that slot
+        },
+        { new: true }
+      );
+
+      if (!updatedSlot) {
+        console.warn('Slot not found for appointment:', appointmentId);
+      } else {
+        console.log('Slot Updated:', updatedSlot);
+      }
+    }
 
     res.status(200).json({
-      message: 'Appointment cancelled successfully',
-      appointment: updatedAppointment,
+      message: 'Appointment cancelled successfully, slot updated',
+      appointment,
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error cancelling appointment:', error);
     res.status(500).json({ message: 'Error cancelling appointment', error });
   }
 });
+
 
 router.delete('/:appointmentId', async (req, res) => {
   try {
@@ -150,18 +201,31 @@ router.get('/appointments', async (req, res) => {
   }
 
   try {
+    // Step 1: Fetch appointments for the user (without populating slotId)
     const appointments = await appointmentModel
       .find({ patientId: userId })
-      .populate('doctorId', 'name speciality image address')
-      .populate('slotId', 'time date');
-
-    console.log(appointments);
+      .populate('doctorId', 'name speciality image address');
 
     if (!appointments || appointments.length === 0) {
       return res.status(404).json({ message: 'No appointments found.' });
     }
 
+    // Step 2: Fetch slot details separately
     for (const appointment of appointments) {
+      if (appointment.slotId) {
+        // Find the slot document that contains the booked slot
+        const slotDocument = await slotModel.findOne(
+          { 'slots._id': appointment.slotId },
+          { 'slots.$': 1, date: 1 } // Get only the specific slot and date
+        );
+
+        if (slotDocument && slotDocument.slots.length > 0) {
+          appointment.time = slotDocument.slots[0].time;
+          appointment.date = slotDocument.date;
+        }
+      }
+
+      // Step 3: Convert doctor image key to a signed URL if available
       if (appointment.doctorId.image) {
         const getObjectParams = {
           Bucket: process.env.BUCKET_NAME,
@@ -176,7 +240,6 @@ router.get('/appointments', async (req, res) => {
     }
 
     console.log('Fetched Appointments:', appointments);
-
     res.status(200).json(appointments);
   } catch (error) {
     console.error('Error fetching appointments:', error);
