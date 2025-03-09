@@ -156,6 +156,21 @@ const Appointment = () => {
                 {currencySymbol} {docInfo.fees}
               </span>
             </p>
+
+            {/* Google Maps Button (Now Correctly Positioned) */}
+            {docInfo.address && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  `${docInfo.address.line1}, ${docInfo.address.line2}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:underline mt-2"
+              >
+                <img className="w-6 h-6" src={assets.GMAP} alt="Google Maps" />
+                <span>View Location on Map</span>
+              </a>
+            )}
           </div>
         </div>
 
