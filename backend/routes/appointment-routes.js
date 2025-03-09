@@ -19,7 +19,7 @@ const s3 = new S3Client({
 });
 
 router.post('/book-appointment', async (req, res) => {
-  const { doctorId, patientId, slotId, date, time, type , meetingLink } = req.body;
+  const { doctorId, patientId, slotId, date, time, type, meetingLink } = req.body;
 
   console.log('Booking Appointment Request:', req.body);
 
@@ -70,7 +70,7 @@ router.post('/book-appointment', async (req, res) => {
       type,
       status: 'Booked',
       notes: '',
-      meetingLink
+      meetingLink,
     });
 
     await newAppointment.save({ session });
@@ -144,7 +144,7 @@ router.patch('/:appointmentId', async (req, res) => {
         { 'slots._id': appointment.slotId }, // Find the slot containing the slotId
         {
           $set: { 'slots.$.isBooked': false }, // Set isBooked to false
-          $unset: { 'slots.$.patient': '' }    // Remove patient field from that slot
+          $unset: { 'slots.$.patient': '' }, // Remove patient field from that slot
         },
         { new: true }
       );
@@ -165,7 +165,6 @@ router.patch('/:appointmentId', async (req, res) => {
     res.status(500).json({ message: 'Error cancelling appointment', error });
   }
 });
-
 
 router.delete('/:appointmentId', async (req, res) => {
   try {

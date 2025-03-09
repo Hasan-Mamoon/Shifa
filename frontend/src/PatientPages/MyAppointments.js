@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -12,17 +12,17 @@ const MyAppointments = () => {
   const fetchAppointments = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/appointment/appointments?userId=${userId}`
+        `${process.env.REACT_APP_SERVER_URL}/appointment/appointments?userId=${userId}`,
       );
       const data = await response.json();
 
       if (response.ok) {
         setAppointments(data);
       } else {
-        console.error("Error fetching appointments:", data.message);
+        console.error('Error fetching appointments:', data.message);
       }
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      console.error('Error fetching appointments:', error);
     } finally {
       setLoading(false);
     }
@@ -35,35 +35,33 @@ const MyAppointments = () => {
   }, [userId]);
 
   const handleCancelAppointment = async (appointmentId) => {
-    const confirmCancel = window.confirm(
-      "Are you sure you want to cancel this appointment?"
-    );
+    const confirmCancel = window.confirm('Are you sure you want to cancel this appointment?');
     if (!confirmCancel) return;
 
     try {
       const response = await fetch(
         `${process.env.REACT_APP_SERVER_URL}/appointment/${appointmentId}`,
         {
-          method: "PATCH",
+          method: 'PATCH',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Failed to cancel appointment");
+        throw new Error(data.message || 'Failed to cancel appointment');
       }
 
       setAppointments((prevAppointments) =>
-        prevAppointments.filter((appointment) => appointment._id !== appointmentId)
+        prevAppointments.filter((appointment) => appointment._id !== appointmentId),
       );
 
-      toast.success("Appointment cancelled successfully");
+      toast.success('Appointment cancelled successfully');
     } catch (error) {
-      console.error("Error cancelling appointment:", error);
-      toast.error("Failed to cancel appointment. Please try again.");
+      console.error('Error cancelling appointment:', error);
+      toast.error('Failed to cancel appointment. Please try again.');
     }
   };
 
@@ -85,15 +83,13 @@ const MyAppointments = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
-        My Appointments
-      </h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">My Appointments</h2>
       <div className="space-y-4">
         {appointments.map((appointment) => {
           const imageUrl =
             appointment.doctorId.image?.length > 1024
-              ? "/path/to/default/image.jpg"
-              : appointment.doctorId.image || "/path/to/default/image.jpg";
+              ? '/path/to/default/image.jpg'
+              : appointment.doctorId.image || '/path/to/default/image.jpg';
 
           return (
             <div
@@ -106,23 +102,19 @@ const MyAppointments = () => {
                 className="w-16 h-16 rounded-full object-cover"
               />
               <div className="flex-1">
-                <p className="text-lg font-semibold text-gray-900">
-                  {appointment.doctorId.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {appointment.doctorId.speciality}
-                </p>
+                <p className="text-lg font-semibold text-gray-900">{appointment.doctorId.name}</p>
+                <p className="text-sm text-gray-600">{appointment.doctorId.speciality}</p>
                 <p className="text-xs text-gray-500 mt-1">
-                  <strong>Meeting Type:</strong>{" "}
-                  {appointment.type === "virtual" ? "Virtual" : "Physical"}
+                  <strong>Meeting Type:</strong>{' '}
+                  {appointment.type === 'virtual' ? 'Virtual' : 'Physical'}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   <strong>Time & Date:</strong> {appointment.date} at {appointment.time}
                 </p>
 
-                {appointment.type === "virtual" && appointment.meetingLink && (
+                {appointment.type === 'virtual' && appointment.meetingLink && (
                   <p className="text-xs text-blue-600 mt-1">
-                    <strong>Meeting Link:</strong>{" "}
+                    <strong>Meeting Link:</strong>{' '}
                     <a
                       href={appointment.meetingLink}
                       target="_blank"

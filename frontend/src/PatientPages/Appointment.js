@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { AppContext } from "../context/AppContext";
-import { assets } from "../assets/assets";
-import RelatedDoctors from "../PatientComponents/RelatedDoctors";
-import { useAuth } from "../context/AuthContext";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
+import { assets } from '../assets/assets';
+import RelatedDoctors from '../PatientComponents/RelatedDoctors';
+import { useAuth } from '../context/AuthContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Appointment = () => {
   const { docId } = useParams();
@@ -15,42 +15,48 @@ const Appointment = () => {
   const [availableDates, setAvailableDates] = useState([]);
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
-  const [slotTime, setSlotTime] = useState("");
-  const [slotId, setSlotId] = useState("");
-  const [appointmentType, setAppointmentType] = useState("virtual");
+  const [slotTime, setSlotTime] = useState('');
+  const [slotId, setSlotId] = useState('');
+  const [appointmentType, setAppointmentType] = useState('virtual');
 
   const docInfo = doctors.find((doc) => doc._id === docId);
 
   const getAvailableDates = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`);
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`,
+      );
       const datesFromDB = await response.json();
       if (response.ok) {
         setAvailableDates(datesFromDB);
       } else {
-        toast.error("Error fetching available dates");
+        toast.error('Error fetching available dates');
       }
     } catch (error) {
-      toast.error("Error fetching available dates");
+      toast.error('Error fetching available dates');
     }
   };
 
   const getAvailableSlots = async (date) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`);
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`,
+      );
       const slotsFromDB = await response.json();
-      
+
       if (response.ok) {
-        setDocSlots(slotsFromDB.map((slot) => ({
-          id: slot._id,
-          time: slot.time,
-          isBooked: slot.isBooked,
-        })));
+        setDocSlots(
+          slotsFromDB.map((slot) => ({
+            id: slot._id,
+            time: slot.time,
+            isBooked: slot.isBooked,
+          })),
+        );
       } else {
-        toast.error("Error fetching slots");
+        toast.error('Error fetching slots');
       }
     } catch (error) {
-      toast.error("Error fetching slots");
+      toast.error('Error fetching slots');
     }
   };
 
@@ -68,7 +74,7 @@ const Appointment = () => {
 
   const bookAppointment = async () => {
     if (!slotTime || !availableDates[slotIndex] || !slotId) {
-      toast.warn("Please select a date and time slot before booking.");
+      toast.warn('Please select a date and time slot before booking.');
       return;
     }
 
@@ -81,26 +87,29 @@ const Appointment = () => {
       type: appointmentType,
     };
 
-    if (appointmentType === "virtual") {
+    if (appointmentType === 'virtual') {
       const jitsiMeetingId = `doctor-${docId}-patient-${user?.id}-${Date.now()}`;
       appointmentData.meetingLink = `https://meet.jit.si/${jitsiMeetingId}`;
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(appointmentData),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(appointmentData),
+        },
+      );
 
       const result = await response.json();
       if (response.ok) {
-        toast.success("Appointment booked successfully!");
+        toast.success('Appointment booked successfully!');
       } else {
         toast.error(result.message);
       }
     } catch (error) {
-      toast.error("Failed to book appointment. Please try again.");
+      toast.error('Failed to book appointment. Please try again.');
     }
   };
 
@@ -118,7 +127,10 @@ const Appointment = () => {
               <img className="w-5" src={assets.verified_icon} alt="" />
             </p>
             <p className="text-gray-500 font-medium mt-4">
-              Appointment fee: <span className="text-gray-600">{currencySymbol} {docInfo.fees}</span>
+              Appointment fee:{' '}
+              <span className="text-gray-600">
+                {currencySymbol} {docInfo.fees}
+              </span>
             </p>
           </div>
         </div>
@@ -127,14 +139,14 @@ const Appointment = () => {
           <p>Choose Appointment Type</p>
           <div className="flex gap-4 mt-2">
             <button
-              className={`px-4 py-2 rounded ${appointmentType === "virtual" ? "bg-primary text-white" : "border"}`}
-              onClick={() => setAppointmentType("virtual")}
+              className={`px-4 py-2 rounded ${appointmentType === 'virtual' ? 'bg-primary text-white' : 'border'}`}
+              onClick={() => setAppointmentType('virtual')}
             >
               Virtual
             </button>
             <button
-              className={`px-4 py-2 rounded ${appointmentType === "physical" ? "bg-primary text-white" : "border"}`}
-              onClick={() => setAppointmentType("physical")}
+              className={`px-4 py-2 rounded ${appointmentType === 'physical' ? 'bg-primary text-white' : 'border'}`}
+              onClick={() => setAppointmentType('physical')}
             >
               Physical
             </button>
@@ -150,7 +162,7 @@ const Appointment = () => {
                   getAvailableSlots(date);
                 }}
                 className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
-                  slotIndex === index ? "bg-primary text-white" : "border border-gray-200"
+                  slotIndex === index ? 'bg-primary text-white' : 'border border-gray-200'
                 }`}
               >
                 <p>{new Date(date).toLocaleDateString()}</p>
@@ -169,15 +181,23 @@ const Appointment = () => {
                   }
                 }}
                 className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer 
-                  ${item.isBooked ? "bg-gray-300 text-gray-500 cursor-not-allowed" :
-                  item.time === slotTime ? "bg-primary text-white" : "text-gray-400 border border-gray-300"}`}
+                  ${
+                    item.isBooked
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : item.time === slotTime
+                        ? 'bg-primary text-white'
+                        : 'text-gray-400 border border-gray-300'
+                  }`}
               >
                 {item.time.toLowerCase()}
               </p>
             ))}
           </div>
 
-          <button className="bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6" onClick={bookAppointment}>
+          <button
+            className="bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6"
+            onClick={bookAppointment}
+          >
             Book an appointment
           </button>
         </div>
@@ -188,6 +208,3 @@ const Appointment = () => {
 };
 
 export default Appointment;
-
-
-

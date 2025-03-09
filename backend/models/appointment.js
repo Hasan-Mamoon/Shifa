@@ -25,8 +25,7 @@ const appointmentSchema = new mongoose.Schema({
     default: 'Booked',
   },
   notes: { type: String },
-  meetingLink: { type: String }
-  
+  meetingLink: { type: String },
 });
 
 const appointmentModel = mongoose.model('Appointment', appointmentSchema);
