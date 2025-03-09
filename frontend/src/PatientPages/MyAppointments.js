@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const userId = user?.id;
-  console.log(userId);
 
   const fetchAppointments = async () => {
     try {
@@ -15,14 +16,11 @@ const MyAppointments = () => {
       );
       const data = await response.json();
 
-      console.log('appointments: ', data);
-
-      if (!response.ok) {
+      if (response.ok) {
+        setAppointments(data);
+      } else {
         console.error('Error fetching appointments:', data.message);
-        return;
       }
-
-      setAppointments(data);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     } finally {
@@ -36,57 +34,111 @@ const MyAppointments = () => {
     }
   }, [userId]);
 
+  const handleCancelAppointment = async (appointmentId) => {
+    const confirmCancel = window.confirm('Are you sure you want to cancel this appointment?');
+    if (!confirmCancel) return;
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/appointment/${appointmentId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to cancel appointment');
+      }
+
+      setAppointments((prevAppointments) =>
+        prevAppointments.filter((appointment) => appointment._id !== appointmentId),
+      );
+
+      toast.success('Appointment cancelled successfully');
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      toast.error('Failed to cancel appointment. Please try again.');
+    }
+  };
+
   if (loading) {
-    return <p>Loading appointments...</p>;
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <p className="text-gray-500">Loading appointments...</p>
+      </div>
+    );
   }
 
   if (appointments.length === 0) {
-    return <p>No appointments found.</p>;
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <p className="text-gray-500">No appointments found.</p>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">My Appointments</p>
-      <div>
+    <div className="max-w-3xl mx-auto px-4">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">My Appointments</h2>
+      <div className="space-y-4">
         {appointments.map((appointment) => {
-          const imageUrl = appointment.doctorId.image || '';
-
-          const maxImageUrlLength = 1024;
-          const finalImageUrl =
-            imageUrl && imageUrl.length <= maxImageUrlLength
-              ? imageUrl
-              : '/path/to/default/image.jpg';
+          const imageUrl =
+            appointment.doctorId.image?.length > 1024
+              ? '/path/to/default/image.jpg'
+              : appointment.doctorId.image || '/path/to/default/image.jpg';
 
           return (
             <div
-              className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
               key={appointment._id}
+              className="flex items-center gap-4 p-4 border rounded-lg shadow-sm bg-white"
             >
-              <div>
-                <img
-                  src={finalImageUrl}
-                  alt={appointment.doctorId.name}
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    borderRadius: '50%',
-                  }}
-                />
+              <img
+                src={imageUrl}
+                alt={appointment.doctorId.name}
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <p className="text-lg font-semibold text-gray-900">{appointment.doctorId.name}</p>
+                <p className="text-sm text-gray-600">{appointment.doctorId.speciality}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  <strong>Meeting Type:</strong>{' '}
+                  {appointment.type === 'virtual' ? 'Virtual' : 'Physical'}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  <strong>Time & Date:</strong> {appointment.date} at {appointment.time}
+                </p>
+
+                {appointment.type === 'virtual' && appointment.meetingLink && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    <strong>Meeting Link:</strong>{' '}
+                    <a
+                      href={appointment.meetingLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-blue-800"
+                    >
+                      Join Meeting
+                    </a>
+                  </p>
+                )}
               </div>
-              <div className="flex-1 text-sm text-zinc-600">
-                <p className="text-neutral-800 font-semibold">{appointment.doctorId.name}</p>
-                <p>{appointment.doctorId.speciality}</p>
-                <p className="text-zinc-700 font-medium mt-1">Address:</p>
-                <p className="text-xs">{appointment.doctorId.address?.line1}</p>
-                <p className="text-xs">{appointment.doctorId.address?.line2}</p>
-                <p className="text-zinc-700 font-medium mt-1">Time & Date:</p>
-                <p className="text-xs">{appointment.date}</p>
-                <p className="text-xs">{appointment.time}</p>
-              </div>
+              <button
+                className="text-xs text-red-600 border border-red-600 px-3 py-1 rounded-md hover:bg-red-600 hover:text-white transition"
+                onClick={() => handleCancelAppointment(appointment._id)}
+              >
+                Cancel
+              </button>
             </div>
           );
         })}
       </div>
+
+      {/* Toast Container to display notifications */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

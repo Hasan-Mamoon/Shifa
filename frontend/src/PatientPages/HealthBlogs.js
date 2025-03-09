@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const categories = [
   'Healthy Lifestyle',
-  'Women’s Health',
+  'Women`s Health',
   'Skin Care',
   'Fitness & Exercise',
   'Health News',
@@ -23,7 +23,7 @@ const HealthBlogs = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch('${process.env.REACT_APP_SERVER_URL}/blog/blogs');
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/blog/blogs`);
         const data = await response.json();
         setBlogs(data);
         setFilteredBlogs(data); // Show all blogs initially
