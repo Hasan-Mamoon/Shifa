@@ -12,8 +12,7 @@ const Home = () => {
       <SpecialityMenu />
       <TopDoctors />
       <Banner />
-      <Calendar/>
-
+      <Calendar />
     </div>
   );
 };

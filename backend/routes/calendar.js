@@ -1,11 +1,10 @@
-import express from "express";
-import CalendarEvent from "../models/calendar.js"; // Ensure `.js` is included
+import express from 'express';
+import CalendarEvent from '../models/calendar.js'; // Ensure `.js` is included
 
 const router = express.Router();
 
-
 // Get all events for a given month
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { start, end } = req.query;
     const events = await CalendarEvent.find({ date: { $gte: start, $lte: end } });
@@ -16,7 +15,7 @@ router.get("/", async (req, res) => {
 });
 
 // Get events for a specific date
-router.get("/:date", async (req, res) => {
+router.get('/:date', async (req, res) => {
   try {
     const events = await CalendarEvent.find({ date: req.params.date });
     res.json(events);
@@ -26,7 +25,7 @@ router.get("/:date", async (req, res) => {
 });
 
 // Add a new event
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const newEvent = new CalendarEvent(req.body);
     await newEvent.save();
@@ -37,14 +36,13 @@ router.post("/", async (req, res) => {
 });
 
 // Delete an event
-router.delete("/:id", async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     await CalendarEvent.findByIdAndDelete(req.params.id);
-    res.json({ message: "Event deleted" });
+    res.json({ message: 'Event deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 export const calendarRoutes = router;
-

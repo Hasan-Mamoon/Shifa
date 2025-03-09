@@ -15,6 +15,12 @@ const doctorSchema = new mongoose.Schema({
     line2: { type: String, required: true },
     line2: { type: String, required: true },
   },
+  reviews: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+      rating: { type: Number, required: true, min: 1, max: 5 },
+    },
+  ],
 });
 
 const doctorModel = mongoose.model('Doctor', doctorSchema);

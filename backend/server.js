@@ -8,7 +8,7 @@ import { patientRouter } from './routes/patient-routes.js';
 import { slotsRouter } from './routes/slot-routes.js';
 import { appointmentRouter } from './routes/appointment-routes.js';
 import { blogRouter } from './routes/blogRoutes.js';
-import {calendarRoutes} from './routes/calendar.js';
+import { calendarRoutes } from './routes/calendar.js';
 
 const app = express();
 dotenv.config();
@@ -30,7 +30,7 @@ app.use('/patient', patientRouter);
 app.use('/slot', slotsRouter);
 app.use('/appointment', appointmentRouter);
 app.use('/blog', blogRouter);
-app.use("/calendar", calendarRoutes);
+app.use('/calendar', calendarRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server Started on port ${process.env.PORT}`);
