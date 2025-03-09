@@ -19,7 +19,7 @@ const s3 = new S3Client({
 });
 
 router.post('/book-appointment', async (req, res) => {
-  const { doctorId, patientId, slotId, date, time } = req.body;
+  const { doctorId, patientId, slotId, date, time, meetingLink } = req.body;
 
   console.log('Booking Appointment Request:', req.body);
 
@@ -69,6 +69,7 @@ router.post('/book-appointment', async (req, res) => {
       time,
       status: 'Booked',
       notes: '',
+      meetingLink
     });
 
     await newAppointment.save({ session });
