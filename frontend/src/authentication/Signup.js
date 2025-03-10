@@ -112,7 +112,11 @@ const Signup = () => {
 
       await axios.post(url, form, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-      alert(`${userType.charAt(0).toUpperCase() + userType.slice(1)} registered successfully`);
+      if (userType === 'doctor') {
+        alert('Doctor registration submitted. Pending for approval.');
+      } else {
+        alert('Patient registered successfully.');
+      }
       navigate('/login');
     } catch (error) {
       setError(`Error registering ${userType}. Please try again.`);

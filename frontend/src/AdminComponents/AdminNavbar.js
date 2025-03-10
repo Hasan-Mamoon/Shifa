@@ -26,7 +26,7 @@ const AdminNavbar = () => {
      
       <nav className="hidden md:flex items-start gap-5 font-medium">
         <button onClick={() => navigate('/admin/dashboard')} >
-          Dashboard
+         DASHBOARD
         </button>
       </nav>
 
