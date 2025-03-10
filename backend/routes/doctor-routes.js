@@ -174,7 +174,6 @@ router.post(
 router.get('/doctors-all', async (req, res) => {
   try {
     const doctors = await doctormodel.find({});
-    console.log('doc', doctors);
 
     for (const doctor of doctors) {
       const getObjectParams = {
@@ -205,7 +204,6 @@ router.get('/:speciality', async (req, res) => {
       speciality: speciality.toString(),
     });
 
-    console.log('doc', doctors);
 
     for (const doctor of doctors) {
       const getObjectParams = {
