@@ -274,6 +274,37 @@ router.put('/edit-patient/:email', upload.single('image'), async (req, res) => {
   }
 });
 
+
+router.put('/update/:id', async (req, res) => {
+  const { id } = req.params; // Patient ID
+  const { medicalHistory } = req.body; // Updated medical history
+
+  try {
+    // Validate the patient ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid patient ID' });
+    }
+
+    // Find the patient by ID and update their medical history
+    const updatedPatient = await patientModel.findByIdAndUpdate(
+      id,
+      { medicalHistory },
+      { new: true } // Return the updated document
+    );
+
+    // If the patient is not found
+    if (!updatedPatient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    // Return the updated patient
+    res.status(200).json(updatedPatient);
+  } catch (error) {
+    console.error('Error updating medical history:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 router.delete('/:email', async (req, res) => {
   try {
     const { email } = req.params;
