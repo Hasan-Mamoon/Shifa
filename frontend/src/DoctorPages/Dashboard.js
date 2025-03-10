@@ -119,10 +119,10 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto p-10 bg-gray-100 shadow-2xl rounded-xl">
-        <h1 className="text-5xl font-bold text-gray-800 mb-8 text-center">Doctor Dashboard</h1>
+        
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold text-gray-800">
-            Welcome, Dr
+            Welcome, Doctor
           </h1>
           <p className="text-gray-600 text-lg mt-2">
             Manage your appointments and schedule with ease.

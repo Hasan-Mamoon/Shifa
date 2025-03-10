@@ -51,7 +51,7 @@ const Navbar = () => {
 
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to="/">
-          <li className="py-1">Home</li>
+          <li className="py-1">HOME</li>
         </NavLink>
         <NavLink to="/doctors">
           <li className="py-1">ALL DOCTORS</li>
