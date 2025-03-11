@@ -18,9 +18,9 @@ const MyProfile = () => {
     }
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/patient/${email}`);
-      console.log('USER DATA: ', response.data[0]);
-      setUserData(response.data[0]);
-      setImagePreview(response.data[0].image || assets.profile_pic);
+      console.log('USER DATA: ', response.data);
+      setUserData(response.data);
+      setImagePreview(response.data.image || assets.profile_pic);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
