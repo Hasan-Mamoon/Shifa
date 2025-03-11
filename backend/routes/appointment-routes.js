@@ -8,6 +8,9 @@ import { slotModel } from '../models/timeslots.js';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import nodemailer from 'nodemailer';
+import Stripe from 'stripe';
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);// ✅ Load Stripe SDK
+
 
 dotenv.config();
 
@@ -43,13 +46,110 @@ const sendEmail = async (to, subject, text) => {
   }
 };
 
+// router.post('/book-appointment', async (req, res) => {
+//   const { doctorId, patientId, slotId, date, time, type, meetingLink } = req.body;
+
+//   console.log('Booking Appointment Request:', req.body);
+
+//   const session = await mongoose.startSession();
+//   try {
+//     session.startTransaction();
+
+//     const slotDocument = await slotModel
+//       .findOne({
+//         doctorId,
+//         date,
+//         slots: { $elemMatch: { _id: slotId, time, isBooked: false } },
+//       })
+//       .session(session);
+
+//     if (!slotDocument) throw new Error('Slot is no longer available.');
+
+//     const updateResult = await slotModel.updateOne(
+//       { doctorId, date, 'slots._id': slotId },
+//       { $set: { 'slots.$.isBooked': true, 'slots.$.patient': patientId } },
+//       { session }
+//     );
+
+//     if (updateResult.nModified === 0) throw new Error('Failed to update slot status.');
+
+//     const newAppointment = new appointmentModel({
+//       doctorId,
+//       patientId,
+//       slotId,
+//       date,
+//       time,
+//       type,
+//       status: 'Booked',
+//       notes: '',
+//       meetingLink,
+//     });
+
+//     await newAppointment.save({ session });
+
+//     await session.commitTransaction();
+
+//     console.log('Appointment Booked:', newAppointment);
+
+//     // Fetch doctor and patient details for email
+//     const doctor = await doctormodel.findById(doctorId);
+//     const patient = await patientModel.findById(patientId);
+
+//     if (doctor && patient) {
+//       const doctorEmail = doctor.email;
+//       const patientEmail = patient.email;
+
+//       // Send email to doctor
+//       sendEmail(
+//         doctorEmail,
+//         'New Appointment Booked',
+//         `An appointment has been booked with you on ${date} at ${time}.` +
+//           (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
+//       );
+
+//       // Send email to patient
+//       sendEmail(
+//         patientEmail,
+//         'Appointment Confirmation',
+//         `Your appointment with Dr. ${doctor.name} is confirmed for ${date} at ${time}.` +
+//           (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
+//       );
+//     }
+
+//     res.status(200).json({ message: 'Appointment booked successfully.' });
+//   } catch (error) {
+//     await session.abortTransaction();
+//     console.error('Error during booking:', error);
+//     res.status(400).json({ message: error.message });
+//   } finally {
+//     session.endSession();
+//   }
+// });
+
+
 router.post('/book-appointment', async (req, res) => {
-  const { doctorId, patientId, slotId, date, time, type, meetingLink } = req.body;
+  const { doctorId, patientId, slotId, date, time, type, meetingLink, sessionId } = req.body;
 
-  console.log('Booking Appointment Request:', req.body);
+  console.log("📩 Received Booking Request:", req.body); // ✅ Debugging
 
-  const session = await mongoose.startSession();
+  if (!sessionId) {
+    console.error("❌ Missing session ID");
+    return res.status(400).json({ message: 'Session ID is required.' });
+  }
+
   try {
+    console.log("🔍 Verifying Stripe session:", sessionId);
+    const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
+    console.log("📝 Stripe Session Data:", stripeSession);
+
+    if (stripeSession.payment_status !== 'paid') {
+      console.error("❌ Payment NOT completed!");
+      return res.status(400).json({ message: 'Payment verification failed.' });
+    }
+
+    console.log("✅ Payment verified! Proceeding with appointment booking...");
+
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     const slotDocument = await slotModel
@@ -60,7 +160,7 @@ router.post('/book-appointment', async (req, res) => {
       })
       .session(session);
 
-    if (!slotDocument) throw new Error('Slot is no longer available.');
+    if (!slotDocument) throw new Error('⚠️ Slot is no longer available.');
 
     const updateResult = await slotModel.updateOne(
       { doctorId, date, 'slots._id': slotId },
@@ -68,7 +168,7 @@ router.post('/book-appointment', async (req, res) => {
       { session }
     );
 
-    if (updateResult.nModified === 0) throw new Error('Failed to update slot status.');
+    if (updateResult.nModified === 0) throw new Error('⚠️ Failed to update slot status.');
 
     const newAppointment = new appointmentModel({
       doctorId,
@@ -83,10 +183,8 @@ router.post('/book-appointment', async (req, res) => {
     });
 
     await newAppointment.save({ session });
-
     await session.commitTransaction();
-
-    console.log('Appointment Booked:', newAppointment);
+    console.log("✅ Appointment Booked:", newAppointment);
 
     // Fetch doctor and patient details for email
     const doctor = await doctormodel.findById(doctorId);
@@ -96,7 +194,7 @@ router.post('/book-appointment', async (req, res) => {
       const doctorEmail = doctor.email;
       const patientEmail = patient.email;
 
-      // Send email to doctor
+      // Send emails
       sendEmail(
         doctorEmail,
         'New Appointment Booked',
@@ -104,7 +202,6 @@ router.post('/book-appointment', async (req, res) => {
           (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
       );
 
-      // Send email to patient
       sendEmail(
         patientEmail,
         'Appointment Confirmation',
@@ -113,13 +210,10 @@ router.post('/book-appointment', async (req, res) => {
       );
     }
 
-    res.status(200).json({ message: 'Appointment booked successfully.' });
+    res.status(200).json({ success: true, message: '✅ Appointment booked successfully.' });
   } catch (error) {
-    await session.abortTransaction();
-    console.error('Error during booking:', error);
-    res.status(400).json({ message: error.message });
-  } finally {
-    session.endSession();
+    console.error('❌ Error during booking:', error);
+    res.status(400).json({ success: false, message: error.message });
   }
 });
 

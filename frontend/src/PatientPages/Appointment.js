@@ -135,31 +135,39 @@ const Appointment = () => {
       amount: docInfo.fees, // Convert to cents
       currency: 'usd', // Ensure currency is provided
     };
-    Checkout(appointmentData);
 
-    if (appointmentType === 'virtual') {
-      const jitsiMeetingId = `doctor-${docId}-patient-${user?.id}-${Date.now()}`;
-      appointmentData.meetingLink = `https://meet.jit.si/${jitsiMeetingId}`;
-    }
+    const result = await Checkout(appointmentData)
+    console.log(result);
 
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(appointmentData),
-        },
-      );
-
-      const result = await response.json();
-      if (response.ok) {
-      } else {
-        toast.error(result.message);
+    if(result){
+      if (appointmentType === 'virtual') {
+        const jitsiMeetingId = `doctor-${docId}-patient-${user?.id}-${Date.now()}`;
+        appointmentData.meetingLink = `https://meet.jit.si/${jitsiMeetingId}`;
       }
-    } catch (error) {
-      toast.error('Failed to book appointment. Please try again.');
+  
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appointmentData),
+          },
+        );
+  
+        const result = await response.json();
+        if (response.ok) {
+          toast.success('Appointment booked successfully!');
+        } else {
+          toast.error(result.message || 'Failed to book appointment.');
+        }
+      } catch (error) {
+        toast.error('Failed to book appointment. Please try again.');
+      }
+    } else{
+      toast.error('Failed to book appointment. Payment unsuccessful.');
     }
+    
   };
 
   return (

@@ -21,15 +21,17 @@ router.post('/create-checkout-session', async (req, res) => {
             product_data: {
               name: `Appointment with Doctor ${doctorId}`,
             },
-            unit_amount: amount * 100, // Stripe accepts amount in cents
+            unit_amount: amount * 100, // Stripe requires cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: 'http://localhost:3000/my-appointments',
+      success_url: `http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: 'http://localhost:3000',
+      client_reference_id: `${doctorId}-${patientId}`, // ✅ Store doctor & patient info
     });
+    
 
     res.json({ sessionId: session.id });
   } catch (error) {
@@ -37,5 +39,29 @@ router.post('/create-checkout-session', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.get('/verify', async (req, res) => {
+  try {
+    const { sessionId } = req.query;
+    console.log("Received session ID for verification:", sessionId); // ✅ Debugging
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Session ID is required' });
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    console.log("Stripe session data:", session); // ✅ Debugging
+
+    if (session.payment_status === 'paid') {
+      res.json({ success: true, session });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (error) {
+    console.error('Error verifying payment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 export { router as paymentRoutes };

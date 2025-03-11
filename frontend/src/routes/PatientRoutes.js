@@ -10,6 +10,7 @@ import Appointment from '../PatientPages/Appointment';
 import ProtectedRoute from './ProtectedRoutes';
 import HealthBlogs from '../PatientPages/HealthBlogs';
 import BlogDetails from '../PatientPages/BlogDetails';
+import PaymentSuccess from '../PaymentComponents/PaymentSuccess';
 const PatientRoutes = () => {
   return (
     <Routes>
@@ -19,6 +20,8 @@ const PatientRoutes = () => {
       <Route path="about" element={<About />} />
       <Route path="contact" element={<Contact />} />
       <Route path="/blogs" element={<HealthBlogs />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+
       <Route
         path="my-profile"
         element={<ProtectedRoute element={<MyProfile />} allowedRoles={['patient']} />}
