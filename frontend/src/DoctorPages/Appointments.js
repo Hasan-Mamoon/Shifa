@@ -166,7 +166,7 @@ const Appointment = () => {
                 onClick={() => {setFilterType('future');setSelectedDate(null);setSelectedPatient(null);
                   setSelectedAppointment(null);}}
               >
-                Future Appointments
+                Upcomming
               </button>
             </div>
 
