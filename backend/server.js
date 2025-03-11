@@ -8,6 +8,8 @@ import { patientRouter } from './routes/patient-routes.js';
 import { slotsRouter } from './routes/slot-routes.js';
 import { appointmentRouter } from './routes/appointment-routes.js';
 import { blogRouter } from './routes/blogRoutes.js';
+import { calendarRoutes } from './routes/calendar.js';
+
 import {adminRoutes} from './routes/adminRoutes.js';
 import {paymentRoutes}  from './routes/paymentRoutes.js';
 const app = express();
@@ -40,6 +42,7 @@ app.use('/patient', patientRouter);
 app.use('/slot', slotsRouter);
 app.use('/appointment', appointmentRouter);
 app.use('/blog', blogRouter);
+app.use('/calendar', calendarRoutes);
 app.use('/admin', adminRoutes);
 app.use("/payment", paymentRoutes);
 

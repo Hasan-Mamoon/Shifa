@@ -18,9 +18,55 @@ const Appointment = () => {
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState('');
   const [slotId, setSlotId] = useState('');
+  const [rating, setRating] = useState(0);
+  const [reviews, setReviews] = useState([]);
   const [appointmentType, setAppointmentType] = useState('virtual');
 
   const docInfo = doctors.find((doc) => doc._id === docId);
+
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/doctor/${docId}/reviews`);
+      const data = await response.json();
+      if (response.ok) setReviews(data.reviews);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const submitReview = async () => {
+    if (rating < 1 || rating > 5) {
+      alert('Please select a rating between 1 and 5 stars.');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/doctor/${docId}/add-review`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ rating, userId: user?.id }),
+        },
+      );
+
+      if (response.ok) {
+        alert('Review submitted successfully!');
+        fetchReviews();
+      } else {
+        alert('Error submitting review.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    }
+  };
+
+  useEffect(() => {
+    //fetchDocInfo();
+    fetchReviews();
+  }, [doctors, docId]);
 
   const getAvailableDates = async () => {
     try {
@@ -144,6 +190,58 @@ const Appointment = () => {
               {docInfo.about}
               </span>
             </p>
+
+            {/* Google Maps Button*/}
+            {docInfo.address && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  `${docInfo.address.line1}, ${docInfo.address.line2}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:underline mt-2"
+              >
+                <img className="w-6 h-6" src={assets.GMAP} alt="Google Maps" />
+                <span>View Location on Map</span>
+              </a>
+            )}
+
+            {/* Review Section */}
+            <div className="mt-6 border-t pt-4">
+              <h3 className="text-lg font-semibold">Patient Reviews</h3>
+
+              {/* Display Average Rating */}
+              <p className="mt-1 text-gray-600">
+                Average Rating:{' '}
+                {reviews.length > 0
+                  ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                  : 'No ratings yet'}
+              </p>
+
+              {/* Star Rating Input */}
+              {user && (
+                <div className="mt-3">
+                  <p className="text-gray-700">Rate this doctor:</p>
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`cursor-pointer text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
+                        onClick={() => setRating(star)}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <button
+                    className="mt-2 bg-primary text-white px-4 py-2 rounded"
+                    onClick={submitReview}
+                  >
+                    Submit Review
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

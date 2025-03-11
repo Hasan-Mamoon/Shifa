@@ -440,4 +440,59 @@ router.put('/update/:id', async (req, res) => {
   }
 });
 
+// Get doctor details with average rating
+router.get('/:id', async (req, res) => {
+  try {
+    const doctor = await doctormodel.findById(req.params.id);
+    if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
+
+    const avgRating =
+      doctor.reviews.length > 0
+        ? doctor.reviews.reduce((sum, r) => sum + r.rating, 0) / doctor.reviews.length
+        : 0;
+
+    res.json({ ...doctor.toObject(), avgRating });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Add or Update Review
+router.post('/:id/add-review', async (req, res) => {
+  try {
+    const { userId, rating } = req.body;
+    const doctor = await doctormodel.findById(req.params.id);
+
+    if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
+
+    // Prevent duplicate reviews
+    const existingReviewIndex = doctor.reviews.findIndex((r) => r.userId.toString() === userId);
+
+    if (existingReviewIndex !== -1) {
+      // Update existing review
+      doctor.reviews[existingReviewIndex].rating = rating;
+    } else {
+      // Add new review
+      doctor.reviews.push({ userId, rating });
+    }
+
+    await doctor.save();
+    res.json({ message: 'Review added successfully', doctor });
+  } catch (err) {
+    res.status(500).json({ message: 'Error submitting review' });
+  }
+});
+
+// Get Reviews for a Doctor
+router.get('/:id/reviews', async (req, res) => {
+  try {
+    const doctor = await doctormodel.findById(req.params.id);
+    if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
+
+    res.json({ reviews: doctor.reviews });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching reviews' });
+  }
+});
+
 export { router as doctorRouter };

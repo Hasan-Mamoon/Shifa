@@ -107,8 +107,9 @@ import Signup from './authentication/Signup';
 import { useAuth } from '../src/context/AuthContext';
 import PatientRoutes from './routes/PatientRoutes';
 import DoctorRoutes from './routes/DoctorRoutes';
-import AdminRoutes from './routes/AdminRoutes';  
-import AdminNavbar from './AdminComponents/AdminNavbar'
+import AdminRoutes from './routes/AdminRoutes';
+import AdminNavbar from './AdminComponents/AdminNavbar';
+import InfoPage from "./PatientPages/InfoPage";
 import PaymentRoutes from './routes/PaymentRoutes';
 
 const App = () => {
@@ -135,6 +136,17 @@ const App = () => {
       ) : (
         <Navbar />
       )}
+      {isAdminRoute ? (
+        user?.role === 'admin' ? (
+          <AdminNavbar />
+        ) : null
+      ) : isDoctorRoute ? (
+        user?.role === 'doctor' ? (
+          <DoctorNavbar />
+        ) : null
+      ) : (
+        <Navbar />
+      )}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup/:userType" element={<Signup />} />
@@ -142,6 +154,8 @@ const App = () => {
         <Route path="/doctor/*" element={<DoctorRoutes />} />
         <Route path="/admin/*" element={<AdminRoutes />} /> {/* Add Admin Routes */}
         <Route path="/payment/*" element={<PaymentRoutes />} />
+        <Route path="/pharmacy/:id" element={<InfoPage />} />
+        <Route path="/lab/:id" element={<InfoPage />} />
       </Routes>
       {!isAdminRoute && <Footer />} {/* Hide footer for admin pages if needed */}
     </div>
