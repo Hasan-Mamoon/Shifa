@@ -33,7 +33,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const data = await apiCall('${process.env.REACT_APP_SERVER_URL}/slot/appointments', 'get', {
+      const data = await apiCall(`${process.env.REACT_APP_SERVER_URL}/slot/appointments`, 'get', {
         doctorId,
         date,
       });
@@ -55,7 +55,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      await apiCall('${process.env.REACT_APP_SERVER_URL}/slot/add', 'post', {
+      await apiCall(`${process.env.REACT_APP_SERVER_URL}/slot/add`, 'post', {
         doctorId,
         date,
         slots: [...slots.map((slot) => slot.time), newSlot],

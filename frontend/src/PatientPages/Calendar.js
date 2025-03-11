@@ -133,8 +133,8 @@ const Calendar = () => {
             isSelected
               ? 'bg-blue-500 text-white shadow-lg'
               : isHighlighted
-              ? 'bg-blue-200 text-black'
-              : 'bg-gray-100 hover:bg-blue-200'
+                ? 'bg-blue-200 text-black'
+                : 'bg-gray-100 hover:bg-blue-200'
           }`}
           onClick={() => handleDateClick(i)}
         >

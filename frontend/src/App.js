@@ -58,11 +58,6 @@
 
 //REMOVED HIDING OF NAVBAR CAUZ IT WAS NOT NEEDED?-----------------------------------------CHECK!!!!!!!-----------
 
-
-
-
-
-
 // import React from 'react';
 // import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 // import Navbar from './PatientComponents/Navbar';
@@ -102,12 +97,6 @@
 
 // export default App;
 
-
-
-
-
-
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './PatientComponents/Navbar';
@@ -118,8 +107,9 @@ import Signup from './authentication/Signup';
 import { useAuth } from '../src/context/AuthContext';
 import PatientRoutes from './routes/PatientRoutes';
 import DoctorRoutes from './routes/DoctorRoutes';
-import AdminRoutes from './routes/AdminRoutes';  
-import AdminNavbar from './AdminComponents/AdminNavbar'
+import AdminRoutes from './routes/AdminRoutes';
+import AdminNavbar from './AdminComponents/AdminNavbar';
+import InfoPage from "./PatientPages/InfoPage";
 
 const App = () => {
   const location = useLocation();
@@ -134,25 +124,29 @@ const App = () => {
 
   return (
     <div className="mx-4 sm:mx-[10%]">
-          {isAdminRoute ? (user?.role === 'admin' ? <AdminNavbar /> : null) : 
-     isDoctorRoute ? (user?.role === 'doctor' ? <DoctorNavbar /> : null) : <Navbar />
-    }
-
+      {isAdminRoute ? (
+        user?.role === 'admin' ? (
+          <AdminNavbar />
+        ) : null
+      ) : isDoctorRoute ? (
+        user?.role === 'doctor' ? (
+          <DoctorNavbar />
+        ) : null
+      ) : (
+        <Navbar />
+      )}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup/:userType" element={<Signup />} />
         <Route path="/*" element={<PatientRoutes />} />
         <Route path="/doctor/*" element={<DoctorRoutes />} />
         <Route path="/admin/*" element={<AdminRoutes />} /> {/* Add Admin Routes */}
+        <Route path="/pharmacy/:id" element={<InfoPage />} />
+        <Route path="/lab/:id" element={<InfoPage />} />
       </Routes>
-
       {!isAdminRoute && <Footer />} {/* Hide footer for admin pages if needed */}
     </div>
   );
 };
 
 export default App;
-
-
-
-

@@ -40,13 +40,16 @@ const Appointment = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/doctor/${docId}/add-review`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/doctor/${docId}/add-review`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ rating, userId: user?.id }),
         },
-        body: JSON.stringify({ rating, userId: user?.id }),
-      });
+      );
 
       if (response.ok) {
         alert('Review submitted successfully!');
@@ -60,7 +63,7 @@ const Appointment = () => {
   };
 
   useEffect(() => {
-    fetchDocInfo();
+    //fetchDocInfo();
     fetchReviews();
   }, [doctors, docId]);
 
@@ -191,37 +194,42 @@ const Appointment = () => {
               </a>
             )}
 
-        {/* Review Section */}
-        <div className="mt-6 border-t pt-4">
-          <h3 className="text-lg font-semibold">Patient Reviews</h3>
+            {/* Review Section */}
+            <div className="mt-6 border-t pt-4">
+              <h3 className="text-lg font-semibold">Patient Reviews</h3>
 
-          {/* Display Average Rating */}
-          <p className="mt-1 text-gray-600">
-            Average Rating: {reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : 'No ratings yet'}
-          </p>
+              {/* Display Average Rating */}
+              <p className="mt-1 text-gray-600">
+                Average Rating:{' '}
+                {reviews.length > 0
+                  ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                  : 'No ratings yet'}
+              </p>
 
-          {/* Star Rating Input */}
-          {user && (
-            <div className="mt-3">
-              <p className="text-gray-700">Rate this doctor:</p>
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    className={`cursor-pointer text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
-                    onClick={() => setRating(star)}
+              {/* Star Rating Input */}
+              {user && (
+                <div className="mt-3">
+                  <p className="text-gray-700">Rate this doctor:</p>
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`cursor-pointer text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
+                        onClick={() => setRating(star)}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <button
+                    className="mt-2 bg-primary text-white px-4 py-2 rounded"
+                    onClick={submitReview}
                   >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <button className="mt-2 bg-primary text-white px-4 py-2 rounded" onClick={submitReview}>
-                Submit Review
-              </button>
+                    Submit Review
+                  </button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-
           </div>
         </div>
 

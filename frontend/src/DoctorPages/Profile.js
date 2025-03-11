@@ -19,7 +19,7 @@ const Profile = () => {
 
   const fetchDoctorData = async () => {
     try {
-      const response = await axios.get('${process.env.REACT_APP_SERVER_URL}/doctor/get-doctor', {
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/doctor/get-doctor`, {
         params: { email: email },
       });
       setDoctorData(response.data[0]);
