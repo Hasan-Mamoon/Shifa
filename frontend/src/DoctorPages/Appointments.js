@@ -1,761 +1,3 @@
-// import React, { useState, useEffect, useContext } from 'react';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-// import { AppContext } from '../context/AppContext';
-// import Layout from '../DoctorComponents/Layout';
-// import { useAuth } from '../context/AuthContext';
-
-// const Appointment = () => {
-//   const { user } = useAuth();
-//   const { docId = user?.id } = useParams();
-//   const { doctors, currencySymbol } = useContext(AppContext);
-//   const [docInfo, setDocInfo] = useState(null);
-//   const [availableDates, setAvailableDates] = useState([]);
-//   const [appointments, setAppointments] = useState([]);
-//   const [selectedDate, setSelectedDate] = useState(null);
-
-//   useEffect(() => {
-//     const fetchDoctorInfo = async () => {
-//       const doc = doctors.find((doc) => doc._id === docId);
-//       setDocInfo(doc);
-//     };
-
-//     fetchDoctorInfo();
-//   }, [docId, doctors]);
-
-//   useEffect(() => {
-//     const fetchAvailableDates = async () => {
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`,
-//         );
-//         setAvailableDates(response.data);
-//       } catch (error) {
-//         console.error('Error fetching available dates:', error);
-//       }
-//     };
-
-//     if (docId) {
-//       fetchAvailableDates();
-//     }
-//   }, [docId]);
-
-//   const handleDateClick = async (date) => {
-//     setSelectedDate(date);
-
-//     try {
-//       const response = await axios.get(
-//         `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`,
-//       );
-//       setAppointments(response.data);
-//     } catch (error) {
-//       console.error('Error fetching appointments:', error);
-//     }
-//   };
-
-//   return (
-//     <Layout>
-//       <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-//         {docInfo && (
-//           <div>
-//             <div className="doctor-info flex flex-col items-center text-center bg-gray-50 p-6 rounded-lg shadow-md">
-//               <img
-//                 src={docInfo.image}
-//                 alt={docInfo.name}
-//                 className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-primary"
-//               />
-//               <h2 className="text-2xl font-bold mt-4 text-gray-600">{docInfo.name}</h2>
-//               <p className="text-gray-500 mt-2">{docInfo.speciality}</p>
-//               <p className="text-gray-500 mt-2 text-sm">{docInfo.about}</p>
-//               <p className="text-primary font-semibold mt-4 text-lg">
-//                 Appointment Fee: {currencySymbol}
-//                 {docInfo.fees}
-//               </p>
-//             </div>
-
-//             <div className="available-dates mt-10">
-//               <h3 className="text-xl font-bold text-gray-800 text-center">
-//                 Select an Appointment Date
-//               </h3>
-//               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-//                 {availableDates.map((date) => (
-//                   <button
-//                     key={date}
-//                     onClick={() => handleDateClick(date)}
-//                     className={`py-3 px-4 text-center rounded-lg shadow-lg transition-all ${
-//                       selectedDate === date
-//                         ? 'bg-primary text-white'
-//                         : 'bg-gray-100 text-gray-800 hover:bg-primary hover:text-white'
-//                     }`}
-//                   >
-//                     {new Date(date).toLocaleDateString('en-US', {
-//                       day: '2-digit',
-//                       month: 'short',
-//                       year: 'numeric',
-//                     })}
-//                   </button>
-//                 ))}
-//               </div>
-//             </div>
-
-//             {selectedDate && (
-//               <div className="appointments mt-10">
-//                 <h3 className="text-xl font-bold text-gray-800 text-center">
-//                   Appointments for {new Date(selectedDate).toLocaleDateString()}
-//                 </h3>
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-//                   {appointments.length > 0 ? (
-//                     appointments.map((slot) => (
-//                       <div
-//                         key={slot._id}
-//                         className={`p-6 rounded-lg shadow-lg transition-all ${
-//                           slot.isBooked
-//                             ? 'bg-red-100 border-red-400'
-//                             : 'bg-green-100 border-green-400'
-//                         } border-2`}
-//                       >
-//                         <p className="text-lg font-medium text-gray-700">Time: {slot.time}</p>
-//                         <p
-//                           className={`text-lg font-bold mt-2 ${
-//                             slot.isBooked ? 'text-red-600' : 'text-green-600'
-//                           }`}
-//                         >
-//                           {slot.isBooked ? 'Booked' : 'Available'}
-//                         </p>
-//                       </div>
-//                     ))
-//                   ) : (
-//                     <p className="text-gray-600 text-center col-span-full">
-//                       No appointments available for this date.
-//                     </p>
-//                   )}
-//                 </div>
-//               </div>
-//             )}
-//           </div>
-//         )}
-//       </div>
-//     </Layout>
-//   );
-// };
-
-// export default Appointment;
-
-
-// import React, { useState, useEffect, useContext } from 'react';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-// import { AppContext } from '../context/AppContext';
-// import Layout from '../DoctorComponents/Layout';
-// import { useAuth } from '../context/AuthContext';
-
-// const Appointment = () => {
-//   const { user } = useAuth();
-//   const { docId = user?.id } = useParams();
-//   const { doctors, currencySymbol } = useContext(AppContext);
-//   const [docInfo, setDocInfo] = useState(null);
-//   const [availableDates, setAvailableDates] = useState([]);
-//   const [appointments, setAppointments] = useState([]);
-//   const [selectedDate, setSelectedDate] = useState(null);
-//   const [selectedPatient, setSelectedPatient] = useState(null);
-
-//   useEffect(() => {
-//     const fetchDoctorInfo = async () => {
-//       const doc = doctors.find((doc) => doc._id === docId);
-//       setDocInfo(doc);
-//     };
-
-//     fetchDoctorInfo();
-//   }, [docId, doctors]);
-
-//   useEffect(() => {
-//     const fetchAvailableDates = async () => {
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
-//         );
-//         setAvailableDates(response.data);
-//       } catch (error) {
-//         console.error('Error fetching available dates:', error);
-//       }
-//     };
-
-//     if (docId) {
-//       fetchAvailableDates();
-//     }
-//   }, [docId]);
-
-//   const handleDateClick = async (date) => {
-//     setSelectedDate(date);
-
-//     try {
-//       const response = await axios.get(
-//         `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
-//       );
-//       setAppointments(response.data);
-//       console.log('Appointments DETAIL:', response.data);
-//     } catch (error) {
-//       console.error('Error fetching appointments:', error);
-//     }
-//   };
-
-//   const handleSlotClick = async (slot) => {
-//     if (slot.isBooked && slot.patient) {
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/patient/bid/${slot.patient}`
-//         );
-//         setSelectedPatient(response.data);
-//         console.log('Patient details:', response.data);
-//       } catch (error) {
-//         console.error('Error fetching patient details:', error);
-//       }
-//     } else {
-//       setSelectedPatient(null);
-//     }
-//   };
-
-//   return (
-//     <Layout>
-//       <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-//         {docInfo && (
-//           <div>
-//             <div className="doctor-info flex flex-col items-center text-center bg-gray-50 p-6 rounded-lg shadow-md">
-//               <img
-//                 src={docInfo.image}
-//                 alt={docInfo.name}
-//                 className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-primary"
-//               />
-//               <h2 className="text-2xl font-bold mt-4 text-gray-600">{docInfo.name}</h2>
-//               <p className="text-gray-500 mt-2">{docInfo.speciality}</p>
-//               <p className="text-gray-500 mt-2 text-sm">{docInfo.about}</p>
-//               <p className="text-primary font-semibold mt-4 text-lg">
-//                 Appointment Fee: {currencySymbol}
-//                 {docInfo.fees}
-//               </p>
-//             </div>
-
-//             <div className="available-dates mt-10">
-//               <h3 className="text-xl font-bold text-gray-800 text-center">
-//                 Select an Appointment Date
-//               </h3>
-//               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-//                 {availableDates.map((date) => (
-//                   <button
-//                     key={date}
-//                     onClick={() => handleDateClick(date)}
-//                     className={`py-3 px-4 text-center rounded-lg shadow-lg transition-all ${
-//                       selectedDate === date
-//                         ? 'bg-primary text-white'
-//                         : 'bg-gray-100 text-gray-800 hover:bg-primary hover:text-white'
-//                     }`}
-//                   >
-//                     {new Date(date).toLocaleDateString('en-US', {
-//                       day: '2-digit',
-//                       month: 'short',
-//                       year: 'numeric',
-//                     })}
-//                   </button>
-//                 ))}
-//               </div>
-//             </div>
-
-//             {selectedDate && (
-//               <div className="appointments mt-10">
-//                 <h3 className="text-xl font-bold text-gray-800 text-center">
-//                   Appointments for {new Date(selectedDate).toLocaleDateString()}
-//                 </h3>
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-//                   {appointments.length > 0 ? (
-//                     appointments.map((slot) => (
-//                       <div
-//                         key={slot._id}
-//                         onClick={() => handleSlotClick(slot)}
-//                         className={`p-6 rounded-lg shadow-lg transition-all cursor-pointer ${
-//                           slot.isBooked
-//                             ? 'bg-red-100 border-red-400'
-//                             : 'bg-green-100 border-green-400'
-//                         } border-2`}
-//                       >
-//                         <p className="text-lg font-medium text-gray-700">Time: {slot.time}</p>
-//                         <p
-//                           className={`text-lg font-bold mt-2 ${
-//                             slot.isBooked ? 'text-red-600' : 'text-green-600'
-//                           }`}
-//                         >
-//                           {slot.isBooked ? 'Booked' : 'Available'}
-//                         </p>
-//                       </div>
-//                     ))
-//                   ) : (
-//                     <p className="text-gray-600 text-center col-span-full">
-//                       No appointments available for this date.
-//                     </p>
-//                   )}
-//                 </div>
-//               </div>
-//             )}
-
-//             {selectedPatient && (
-//               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
-//                 <h3 className="text-xl font-bold text-gray-800">Patient Details</h3>
-//                 <p className="text-gray-600">Name: {selectedPatient.name}</p>
-//                 <p className="text-gray-600">Email: {selectedPatient.email}</p>
-//                 <p className="text-gray-600">Phone: {selectedPatient.phone}</p>
-//                 <p className="text-gray-600">Medical History: {selectedPatient.medicalHistory}</p>
-//               </div>
-//             )}
-//           </div>
-//         )}
-//       </div>
-//     </Layout>
-//   );
-// };
-
-// export default Appointment;
-
-
-// import React, { useState, useEffect, useContext } from 'react';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-// import { AppContext } from '../context/AppContext';
-// import Layout from '../DoctorComponents/Layout';
-// import { useAuth } from '../context/AuthContext';
-
-// const Appointment = () => {
-//   const { user } = useAuth();
-//   const { docId = user?.id } = useParams();
-//   const { doctors, currencySymbol } = useContext(AppContext);
-//   const [docInfo, setDocInfo] = useState(null);
-//   const [availableDates, setAvailableDates] = useState([]);
-//   const [appointments, setAppointments] = useState([]);
-//   const [selectedDate, setSelectedDate] = useState(null);
-//   const [selectedPatient, setSelectedPatient] = useState(null);
-//   const [selectedAppointment, setSelectedAppointment] = useState(null);
-
-//   useEffect(() => {
-//     const fetchDoctorInfo = async () => {
-//       const doc = doctors.find((doc) => doc._id === docId);
-//       setDocInfo(doc);
-//     };
-
-//     fetchDoctorInfo();
-//   }, [docId, doctors]);
-
-//   useEffect(() => {
-//     const fetchAvailableDates = async () => {
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
-//         );
-//         setAvailableDates(response.data);
-//       } catch (error) {
-//         console.error('Error fetching available dates:', error);
-//       }
-//     };
-
-//     if (docId) {
-//       fetchAvailableDates();
-//     }
-//   }, [docId]);
-
-//   const handleDateClick = async (date) => {
-//     setSelectedDate(date);
-
-//     try {
-//       const response = await axios.get(
-//         `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
-//       );
-//       setAppointments(response.data);
-//       console.log('Appointments DETAIL:', response.data);
-//     } catch (error) {
-//       console.error('Error fetching appointments:', error);
-//     }
-//   };
-
-//   const handleSlotClick = async (slot) => {
-//     if (slot.isBooked && slot.patient) {
-//       try {
-//         // Fetch patient details
-//         const patientResponse = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/patient/bid/${slot.patient}`
-//         );
-//         setSelectedPatient(patientResponse.data);
-//         console.log('Patient details:', patientResponse.data);
-
-//         // Fetch appointment details using slotId and patientId
-//         const appointmentResponse = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/patient/details?slotId=${slot._id}&patientId=${slot.patient}`
-//         );
-//         setSelectedAppointment(appointmentResponse.data);
-//         console.log('Appointment details:', appointmentResponse.data);
-
-//       } catch (error) {
-//         console.error('Error fetching details:', error);
-//       }
-//     } else {
-//       setSelectedPatient(null);
-//       setSelectedAppointment(null);
-//     }
-//   };
-
-//   return (
-//     <Layout>
-//       <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-//         {docInfo && (
-//           <div>
-//             <div className="doctor-info flex flex-col items-center text-center bg-gray-50 p-6 rounded-lg shadow-md">
-//               <img
-//                 src={docInfo.image}
-//                 alt={docInfo.name}
-//                 className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-primary"
-//               />
-//               <h2 className="text-2xl font-bold mt-4 text-gray-600">{docInfo.name}</h2>
-//               <p className="text-gray-500 mt-2">{docInfo.speciality}</p>
-//               <p className="text-gray-500 mt-2 text-sm">{docInfo.about}</p>
-//               <p className="text-primary font-semibold mt-4 text-lg">
-//                 Appointment Fee: {currencySymbol}
-//                 {docInfo.fees}
-//               </p>
-//             </div>
-
-//             <div className="available-dates mt-10">
-//               <h3 className="text-xl font-bold text-gray-800 text-center">
-//                 Select an Appointment Date
-//               </h3>
-//               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-//                 {availableDates.map((date) => (
-//                   <button
-//                     key={date}
-//                     onClick={() => handleDateClick(date)}
-//                     className={`py-3 px-4 text-center rounded-lg shadow-lg transition-all ${
-//                       selectedDate === date
-//                         ? 'bg-primary text-white'
-//                         : 'bg-gray-100 text-gray-800 hover:bg-primary hover:text-white'
-//                     }`}
-//                   >
-//                     {new Date(date).toLocaleDateString('en-US', {
-//                       day: '2-digit',
-//                       month: 'short',
-//                       year: 'numeric',
-//                     })}
-//                   </button>
-//                 ))}
-//               </div>
-//             </div>
-
-//             {selectedDate && (
-//               <div className="appointments mt-10">
-//                 <h3 className="text-xl font-bold text-gray-800 text-center">
-//                   Appointments for {new Date(selectedDate).toLocaleDateString()}
-//                 </h3>
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-//                   {appointments.length > 0 ? (
-//                     appointments.map((slot) => (
-//                       <div
-//                         key={slot._id}
-//                         onClick={() => handleSlotClick(slot)}
-//                         className={`p-6 rounded-lg shadow-lg transition-all cursor-pointer ${
-//                           slot.isBooked
-//                             ? 'bg-red-100 border-red-400'
-//                             : 'bg-green-100 border-green-400'
-//                         } border-2`}
-//                       >
-//                         <p className="text-lg font-medium text-gray-700">Time: {slot.time}</p>
-//                         <p
-//                           className={`text-lg font-bold mt-2 ${
-//                             slot.isBooked ? 'text-red-600' : 'text-green-600'
-//                           }`}
-//                         >
-//                           {slot.isBooked ? 'Booked' : 'Available'}
-//                         </p>
-//                       </div>
-//                     ))
-//                   ) : (
-//                     <p className="text-gray-600 text-center col-span-full">
-//                       No appointments available for this date.
-//                     </p>
-//                   )}
-//                 </div>
-//               </div>
-//             )}
-
-//             {selectedPatient && (
-//               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
-//                 <h3 className="text-xl font-bold text-gray-800">Patient Details</h3>
-//                 <p className="text-gray-600">Name: {selectedPatient.name}</p>
-//                 <p className="text-gray-600">Email: {selectedPatient.email}</p>
-//                 <p className="text-gray-600">Phone: {selectedPatient.phone}</p>
-//                 <p className="text-gray-600">Medical History: {selectedPatient.medicalHistory}</p>
-//               </div>
-//             )}
-
-//             {selectedAppointment && (
-//               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
-//                 <h3 className="text-xl font-bold text-gray-800">Appointment Details</h3>
-//                 <p className="text-gray-600">
-//                   Type: {selectedAppointment.type === "physical" ? "Physical" : "Virtual"}
-//                 </p>
-//                 {selectedAppointment.type === "virtual" && selectedAppointment.meetingLink && (
-//                   <a
-//                     href={selectedAppointment.meetingLink}
-//                     target="_blank"
-//                     rel="noopener noreferrer"
-//                     className="text-blue-600 underline"
-//                   >
-//                     Join Meeting
-//                   </a>
-//                 )}
-//               </div>
-//             )}
-//           </div>
-//         )}
-//       </div>
-//     </Layout>
-//   );
-// };
-
-// export default Appointment;
-
-
-// import React, { useState, useEffect, useContext } from 'react';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-// import { AppContext } from '../context/AppContext';
-// import Layout from '../DoctorComponents/Layout';
-// import { useAuth } from '../context/AuthContext';
-
-// const Appointment = () => {
-//   const { user } = useAuth();
-//   const { docId = user?.id } = useParams();
-//   const { doctors, currencySymbol } = useContext(AppContext);
-//   const [docInfo, setDocInfo] = useState(null);
-//   const [availableDates, setAvailableDates] = useState([]);
-//   const [appointments, setAppointments] = useState([]);
-//   const [selectedDate, setSelectedDate] = useState(null);
-//   const [selectedPatient, setSelectedPatient] = useState(null);
-//   const [selectedAppointment, setSelectedAppointment] = useState(null);
-//   const [editableMedicalHistory, setEditableMedicalHistory] = useState('');
-
-//   useEffect(() => {
-//     const fetchDoctorInfo = async () => {
-//       const doc = doctors.find((doc) => doc._id === docId);
-//       setDocInfo(doc);
-//     };
-
-//     fetchDoctorInfo();
-//   }, [docId, doctors]);
-
-//   useEffect(() => {
-//     const fetchAvailableDates = async () => {
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
-//         );
-//         setAvailableDates(response.data);
-//       } catch (error) {
-//         console.error('Error fetching available dates:', error);
-//       }
-//     };
-
-//     if (docId) {
-//       fetchAvailableDates();
-//     }
-//   }, [docId]);
-
-//   const handleDateClick = async (date) => {
-//     setSelectedDate(date);
-
-//     try {
-//       const response = await axios.get(
-//         `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
-//       );
-//       setAppointments(response.data);
-//       console.log('Appointments DETAIL:', response.data);
-//     } catch (error) {
-//       console.error('Error fetching appointments:', error);
-//     }
-//   };
-
-//   const handleSlotClick = async (slot) => {
-//     if (slot.isBooked && slot.patient) {
-//       try {
-//         // Fetch patient details
-//         const patientResponse = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/patient/bid/${slot.patient}`
-//         );
-//         setSelectedPatient(patientResponse.data);
-//         setEditableMedicalHistory(patientResponse.data.medicalHistory || '');
-//         console.log('Patient details:', patientResponse.data);
-
-//         // Fetch appointment details using slotId and patientId
-//         const appointmentResponse = await axios.get(
-//           `${process.env.REACT_APP_SERVER_URL}/patient/details?slotId=${slot._id}&patientId=${slot.patient}`
-//         );
-//         setSelectedAppointment(appointmentResponse.data);
-//         console.log('Appointment details:', appointmentResponse.data);
-
-//       } catch (error) {
-//         console.error('Error fetching details:', error);
-//       }
-//     } else {
-//       setSelectedPatient(null);
-//       setSelectedAppointment(null);
-//       setEditableMedicalHistory('');
-//     }
-//   };
-
-//   const handleMedicalHistoryChange = (e) => {
-//     setEditableMedicalHistory(e.target.value);
-//   };
-
-//   const saveMedicalHistory = async () => {
-//     if (!selectedPatient) return;
-
-//     try {
-//       const response = await axios.put(
-//         `${process.env.REACT_APP_SERVER_URL}/patient/update/${selectedPatient._id}`,
-//         { medicalHistory: editableMedicalHistory }
-//       );
-//       setSelectedPatient({ ...selectedPatient, medicalHistory: editableMedicalHistory });
-//       console.log('Medical history updated:', response.data);
-//     } catch (error) {
-//       console.error('Error updating medical history:', error);
-//     }
-//   };
-
-//   return (
-//     <Layout>
-//       <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-//         {docInfo && (
-//           <div>
-//             <div className="doctor-info flex flex-col items-center text-center bg-gray-50 p-6 rounded-lg shadow-md">
-//               <img
-//                 src={docInfo.image}
-//                 alt={docInfo.name}
-//                 className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-primary"
-//               />
-//               <h2 className="text-2xl font-bold mt-4 text-gray-600">{docInfo.name}</h2>
-//               <p className="text-gray-500 mt-2">{docInfo.speciality}</p>
-//               <p className="text-gray-500 mt-2 text-sm">{docInfo.about}</p>
-//               <p className="text-primary font-semibold mt-4 text-lg">
-//                 Appointment Fee: {currencySymbol}
-//                 {docInfo.fees}
-//               </p>
-//             </div>
-
-//             <div className="available-dates mt-10">
-//               <h3 className="text-xl font-bold text-gray-800 text-center">
-//                 Select an Appointment Date
-//               </h3>
-//               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-//                 {availableDates.map((date) => (
-//                   <button
-//                     key={date}
-//                     onClick={() => handleDateClick(date)}
-//                     className={`py-3 px-4 text-center rounded-lg shadow-lg transition-all ${
-//                       selectedDate === date
-//                         ? 'bg-primary text-white'
-//                         : 'bg-gray-100 text-gray-800 hover:bg-primary hover:text-white'
-//                     }`}
-//                   >
-//                     {new Date(date).toLocaleDateString('en-US', {
-//                       day: '2-digit',
-//                       month: 'short',
-//                       year: 'numeric',
-//                     })}
-//                   </button>
-//                 ))}
-//               </div>
-//             </div>
-
-//             {selectedDate && (
-//               <div className="appointments mt-10">
-//                 <h3 className="text-xl font-bold text-gray-800 text-center">
-//                   Appointments for {new Date(selectedDate).toLocaleDateString()}
-//                 </h3>
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-//                   {appointments.length > 0 ? (
-//                     appointments.map((slot) => (
-//                       <div
-//                         key={slot._id}
-//                         onClick={() => handleSlotClick(slot)}
-//                         className={`p-6 rounded-lg shadow-lg transition-all cursor-pointer ${
-//                           slot.isBooked
-//                             ? 'bg-red-100 border-red-400'
-//                             : 'bg-green-100 border-green-400'
-//                         } border-2`}
-//                       >
-//                         <p className="text-lg font-medium text-gray-700">Time: {slot.time}</p>
-//                         <p
-//                           className={`text-lg font-bold mt-2 ${
-//                             slot.isBooked ? 'text-red-600' : 'text-green-600'
-//                           }`}
-//                         >
-//                           {slot.isBooked ? 'Booked' : 'Available'}
-//                         </p>
-//                       </div>
-//                     ))
-//                   ) : (
-//                     <p className="text-gray-600 text-center col-span-full">
-//                       No appointments available for this date.
-//                     </p>
-//                   )}
-//                 </div>
-//               </div>
-//             )}
-
-//             {selectedPatient && (
-//               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
-//                 <h3 className="text-xl font-bold text-gray-800">Patient Details</h3>
-//                 <p className="text-gray-600">Name: {selectedPatient.name}</p>
-//                 <p className="text-gray-600">Email: {selectedPatient.email}</p>
-//                 <p className="text-gray-600">Phone: {selectedPatient.phone}</p>
-//                 <div className="mt-4">
-//                   <label className="block text-gray-700">Medical History:</label>
-//                   <textarea
-//                     value={editableMedicalHistory}
-//                     onChange={handleMedicalHistoryChange}
-//                     className="w-full p-2 mt-2 border rounded-lg"
-//                     rows="4"
-//                   />
-//                   <button
-//                     onClick={saveMedicalHistory}
-//                     className="mt-4 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-all"
-//                   >
-//                     Save Medical History
-//                   </button>
-//                 </div>
-//               </div>
-//             )}
-
-//             {selectedAppointment && (
-//               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
-//                 <h3 className="text-xl font-bold text-gray-800">Appointment Details</h3>
-//                 <p className="text-gray-600">
-//                   Type: {selectedAppointment.type === "physical" ? "Physical" : "Virtual"}
-//                 </p>
-//                 {selectedAppointment.type === "virtual" && selectedAppointment.meetingLink && (
-//                   <a
-//                     href={selectedAppointment.meetingLink}
-//                     target="_blank"
-//                     rel="noopener noreferrer"
-//                     className="text-blue-600 underline"
-//                   >
-//                     Join Meeting
-//                   </a>
-//                 )}
-//               </div>
-//             )}
-//           </div>
-//         )}
-//       </div>
-//     </Layout>
-//   );
-// };
-
-// export default Appointment;
-
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -764,6 +6,7 @@ import Layout from '../DoctorComponents/Layout';
 import { useAuth } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 const Appointment = () => {
   const { user } = useAuth();
@@ -775,7 +18,11 @@ const Appointment = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [editableMedicalHistory, setEditableMedicalHistory] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableMedicalHistory, setEditableMedicalHistory] = useState(
+    selectedPatient?.medicalHistory || '',
+  );
+  const [originalHistory, setOriginalHistory] = useState(editableMedicalHistory);
 
   useEffect(() => {
     const fetchDoctorInfo = async () => {
@@ -790,7 +37,7 @@ const Appointment = () => {
     const fetchAvailableDates = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
+          `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`,
         );
         setAvailableDates(response.data);
       } catch (error) {
@@ -808,7 +55,7 @@ const Appointment = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
+        `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`,
       );
       setAppointments(response.data);
       console.log('Appointments DETAIL:', response.data);
@@ -822,7 +69,7 @@ const Appointment = () => {
       try {
         // Fetch patient details
         const patientResponse = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/patient/bid/${slot.patient}`
+          `${process.env.REACT_APP_SERVER_URL}/patient/bid/${slot.patient}`,
         );
         setSelectedPatient(patientResponse.data);
         setEditableMedicalHistory(patientResponse.data.medicalHistory || '');
@@ -830,11 +77,10 @@ const Appointment = () => {
 
         // Fetch appointment details using slotId and patientId
         const appointmentResponse = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/patient/details?slotId=${slot._id}&patientId=${slot.patient}`
+          `${process.env.REACT_APP_SERVER_URL}/patient/details?slotId=${slot._id}&patientId=${slot.patient}`,
         );
         setSelectedAppointment(appointmentResponse.data);
         console.log('Appointment details:', appointmentResponse.data);
-
       } catch (error) {
         console.error('Error fetching details:', error);
       }
@@ -845,45 +91,64 @@ const Appointment = () => {
     }
   };
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
   const handleMedicalHistoryChange = (e) => {
     setEditableMedicalHistory(e.target.value);
   };
 
+  // const saveMedicalHistory = async () => {
+  //   if (!selectedPatient) return;
+
+  //   try {
+  //     const response = await axios.put(
+  //       `${process.env.REACT_APP_SERVER_URL}/patient/update/${selectedPatient._id}`,
+  //       { medicalHistory: editableMedicalHistory }
+  //     );
+
+  //     // Update the selected patient's medical history in the state
+  //     setSelectedPatient({ ...selectedPatient, medicalHistory: editableMedicalHistory });
+
+  //     // Show success toast
+  //     toast.success('Medical history updated successfully!', {
+  //       position: "top-right",
+  //       autoClose: 3000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //     });
+
+  //     console.log('Medical history updated:', response.data);
+  //   } catch (error) {
+  //     console.error('Error updating medical history:', error);
+
+  //     // Show error toast
+  //     toast.error('Failed to update medical history. Please try again.', {
+  //       position: "top-right",
+  //       autoClose: 3000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //     });
+  //   }
+  // };
   const saveMedicalHistory = async () => {
-    if (!selectedPatient) return;
+    if (editableMedicalHistory === originalHistory) return; // Prevent unnecessary updates
 
     try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_SERVER_URL}/patient/update/${selectedPatient._id}`,
-        { medicalHistory: editableMedicalHistory }
-      );
-
-      // Update the selected patient's medical history in the state
-      setSelectedPatient({ ...selectedPatient, medicalHistory: editableMedicalHistory });
-
-      // Show success toast
-      toast.success('Medical history updated successfully!', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
+      await axios.put(`${process.env.REACT_APP_SERVER_URL}/patient/update/${selectedPatient._id}`, {
+        medicalHistory: editableMedicalHistory,
       });
 
-      console.log('Medical history updated:', response.data);
+      toast.success('Medical history updated successfully!');
+      setOriginalHistory(editableMedicalHistory);
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error updating medical history:', error);
-
-      // Show error toast
-      toast.error('Failed to update medical history. Please try again.', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Failed to update medical history.');
     }
   };
 
@@ -989,20 +254,45 @@ const Appointment = () => {
                 <p className="text-gray-600">Name: {selectedPatient.name}</p>
                 <p className="text-gray-600">Email: {selectedPatient.email}</p>
                 <p className="text-gray-600">Phone: {selectedPatient.phone}</p>
-                <div className="mt-4">
-                  <label className="block text-gray-700">Medical History:</label>
-                  <textarea
-                    value={editableMedicalHistory}
-                    onChange={handleMedicalHistoryChange}
-                    className="w-full p-2 mt-2 border rounded-lg"
-                    rows="4"
-                  />
-                  <button
-                    onClick={saveMedicalHistory}
-                    className="mt-4 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-all"
-                  >
-                    Save Medical History
-                  </button>
+                <div className="mt-8 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">Patient Medical History</h3>
+
+                    {!isEditing && (
+                      <button
+                        onClick={handleEditClick}
+                        className="text-gray-500 hover:text-gray-700 transition"
+                      >
+                        <PencilSquareIcon className="w-6 h-6" />
+                      </button>
+                    )}
+                  </div>
+
+                  {isEditing ? (
+                    <div>
+                      <textarea
+                        value={editableMedicalHistory}
+                        onChange={handleMedicalHistoryChange}
+                        className="w-full p-4 border rounded-lg bg-gray-50 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                        rows="5"
+                      />
+                      <button
+                        onClick={saveMedicalHistory}
+                        disabled={editableMedicalHistory === originalHistory}
+                        className={`mt-4 w-full py-2 rounded-lg font-semibold transition-all ${
+                          editableMedicalHistory !== originalHistory
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                        }`}
+                      >
+                        Save Medical History
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 bg-gray-100 p-3 rounded-md">
+                      {editableMedicalHistory || 'No history available.'}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -1012,9 +302,9 @@ const Appointment = () => {
               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
                 <h3 className="text-xl font-bold text-gray-800">Appointment Details</h3>
                 <p className="text-gray-600">
-                  Type: {selectedAppointment.type === "physical" ? "Physical" : "Virtual"}
+                  Type: {selectedAppointment.type === 'physical' ? 'Physical' : 'Virtual'}
                 </p>
-                {selectedAppointment.type === "virtual" && selectedAppointment.meetingLink && (
+                {selectedAppointment.type === 'virtual' && selectedAppointment.meetingLink && (
                   <a
                     href={selectedAppointment.meetingLink}
                     target="_blank"
@@ -1034,3 +324,148 @@ const Appointment = () => {
 };
 
 export default Appointment;
+
+// import React, { useState, useEffect, useContext } from 'react';
+// import { useParams } from 'react-router-dom';
+// import axios from 'axios';
+// import { AppContext } from '../context/AppContext';
+// import Layout from '../DoctorComponents/Layout';
+// import { useAuth } from '../context/AuthContext';
+// import { ToastContainer, toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
+
+// const Appointment = () => {
+//   const { user } = useAuth();
+//   const { docId = user?.id } = useParams();
+//   const { doctors, currencySymbol } = useContext(AppContext);
+//   const [docInfo, setDocInfo] = useState(null);
+//   const [availableDates, setAvailableDates] = useState([]);
+//   const [appointments, setAppointments] = useState([]);
+//   const [selectedDate, setSelectedDate] = useState(null);
+//   const [selectedPatient, setSelectedPatient] = useState(null);
+//   const [selectedAppointment, setSelectedAppointment] = useState(null);
+//   const [editableMedicalHistory, setEditableMedicalHistory] = useState('');
+
+//   useEffect(() => {
+//     if (!doctors || doctors.length === 0) return;
+//     const doc = doctors.find((doc) => doc._id === docId);
+//     setDocInfo(doc || null);
+//   }, [docId, doctors]);
+
+//   useEffect(() => {
+//     const fetchAvailableDates = async () => {
+//       try {
+//         const response = await axios.get(
+//           `${process.env.REACT_APP_SERVER_URL}/slot/dates?doctorId=${docId}`
+//         );
+//         setAvailableDates(response.data);
+//       } catch (error) {
+//         console.error('Error fetching available dates:', error);
+//       }
+//     };
+//     if (docId) fetchAvailableDates();
+//   }, [docId]);
+
+//   const handleDateClick = async (date) => {
+//     setSelectedDate(date);
+//     try {
+//       const response = await axios.get(
+//         `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`
+//       );
+//       setAppointments(response.data);
+//     } catch (error) {
+//       console.error('Error fetching appointments:', error);
+//     }
+//   };
+
+//   const saveMedicalHistory = async () => {
+//     if (!selectedPatient) return;
+//     try {
+//       await axios.put(
+//         `${process.env.REACT_APP_SERVER_URL}/patient/update/${selectedPatient._id}`,
+//         { medicalHistory: editableMedicalHistory }
+//       );
+//       setSelectedPatient((prev) => ({ ...prev, medicalHistory: editableMedicalHistory }));
+//       toast.success('Medical history updated successfully!');
+//     } catch (error) {
+//       console.error('Error updating medical history:', error);
+//       toast.error('Failed to update medical history. Please try again.');
+//     }
+//   };
+
+//   return (
+//     <Layout>
+//       <ToastContainer position="top-right" autoClose={3000} hideProgressBar closeOnClick pauseOnHover draggable />
+//       <div className="max-w-4xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-xl">
+//         {docInfo && (
+//           <div className="text-center">
+//             <img
+//               src={docInfo.image}
+//               alt={docInfo.name}
+//               className="w-28 h-28 mx-auto rounded-full border-4 border-gray-300 shadow-md"
+//             />
+//             <h2 className="text-2xl font-semibold mt-4 text-gray-700">{docInfo.name}</h2>
+//             <p className="text-gray-500">{docInfo.speciality}</p>
+//           </div>
+//         )}
+
+//         <h3 className="text-lg font-semibold mt-8 text-gray-800">Available Dates</h3>
+//         <div className="flex flex-wrap gap-4 mt-4">
+//           {availableDates.map((date) => (
+//             <button
+//               key={date}
+//               onClick={() => handleDateClick(date)}
+//               className={`py-2 px-4 rounded-lg text-sm font-medium transition-all shadow-md ${
+//                 selectedDate === date ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-blue-500 hover:text-white'
+//               }`}
+//             >
+//               {new Date(date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+//             </button>
+//           ))}
+//         </div>
+
+//         {selectedPatient && (
+//           <div className="mt-8 p-6 bg-gray-50 rounded-lg shadow">
+//             <h3 className="text-lg font-semibold text-gray-800">Patient Details</h3>
+//             <p className="text-gray-600">Name: {selectedPatient.name}</p>
+//             <p className="text-gray-600">Email: {selectedPatient.email}</p>
+//             <label className="block text-gray-700 mt-4">Medical History:</label>
+//             <textarea
+//               value={editableMedicalHistory}
+//               onChange={(e) => setEditableMedicalHistory(e.target.value)}
+//               className="w-full p-3 border rounded-lg bg-white shadow-sm focus:ring focus:ring-blue-300"
+//               rows="4"
+//             />
+//             <button
+//               onClick={saveMedicalHistory}
+//               className="mt-4 w-full py-2 text-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+//             >
+//               Save
+//             </button>
+//           </div>
+//         )}
+//          {/* Appointment Details */}
+//          {selectedAppointment && (
+//               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
+//                 <h3 className="text-xl font-bold text-gray-800">Appointment Details</h3>
+//                 <p className="text-gray-600">
+//                   Type: {selectedAppointment.type === "physical" ? "Physical" : "Virtual"}
+//                 </p>
+//                 {selectedAppointment.type === "virtual" && selectedAppointment.meetingLink && (
+//                   <a
+//                     href={selectedAppointment.meetingLink}
+//                     target="_blank"
+//                     rel="noopener noreferrer"
+//                     className="text-blue-600 underline"
+//                   >
+//                     Join Meeting
+//                   </a>
+//                 )}
+//               </div>
+//             )}
+//       </div>
+//     </Layout>
+//   );
+// };
+
+// export default Appointment;

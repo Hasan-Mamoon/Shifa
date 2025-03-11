@@ -37,7 +37,6 @@
 //               <FaUserMd /> Manage Doctors
 //             </li>
 
-
 //             <li
 //               className="flex items-center gap-3 cursor-pointer hover:text-gray-200 mt-6"
 //               onClick={handleLogout}
@@ -52,7 +51,7 @@
 //       <main className="flex-1 p-8">
 //         <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
 //         <p className="mt-2 text-gray-600">
-//           Welcome, Admin! 
+//           Welcome, Admin!
 //         </p>
 
 //         {/* Dashboard Stats */}
@@ -73,7 +72,6 @@
 //             </div>
 //           </div>
 
-         
 //         </div>
 //       </main>
 //     </div>
@@ -82,13 +80,10 @@
 
 // export default AdminDashboard;
 
-
-
-
-import React, { useEffect, useState } from "react";
-import { FaUserMd, FaUser, FaSignOutAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { FaUserMd, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -100,7 +95,7 @@ const AdminDashboard = () => {
         const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/admin/count`);
         setCounts(response.data);
       } catch (error) {
-        console.error("Error fetching counts:", error);
+        console.error('Error fetching counts:', error);
       }
     };
 
@@ -109,7 +104,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate('/login');
   };
 
   return (
@@ -119,9 +114,9 @@ const AdminDashboard = () => {
         <h2 className="text-2xl font-bold mb-6">Admin Panel</h2>
         <nav>
           <ul className="space-y-4">
-            <li 
+            <li
               className="flex items-center gap-3 cursor-pointer hover:text-gray-200"
-              onClick={() => navigate("/admin/manage-doctors")} 
+              onClick={() => navigate('/admin/manage-doctors')}
             >
               <FaUserMd /> Manage Doctors
             </li>
@@ -139,9 +134,7 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <main className="flex-1 p-8">
         <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-        <p className="mt-2 text-gray-600">
-          Welcome, Admin! 
-        </p>
+        <p className="mt-2 text-gray-600">Welcome, Admin!</p>
 
         {/* Dashboard Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">

@@ -116,11 +116,6 @@
 
 // export default Login;
 
-
-
-
-
-
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
@@ -234,12 +229,12 @@ const Login = () => {
           Login
         </button>
       </form>
-     <p className="text-center mt-4">
-         Don't have an account?{' '}
-         <Link to={`/signup/${formData.role}`} className="text-blue-600 underline">
-           Create an account
-         </Link>
-       </p>
+      <p className="text-center mt-4">
+        Don't have an account?{' '}
+        <Link to={`/signup/${formData.role}`} className="text-blue-600 underline">
+          Create an account
+        </Link>
+      </p>
     </div>
   );
 };
