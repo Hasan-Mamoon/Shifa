@@ -94,7 +94,6 @@ const Appointment = () => {
     setEditableMedicalHistory(e.target.value);
   };
 
-
   const saveMedicalHistory = async () => {
     if (editableMedicalHistory === originalHistory) return;
 
@@ -154,8 +153,12 @@ const Appointment = () => {
                 className={`py-2 px-4 rounded-lg shadow-md ${
                   filterType === 'past' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
                 }`}
-                onClick={() => {setFilterType('past');setSelectedDate(null);setSelectedPatient(null);
-                  setSelectedAppointment(null);}}
+                onClick={() => {
+                  setFilterType('past');
+                  setSelectedDate(null);
+                  setSelectedPatient(null);
+                  setSelectedAppointment(null);
+                }}
               >
                 Past Appointments
               </button>
@@ -163,8 +166,12 @@ const Appointment = () => {
                 className={`py-2 px-4 rounded-lg shadow-md ${
                   filterType === 'future' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
                 }`}
-                onClick={() => {setFilterType('future');setSelectedDate(null);setSelectedPatient(null);
-                  setSelectedAppointment(null);}}
+                onClick={() => {
+                  setFilterType('future');
+                  setSelectedDate(null);
+                  setSelectedPatient(null);
+                  setSelectedAppointment(null);
+                }}
               >
                 Upcomming
               </button>
@@ -175,7 +182,11 @@ const Appointment = () => {
                 filteredDates.map((date) => (
                   <button
                     key={date}
-                    onClick={() => {setSelectedPatient(null);setSelectedAppointment(null);handleDateClick(date)}}
+                    onClick={() => {
+                      setSelectedPatient(null);
+                      setSelectedAppointment(null);
+                      handleDateClick(date);
+                    }}
                     className={`py-3 px-4 rounded-lg shadow-lg transition-all ${
                       selectedDate === date
                         ? 'bg-primary text-white'
@@ -190,7 +201,9 @@ const Appointment = () => {
                   </button>
                 ))
               ) : (
-                <p className="text-gray-600 text-center col-span-full">No available appointments.</p>
+                <p className="text-gray-600 text-center col-span-full">
+                  No available appointments.
+                </p>
               )}
             </div>
 
@@ -206,7 +219,9 @@ const Appointment = () => {
                         key={slot._id}
                         onClick={() => handleSlotClick(slot)}
                         className={`p-6 rounded-lg shadow-lg transition-all cursor-pointer ${
-                          slot.isBooked ? 'bg-red-100 border-red-400' : 'bg-green-100 border-green-400'
+                          slot.isBooked
+                            ? 'bg-red-100 border-red-400'
+                            : 'bg-green-100 border-green-400'
                         } border-2`}
                       >
                         <p className="text-lg font-medium text-gray-700">Time: {slot.time}</p>

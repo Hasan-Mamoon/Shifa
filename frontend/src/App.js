@@ -109,7 +109,7 @@ import PatientRoutes from './routes/PatientRoutes';
 import DoctorRoutes from './routes/DoctorRoutes';
 import AdminRoutes from './routes/AdminRoutes';
 import AdminNavbar from './AdminComponents/AdminNavbar';
-import InfoPage from "./PatientPages/InfoPage";
+import InfoPage from './PatientPages/InfoPage';
 import PaymentRoutes from './routes/PaymentRoutes';
 
 const App = () => {
@@ -125,7 +125,6 @@ const App = () => {
 
   return (
     <div className="mx-4 sm:mx-[10%]">
-
       {isAdminRoute ? (
         user?.role === 'admin' ? (
           <AdminNavbar />

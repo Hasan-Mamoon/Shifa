@@ -172,9 +172,6 @@ router.post('/login', async (req, res) => {
 //   }
 // );
 
-
-
-
 // router.post('/add-doctor', upload.fields([{ name: 'degree', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
 //   try {
 //     const { email, password, name, speciality, experience, about, fees } = req.body;
@@ -199,7 +196,6 @@ router.post('/login', async (req, res) => {
 //     res.status(500).json({ message: 'Error adding doctor', error: err });
 //   }
 // });
-
 
 router.post(
   '/add-doctor',
@@ -279,9 +275,6 @@ router.post(
   }
 );
 
-
-
-
 router.get('/doctors-all', async (req, res) => {
   try {
     const doctors = await doctormodel.find({});
@@ -314,7 +307,6 @@ router.get('/:speciality', async (req, res) => {
     const doctors = await doctormodel.find({
       speciality: speciality.toString(),
     });
-
 
     for (const doctor of doctors) {
       const getObjectParams = {

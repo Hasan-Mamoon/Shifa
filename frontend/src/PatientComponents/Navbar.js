@@ -5,17 +5,16 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const pharmacies = [
-  { id: "pharmacy1", name: "Dawaai" },
-  { id: "pharmacy2", name: "Healthwire" },
-  { id: "pharmacy3", name: "DVAGO" },
-
+  { id: 'pharmacy1', name: 'Dawaai' },
+  { id: 'pharmacy2', name: 'Healthwire' },
+  { id: 'pharmacy3', name: 'DVAGO' },
 ];
 
 const labs = [
-  { id: "lab1", name: "Islamabad Diagnostic Centre (IDC)" },
-  { id: "lab2", name: "Chughtai Lab" },
-  { id: "lab3", name: "Mughal Labs" },
-  { id: "lab4", name: "Shifa4U" },
+  { id: 'lab1', name: 'Islamabad Diagnostic Centre (IDC)' },
+  { id: 'lab2', name: 'Chughtai Lab' },
+  { id: 'lab3', name: 'Mughal Labs' },
+  { id: 'lab4', name: 'Shifa4U' },
 ];
 
 const Navbar = () => {
@@ -81,10 +80,10 @@ const Navbar = () => {
         <NavLink to="/blogs">
           <li className="py-1">HEALTH-BLOGS</li>
         </NavLink>
-        
+
         {/* Pharmacy Dropdown */}
         <div className="relative">
-          <li 
+          <li
             className="py-1 cursor-pointer"
             onClick={() => setShowPharmacyDropdown(!showPharmacyDropdown)}
           >
@@ -93,8 +92,8 @@ const Navbar = () => {
           {showPharmacyDropdown && (
             <div className="absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
               {pharmacies.map((pharmacy) => (
-                <p 
-                  key={pharmacy.id} 
+                <p
+                  key={pharmacy.id}
                   className="cursor-pointer hover:bg-gray-100 p-2"
                   onClick={() => navigate(`/pharmacy/${pharmacy.id}`)}
                 >
@@ -107,17 +106,14 @@ const Navbar = () => {
 
         {/* Labs Dropdown */}
         <div className="relative">
-          <li 
-            className="py-1 cursor-pointer"
-            onClick={() => setShowLabDropdown(!showLabDropdown)}
-          >
+          <li className="py-1 cursor-pointer" onClick={() => setShowLabDropdown(!showLabDropdown)}>
             LABS ▼
           </li>
           {showLabDropdown && (
             <div className="absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
               {labs.map((lab) => (
-                <p 
-                  key={lab.id} 
+                <p
+                  key={lab.id}
                   className="cursor-pointer hover:bg-gray-100 p-2"
                   onClick={() => navigate(`/lab/${lab.id}`)}
                 >
