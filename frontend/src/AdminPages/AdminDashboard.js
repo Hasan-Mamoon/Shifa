@@ -120,7 +120,10 @@ const AdminDashboard = () => {
             >
               <FaUserMd /> Manage Doctors
             </li>
-            <li className="flex items-center gap-3 cursor-pointer hover:text-gray-200" onClick={() => navigate('/admin/manage-discounts')}>
+            <li
+              className="flex items-center gap-3 cursor-pointer hover:text-gray-200"
+              onClick={() => navigate('/admin/manage-discounts')}
+            >
               <FaPercentage /> Manage Discounts
             </li>
 

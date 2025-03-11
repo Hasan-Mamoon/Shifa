@@ -24,9 +24,12 @@ const AdminDiscounts = () => {
         return;
       }
 
-      const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/admin/apply-discount`, {
-        discountPercentage,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER_URL}/admin/apply-discount`,
+        {
+          discountPercentage,
+        },
+      );
 
       setMessage(response.data.message);
       setActiveDiscount(discountPercentage);
@@ -39,7 +42,9 @@ const AdminDiscounts = () => {
 
   const removeDiscount = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/admin/remove-discount`);
+      const response = await axios.post(
+        `${process.env.REACT_APP_SERVER_URL}/admin/remove-discount`,
+      );
       setMessage(response.data.message);
       setActiveDiscount(null);
       localStorage.removeItem('lastDiscount');
@@ -84,14 +89,22 @@ const AdminDiscounts = () => {
               placeholder="Enter discount (e.g., 10)"
             />
 
-            <button onClick={applyDiscount} className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+            <button
+              onClick={applyDiscount}
+              className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            >
               Apply Discount
             </button>
           </>
         ) : (
           <>
-            <p className="text-lg font-semibold text-gray-700">Active Discount: <strong>{activeDiscount}%</strong></p>
-            <button onClick={removeDiscount} className="mt-4 w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700">
+            <p className="text-lg font-semibold text-gray-700">
+              Active Discount: <strong>{activeDiscount}%</strong>
+            </p>
+            <button
+              onClick={removeDiscount}
+              className="mt-4 w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700"
+            >
               Remove Discount
             </button>
           </>
