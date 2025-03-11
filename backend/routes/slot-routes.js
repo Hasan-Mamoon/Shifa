@@ -177,5 +177,26 @@ router.get('/slotsbyid', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch slots. Please try again later.' });
   }
 });
+router.get('/stats', async (req, res) => {
+  const { doctorId } = req.query;
+  if (!doctorId) {
+    return res.status(400).json({ message: 'Doctor ID is required' });
+  }
+
+  try {
+    const appointments = await appointmentModel.find({ doctorId });
+    const slots = await slotModel.find({ doctorId });
+
+    // Count booked and available slots
+    const bookedCount = appointments.length;
+    const availableCount = slots.filter((slot) => !slot.isBooked).length;
+
+    res.json({ totalAppointments: bookedCount, availableSlots: availableCount });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 export { router as slotsRouter };

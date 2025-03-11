@@ -12,8 +12,7 @@ const doctorSchema = new mongoose.Schema({
   fees: { type: Number, required: true },
   address: {
     line1: { type: String, required: true },
-    line2: { type: String, required: true },
-    line2: { type: String, required: true },
+    line2: { type: String }, 
   },
   reviews: [
     {
@@ -24,5 +23,4 @@ const doctorSchema = new mongoose.Schema({
 });
 
 const doctorModel = mongoose.model('Doctor', doctorSchema);
-
 export { doctorModel as doctormodel };

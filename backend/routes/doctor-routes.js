@@ -4,6 +4,7 @@ import multer from 'multer';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { PendingDoctor } from '../models/PendingDoctor.js';
 
 import path from 'path';
 import sharp from 'sharp';
@@ -97,6 +98,109 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// router.post(
+//   '/add-doctor',
+//   upload.fields([
+//     { name: 'degree', maxCount: 1 },
+//     { name: 'image', maxCount: 1 },
+//   ]),
+//   async (req, res) => {
+//     try {
+//       let address1 = req.body.address;
+//       if (typeof address1 === 'string') {
+//         address1 = JSON.parse(address1);
+//       }
+
+//       console.log('req.body', req.body);
+//       console.log('req.files', req.files);
+
+//       if (!req.files || !req.files.image || !req.files.degree) {
+//         return res.status(400).json({ message: 'Image and Degree files are required' });
+//       }
+
+//       const imageName = randomImageName();
+//       const buffer = await sharp(req.files.image[0].buffer)
+//         .resize({ height: 1920, width: 1080, fit: 'contain' })
+//         .toBuffer();
+
+//       const imageParams = {
+//         Bucket: bucketName,
+//         Key: imageName,
+//         Body: buffer,
+//         ContentType: req.files.image[0].mimetype,
+//       };
+
+//       const imageCommand = new PutObjectCommand(imageParams);
+//       await s3.send(imageCommand);
+
+//       const degreeName = randomImageName();
+//       const degreeBuffer = req.files.degree[0].buffer;
+
+//       const degreeParams = {
+//         Bucket: bucketName,
+//         Key: degreeName,
+//         Body: degreeBuffer,
+//         ContentType: req.files.degree[0].mimetype,
+//       };
+
+//       const degreeCommand = new PutObjectCommand(degreeParams);
+//       await s3.send(degreeCommand);
+
+//       const { email, password, name, speciality, experience, about, fees } = req.body;
+
+//       const hashedPassword = await bcrypt.hash(password, 10);
+
+//       const newDoctor = new doctormodel({
+//         email,
+//         password: hashedPassword,
+//         name,
+//         image: imageName,
+//         speciality,
+//         degree: degreeName,
+//         experience,
+//         about,
+//         fees,
+//         address: address1,
+//       });
+
+//       const savedDoctor = await newDoctor.save();
+//       return res.status(201).json({ message: 'Doctor added successfully', doctor: savedDoctor });
+//     } catch (err) {
+//       console.error(err);
+//       return res.status(500).json({ message: 'Error adding doctor', error: err });
+//     }
+//   }
+// );
+
+
+
+
+// router.post('/add-doctor', upload.fields([{ name: 'degree', maxCount: 1 }, { name: 'image', maxCount: 1 }]), async (req, res) => {
+//   try {
+//     const { email, password, name, speciality, experience, about, fees } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const imageName = randomImageName();
+//     const imageBuffer = await sharp(req.files.image[0].buffer)
+//       .resize({ width: 300, height: 300, fit: 'cover' })
+//       .toBuffer();
+
+//     const degreeName = randomImageName();
+//     const degreeBuffer = req.files.degree[0].buffer;
+
+//     await s3.send(new PutObjectCommand({ Bucket: bucketName, Key: imageName, Body: imageBuffer, ContentType: req.files.image[0].mimetype }));
+//     await s3.send(new PutObjectCommand({ Bucket: bucketName, Key: degreeName, Body: degreeBuffer, ContentType: req.files.degree[0].mimetype }));
+
+//     const newDoctor = new doctormodel({ email, password: hashedPassword, name, image: imageName, speciality, degree: degreeName, experience, about, fees, status: 'pending' });
+
+//     await newDoctor.save();
+//     res.status(201).json({ message: 'Doctor request sent for approval' });
+//   } catch (err) {
+//     res.status(500).json({ message: 'Error adding doctor', error: err });
+//   }
+// });
+
+
 router.post(
   '/add-doctor',
   upload.fields([
@@ -105,76 +209,82 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      let address1 = req.body.address;
-      if (typeof address1 === 'string') {
-        address1 = JSON.parse(address1);
+      const { email, password, name, speciality, experience, about, fees } = req.body;
+
+      // Parse address from the request body (handling JSON string case)
+      let address = req.body.address;
+      if (typeof address === 'string') {
+        try {
+          address = JSON.parse(address);
+        } catch (error) {
+          return res.status(400).json({ message: 'Invalid address format' });
+        }
       }
 
-      console.log('req.body', req.body);
-      console.log('req.files', req.files);
-
+      // Ensure image and degree files exist
       if (!req.files || !req.files.image || !req.files.degree) {
         return res.status(400).json({ message: 'Image and Degree files are required' });
       }
 
-      const imageName = randomImageName();
-      const buffer = await sharp(req.files.image[0].buffer)
-        .resize({ height: 1920, width: 1080, fit: 'contain' })
-        .toBuffer();
-
-      const imageParams = {
-        Bucket: bucketName,
-        Key: imageName,
-        Body: buffer,
-        ContentType: req.files.image[0].mimetype,
-      };
-
-      const imageCommand = new PutObjectCommand(imageParams);
-      await s3.send(imageCommand);
-
-      const degreeName = randomImageName();
-      const degreeBuffer = req.files.degree[0].buffer;
-
-      const degreeParams = {
-        Bucket: bucketName,
-        Key: degreeName,
-        Body: degreeBuffer,
-        ContentType: req.files.degree[0].mimetype,
-      };
-
-      const degreeCommand = new PutObjectCommand(degreeParams);
-      await s3.send(degreeCommand);
-
-      const { email, password, name, speciality, experience, about, fees } = req.body;
-
+      // Hash the password before storing
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newDoctor = new doctormodel({
+      // Process & Upload Image
+      const imageName = `${randomImageName()}.jpg`;
+      const imageBuffer = await sharp(req.files.image[0].buffer)
+        .resize({ width: 300, height: 300, fit: 'cover' })
+        .toBuffer();
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: imageName,
+          Body: imageBuffer,
+          ContentType: req.files.image[0].mimetype,
+        })
+      );
+
+      // Process & Upload Degree
+      const degreeName = `${randomImageName()}.pdf`;
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: degreeName,
+          Body: req.files.degree[0].buffer,
+          ContentType: req.files.degree[0].mimetype,
+        })
+      );
+
+      // Create a new pending doctor record
+      const newPendingDoctor = new PendingDoctor({
         email,
         password: hashedPassword,
         name,
-        image: imageName,
         speciality,
-        degree: degreeName,
         experience,
         about,
         fees,
-        address: address1,
+        address, // Store address
+        image: imageName,
+        degree: degreeName,
+        status: 'pending', // Waiting for admin approval
       });
 
-      const savedDoctor = await newDoctor.save();
-      return res.status(201).json({ message: 'Doctor added successfully', doctor: savedDoctor });
+      await newPendingDoctor.save();
+      res.status(201).json({ message: 'Doctor request sent for approval' });
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Error adding doctor', error: err });
+      console.error('Error adding doctor:', err);
+      res.status(500).json({ message: 'Internal Server Error', error: err.message });
     }
   }
 );
 
+
+
+
 router.get('/doctors-all', async (req, res) => {
   try {
     const doctors = await doctormodel.find({});
-    console.log('doc', doctors);
 
     for (const doctor of doctors) {
       const getObjectParams = {
@@ -205,7 +315,6 @@ router.get('/:speciality', async (req, res) => {
       speciality: speciality.toString(),
     });
 
-    console.log('doc', doctors);
 
     for (const doctor of doctors) {
       const getObjectParams = {

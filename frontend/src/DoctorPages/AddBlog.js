@@ -158,7 +158,7 @@ const AddBlog = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        '${process.env.REACT_APP_SERVER_URL}/blog/add-blog',
+        `${process.env.REACT_APP_SERVER_URL}/blog/add-blog`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } },
       );

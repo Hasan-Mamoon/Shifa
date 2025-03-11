@@ -112,7 +112,11 @@ const Signup = () => {
 
       await axios.post(url, form, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-      alert(`${userType.charAt(0).toUpperCase() + userType.slice(1)} registered successfully`);
+      if (userType === 'doctor') {
+        alert('Doctor registration submitted. Pending for approval.');
+      } else {
+        alert('Patient registered successfully.');
+      }
       navigate('/login');
     } catch (error) {
       setError(`Error registering ${userType}. Please try again.`);
@@ -217,15 +221,22 @@ const Signup = () => {
 
         {userType === 'doctor' && (
           <>
-            <input
-              type="text"
-              name="speciality"
-              placeholder="Speciality"
-              value={formData.speciality}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            />
+    <select
+      name="speciality"
+      value={formData.speciality}
+      onChange={handleChange}
+      required
+      className="w-full p-2 border rounded"
+    >
+      <option value="">Select Speciality</option>
+      <option value="Gastroenterologist">Gastroenterologist</option>
+      <option value="General Physician">General Physician</option>
+      <option value="Gynecologist">Gynecologist</option>
+      <option value="Dermatologist">Dermatologist</option>
+      <option value="Pediatricians">Pediatricians</option>
+      <option value="Neurologist">Neurologist</option>
+    </select>
+
             <input
               type="text"
               name="experience"

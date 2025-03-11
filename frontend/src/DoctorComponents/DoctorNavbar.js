@@ -92,15 +92,15 @@ const DoctorNavbar = () => {
       {/* Navigation Links */}
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to="/doctor/dashboard">
-          <li className="py-1 flex items-center gap-2">Dashboard</li>
+          <li className="py-1 flex items-center gap-2">DASHBOARD</li>
         </NavLink>
 
         <NavLink to="/doctor/blogs">
-          <li className="py-1 flex items-center gap-2">Add-Blogs</li>
+          <li className="py-1 flex items-center gap-2">ADD-BLOGS</li>
         </NavLink>
 
         <NavLink to="/doctor/blogs/list">
-          <li className="py-1 flex items-center gap-2">All-Blogs</li>
+          <li className="py-1 flex items-center gap-2">ALL-BLOGS</li>
         </NavLink>
       </ul>
 
