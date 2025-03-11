@@ -116,18 +116,6 @@
 
 // export default Login;
 
-
-
-
-
-
-
-
-
-
-
-
-
 // import { useState } from 'react';
 // import axios from 'axios';
 // import { useNavigate, Link, useLocation } from 'react-router-dom';
@@ -252,14 +240,6 @@
 // };
 
 // export default Login;
-
-
-
-
-
-
-
-
 
 import { useState } from 'react';
 import axios from 'axios';
@@ -387,16 +367,14 @@ const Login = () => {
 
       {/* Right Half: Logo Section */}
       <div className="w-1/2 bg-gradient-to-r from-white to-primary flex justify-center items-center">
-  <div className="flex justify-center items-center w-full h-full">
-    <img
-      src={assets.logo}
-      alt="Logo"
-      className="w-full h-full object-contain"  // Stretch image to fill the container
-    />
-  </div>
-</div>
-
-
+        <div className="flex justify-center items-center w-full h-full">
+          <img
+            src={assets.logo}
+            alt="Logo"
+            className="w-full h-full object-contain" // Stretch image to fill the container
+          />
+        </div>
+      </div>
     </div>
   );
 };

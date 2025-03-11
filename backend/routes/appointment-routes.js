@@ -216,7 +216,6 @@ router.delete('/:appointmentId', async (req, res) => {
   }
 });
 
-
 router.get('/appointments', async (req, res) => {
   const { userId } = req.query;
 
