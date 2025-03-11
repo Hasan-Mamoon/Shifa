@@ -25,7 +25,7 @@ app.use(cors({
   origin: "http://localhost:3000", // Must match frontend origin exactly
   credentials: true, // Allows cookies
   allowedHeaders: ["Content-Type", "Authorization"], // Explicitly allow Authorization
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow required methods
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"], // Allow required methods
 }));
 
 //Handle Preflight Requests (OPTIONS)

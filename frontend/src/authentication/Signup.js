@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link, useParams } from 'react-router-dom';
+import { assets } from '../assets/assets';
 
 const Signup = () => {
   const { userType } = useParams();
@@ -124,8 +125,10 @@ const Signup = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h2 className="text-2xl font-bold mb-4 text-center">
+
+    <div className="flex h-screen">
+    <div className="max-w-lg mx-auto  bg-white rounded-lg ">
+      <h2 className="text-2xl font-bold mb-2 text-center">
         {userType === 'doctor' ? 'Doctor' : 'Patient'} Signup
       </h2>
       {error && <p className="text-red-500 text-center">{error}</p>}
@@ -307,12 +310,22 @@ const Signup = () => {
         </button>
       </form>
 
-      <p className="text-center mt-4">
+      <p className="text-center mt-2">
         Already have an account?{' '}
         <Link to="/login" className="text-blue-600 underline">
           Login here
         </Link>
       </p>
+      </div>
+       <div className="w-1/2 bg-gradient-to-r from-white to-primary flex justify-center items-center">
+        <div className="flex justify-center items-center w-full h-full">
+          <img
+            src={assets.logo}
+            alt="Logo"
+            className="w-full h-full object-contain"  // Stretch image to fill the container
+          />
+        </div>
+      </div>
     </div>
   );
 };
