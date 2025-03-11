@@ -187,6 +187,52 @@ router.put('/update-doctor-status/:id', async (req, res) => {
     res.status(500).json({ message: 'Error updating doctor status', error: error.message });
   }
 });
+//////////////////////////
+
+// Apply Discount
+router.post('/apply-discount', async (req, res) => {
+  try {
+    const { discountPercentage } = req.body; // Example: { discountPercentage: 10 }
+
+    if (!discountPercentage || discountPercentage <= 0 || discountPercentage > 100) {
+      return res.status(400).json({ message: 'Invalid discount percentage' });
+    }
+
+    const doctors = await doctormodel.find();
+
+    for (const doctor of doctors) {
+      if (!doctor.originalFees) {
+        doctor.originalFees = doctor.fees; // Store original fee before discount
+      }
+      doctor.fees = Math.round(doctor.originalFees * (1 - discountPercentage / 100)); // Apply discount
+      await doctor.save();
+    }
+
+    res.status(200).json({ message: 'Discount applied successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+// Remove Discount
+router.post('/remove-discount', async (req, res) => {
+  try {
+    const doctors = await doctormodel.find();
+
+    for (const doctor of doctors) {
+      if (doctor.originalFees) {
+        doctor.fees = doctor.originalFees; // Restore original fee
+        doctor.originalFees = undefined; // Remove stored original fee
+        await doctor.save();
+      }
+    }
+
+    res.status(200).json({ message: 'Discount removed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
 
 export default router;
 
