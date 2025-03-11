@@ -125,17 +125,7 @@ const App = () => {
 
   return (
     <div className="mx-4 sm:mx-[10%]">
-      {isAdminRoute ? (
-        user?.role === 'admin' ? (
-          <AdminNavbar />
-        ) : null
-      ) : isDoctorRoute ? (
-        user?.role === 'doctor' ? (
-          <DoctorNavbar />
-        ) : null
-      ) : (
-        <Navbar />
-      )}
+
       {isAdminRoute ? (
         user?.role === 'admin' ? (
           <AdminNavbar />
