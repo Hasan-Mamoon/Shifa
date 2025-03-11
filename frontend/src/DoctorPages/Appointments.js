@@ -23,13 +23,13 @@ const Appointment = () => {
     selectedPatient?.medicalHistory || '',
   );
   const [originalHistory, setOriginalHistory] = useState(editableMedicalHistory);
+  const [filterType, setFilterType] = useState('future'); // 'past' or 'future'
 
   useEffect(() => {
     const fetchDoctorInfo = async () => {
       const doc = doctors.find((doc) => doc._id === docId);
       setDocInfo(doc);
     };
-
     fetchDoctorInfo();
   }, [docId, doctors]);
 
@@ -52,13 +52,11 @@ const Appointment = () => {
 
   const handleDateClick = async (date) => {
     setSelectedDate(date);
-
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_SERVER_URL}/slot/appointments?doctorId=${docId}&date=${date}`,
       );
       setAppointments(response.data);
-      console.log('Appointments DETAIL:', response.data);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     }
@@ -67,20 +65,17 @@ const Appointment = () => {
   const handleSlotClick = async (slot) => {
     if (slot.isBooked && slot.patient) {
       try {
-        // Fetch patient details
         const patientResponse = await axios.get(
           `${process.env.REACT_APP_SERVER_URL}/patient/bid/${slot.patient}`,
         );
         setSelectedPatient(patientResponse.data);
         setEditableMedicalHistory(patientResponse.data.medicalHistory || '');
-        console.log('Patient details:', patientResponse.data);
+        setOriginalHistory(patientResponse.data.medicalHistory || '');
 
-        // Fetch appointment details using slotId and patientId
         const appointmentResponse = await axios.get(
           `${process.env.REACT_APP_SERVER_URL}/patient/details?slotId=${slot._id}&patientId=${slot.patient}`,
         );
         setSelectedAppointment(appointmentResponse.data);
-        console.log('Appointment details:', appointmentResponse.data);
       } catch (error) {
         console.error('Error fetching details:', error);
       }
@@ -99,8 +94,9 @@ const Appointment = () => {
     setEditableMedicalHistory(e.target.value);
   };
 
+
   const saveMedicalHistory = async () => {
-    if (editableMedicalHistory === originalHistory) return; // Prevent unnecessary updates
+    if (editableMedicalHistory === originalHistory) return;
 
     try {
       await axios.put(`${process.env.REACT_APP_SERVER_URL}/patient/update/${selectedPatient._id}`, {
@@ -114,6 +110,12 @@ const Appointment = () => {
       toast.error('Failed to update medical history.');
     }
   };
+
+  const filteredDates = availableDates.filter((date) => {
+    const today = new Date().setHours(0, 0, 0, 0);
+    const appointmentDate = new Date(date).setHours(0, 0, 0, 0);
+    return filterType === 'past' ? appointmentDate < today : appointmentDate >= today;
+  });
 
   return (
     <Layout>
@@ -147,17 +149,34 @@ const Appointment = () => {
               </p>
             </div>
 
-            {/* Available Dates */}
-            <div className="available-dates mt-10">
-              <h3 className="text-xl font-bold text-gray-800 text-center">
-                Select an Appointment Date
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-                {availableDates.map((date) => (
+            <div className="flex justify-center gap-4 mb-6">
+              <button
+                className={`py-2 px-4 rounded-lg shadow-md ${
+                  filterType === 'past' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+                onClick={() => {setFilterType('past');setSelectedDate(null);setSelectedPatient(null);
+                  setSelectedAppointment(null);}}
+              >
+                Past Appointments
+              </button>
+              <button
+                className={`py-2 px-4 rounded-lg shadow-md ${
+                  filterType === 'future' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+                onClick={() => {setFilterType('future');setSelectedDate(null);setSelectedPatient(null);
+                  setSelectedAppointment(null);}}
+              >
+                Future Appointments
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+              {filteredDates.length > 0 ? (
+                filteredDates.map((date) => (
                   <button
                     key={date}
-                    onClick={() => handleDateClick(date)}
-                    className={`py-3 px-4 text-center rounded-lg shadow-lg transition-all ${
+                    onClick={() => {setSelectedPatient(null);setSelectedAppointment(null);handleDateClick(date)}}
+                    className={`py-3 px-4 rounded-lg shadow-lg transition-all ${
                       selectedDate === date
                         ? 'bg-primary text-white'
                         : 'bg-gray-100 text-gray-800 hover:bg-primary hover:text-white'
@@ -169,11 +188,12 @@ const Appointment = () => {
                       year: 'numeric',
                     })}
                   </button>
-                ))}
-              </div>
+                ))
+              ) : (
+                <p className="text-gray-600 text-center col-span-full">No available appointments.</p>
+              )}
             </div>
 
-            {/* Appointments */}
             {selectedDate && (
               <div className="appointments mt-10">
                 <h3 className="text-xl font-bold text-gray-800 text-center">
@@ -186,9 +206,7 @@ const Appointment = () => {
                         key={slot._id}
                         onClick={() => handleSlotClick(slot)}
                         className={`p-6 rounded-lg shadow-lg transition-all cursor-pointer ${
-                          slot.isBooked
-                            ? 'bg-red-100 border-red-400'
-                            : 'bg-green-100 border-green-400'
+                          slot.isBooked ? 'bg-red-100 border-red-400' : 'bg-green-100 border-green-400'
                         } border-2`}
                       >
                         <p className="text-lg font-medium text-gray-700">Time: {slot.time}</p>
@@ -209,7 +227,6 @@ const Appointment = () => {
                 </div>
               </div>
             )}
-
             {/* Patient Details */}
             {selectedPatient && (
               <div className="patient-details mt-10 bg-gray-100 p-6 rounded-lg shadow-lg">
