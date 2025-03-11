@@ -2,9 +2,12 @@ import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { appointmentModel } from '../models/appointment.js';
+import { patientModel } from '../models/patient.js';
+import { doctormodel } from '../models/doctor.js';
 import { slotModel } from '../models/timeslots.js';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -18,13 +21,36 @@ const s3 = new S3Client({
   },
 });
 
+
+const transporter = nodemailer.createTransport({
+  service: process.env.EMAIL_SERVICE, // Example: 'gmail'
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+const sendEmail = async (to, subject, text) => {
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to,
+      subject,
+      text,
+    });
+    console.log(`Email sent to ${to}`);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};
+
+
 router.post('/book-appointment', async (req, res) => {
   const { doctorId, patientId, slotId, date, time, type, meetingLink } = req.body;
 
   console.log('Booking Appointment Request:', req.body);
 
   const session = await mongoose.startSession();
-
   try {
     session.startTransaction();
 
@@ -32,34 +58,19 @@ router.post('/book-appointment', async (req, res) => {
       .findOne({
         doctorId,
         date,
-        slots: {
-          $elemMatch: {
-            _id: slotId,
-            time: time,
-            isBooked: false,
-          },
-        },
+        slots: { $elemMatch: { _id: slotId, time, isBooked: false } },
       })
       .session(session);
 
-    if (!slotDocument) {
-      throw new Error('Slot is no longer available.');
-    }
+    if (!slotDocument) throw new Error('Slot is no longer available.');
 
     const updateResult = await slotModel.updateOne(
       { doctorId, date, 'slots._id': slotId },
-      {
-        $set: {
-          'slots.$.isBooked': true,
-          'slots.$.patient': patientId,
-        },
-      },
+      { $set: { 'slots.$.isBooked': true, 'slots.$.patient': patientId } },
       { session }
     );
 
-    if (updateResult.nModified === 0) {
-      throw new Error('Failed to update slot status.');
-    }
+    if (updateResult.nModified === 0) throw new Error('Failed to update slot status.');
 
     const newAppointment = new appointmentModel({
       doctorId,
@@ -78,6 +89,29 @@ router.post('/book-appointment', async (req, res) => {
     await session.commitTransaction();
 
     console.log('Appointment Booked:', newAppointment);
+
+    // Fetch doctor and patient details for email
+    const doctor = await doctormodel.findById(doctorId);
+    const patient = await patientModel.findById(patientId);
+
+    if (doctor && patient) {
+      const doctorEmail = doctor.email;
+      const patientEmail = patient.email;
+
+      // Send email to doctor
+      sendEmail(
+        doctorEmail,
+        'New Appointment Booked',
+        `An appointment has been booked with you on ${date} at ${time}.`
+      );
+
+      // Send email to patient
+      sendEmail(
+        patientEmail,
+        'Appointment Confirmation',
+        `Your appointment with Dr. ${doctor.name} is confirmed for ${date} at ${time}.`
+      );
+    }
 
     res.status(200).json({ message: 'Appointment booked successfully.' });
   } catch (error) {
@@ -120,40 +154,50 @@ router.post('/book-appointment', async (req, res) => {
 router.patch('/:appointmentId', async (req, res) => {
   try {
     const { appointmentId } = req.params;
-
     console.log('Cancel Appointment Request:', appointmentId);
 
-    // Step 1: Find the appointment to get the slotId
     const appointment = await appointmentModel.findByIdAndUpdate(
       appointmentId,
       { $set: { status: 'Cancelled' } },
       { new: true, runValidators: true }
     );
 
-    if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
-    }
-
-    // Step 2: Update the appointment status to "Cancelled"
+    if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
 
     console.log('Appointment Cancelled:', appointment);
 
-    // Step 3: If the appointment has a slotId, update the specific slot in the slot array
     if (appointment.slotId) {
       const updatedSlot = await slotModel.findOneAndUpdate(
-        { 'slots._id': appointment.slotId }, // Find the slot containing the slotId
-        {
-          $set: { 'slots.$.isBooked': false }, // Set isBooked to false
-          $unset: { 'slots.$.patient': '' }, // Remove patient field from that slot
-        },
+        { 'slots._id': appointment.slotId },
+        { $set: { 'slots.$.isBooked': false }, $unset: { 'slots.$.patient': '' } },
         { new: true }
       );
 
-      if (!updatedSlot) {
-        console.warn('Slot not found for appointment:', appointmentId);
-      } else {
-        console.log('Slot Updated:', updatedSlot);
-      }
+      if (!updatedSlot) console.warn('Slot not found for appointment:', appointmentId);
+      else console.log('Slot Updated:', updatedSlot);
+    }
+
+    // Fetch doctor and patient details for email
+    const doctor = await doctormodel.findById(appointment.doctorId);
+    const patient = await patientModel.findById(appointment.patientId);
+
+    if (doctor && patient) {
+      const doctorEmail = doctor.email;
+      const patientEmail = patient.email;
+
+      // Send email to doctor
+      sendEmail(
+        doctorEmail,
+        'Appointment Cancelled',
+        `An appointment scheduled on ${appointment.date} at ${appointment.time} has been cancelled.`
+      );
+
+      // Send email to patient
+      sendEmail(
+        patientEmail,
+        'Appointment Cancellation',
+        `Your appointment with Dr. ${doctor.name} on ${appointment.date} at ${appointment.time} has been cancelled.`
+      );
     }
 
     res.status(200).json({
