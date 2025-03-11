@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../DoctorComponents/Layout';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { FaCalendarAlt, FaClock, FaCheckCircle, FaUserMd } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaCheckCircle, FaUserMd } from 'react-icons/fa';
 
 const Dashboard = () => {
   const [slots, setSlots] = useState([]);
@@ -40,17 +40,17 @@ const Dashboard = () => {
         doctorId,
         date,
       });
-  
+
       if (data.length === 0) {
         setSlots([]);
         setStats({ totalAppointments: 0, availableSlots: 0 }); // Set stats to zero when no slots exist
         setMessage('No slots available for this date');
         return;
       }
-  
+
       const bookedSlots = data.filter((slot) => slot.isBooked).length;
       const availableSlots = data.filter((slot) => !slot.isBooked).length;
-  
+
       setSlots(data);
       setStats({
         totalAppointments: bookedSlots,
@@ -62,8 +62,6 @@ const Dashboard = () => {
       setStats({ totalAppointments: 0, availableSlots: 0 }); // Reset stats on error
     }
   };
-  
-  
 
   const fetchStats = async () => {
     if (!doctorId) return;
@@ -119,11 +117,8 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto p-10 bg-gray-100 shadow-2xl rounded-xl">
-        
         <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold text-gray-800">
-            Welcome, Doctor
-          </h1>
+          <h1 className="text-5xl font-bold text-gray-800">Welcome, Doctor</h1>
           <p className="text-gray-600 text-lg mt-2">
             Manage your appointments and schedule with ease.
           </p>
@@ -219,9 +214,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-
 
 // import React, { useEffect, useState } from "react";
 // import Layout from "../DoctorComponents/Layout";

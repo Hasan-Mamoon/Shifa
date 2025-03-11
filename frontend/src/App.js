@@ -58,11 +58,6 @@
 
 //REMOVED HIDING OF NAVBAR CAUZ IT WAS NOT NEEDED?-----------------------------------------CHECK!!!!!!!-----------
 
-
-
-
-
-
 // import React from 'react';
 // import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 // import Navbar from './PatientComponents/Navbar';
@@ -102,12 +97,6 @@
 
 // export default App;
 
-
-
-
-
-
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './PatientComponents/Navbar';
@@ -135,10 +124,17 @@ const App = () => {
 
   return (
     <div className="mx-4 sm:mx-[10%]">
-          {isAdminRoute ? (user?.role === 'admin' ? <AdminNavbar /> : null) : 
-     isDoctorRoute ? (user?.role === 'doctor' ? <DoctorNavbar /> : null) : <Navbar />
-    }
-
+      {isAdminRoute ? (
+        user?.role === 'admin' ? (
+          <AdminNavbar />
+        ) : null
+      ) : isDoctorRoute ? (
+        user?.role === 'doctor' ? (
+          <DoctorNavbar />
+        ) : null
+      ) : (
+        <Navbar />
+      )}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup/:userType" element={<Signup />} />
@@ -147,14 +143,9 @@ const App = () => {
         <Route path="/admin/*" element={<AdminRoutes />} /> {/* Add Admin Routes */}
         <Route path="/payment/*" element={<PaymentRoutes />} />
       </Routes>
-
       {!isAdminRoute && <Footer />} {/* Hide footer for admin pages if needed */}
     </div>
   );
 };
 
 export default App;
-
-
-
-

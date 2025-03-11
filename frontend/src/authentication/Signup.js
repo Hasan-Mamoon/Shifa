@@ -221,21 +221,21 @@ const Signup = () => {
 
         {userType === 'doctor' && (
           <>
-    <select
-      name="speciality"
-      value={formData.speciality}
-      onChange={handleChange}
-      required
-      className="w-full p-2 border rounded"
-    >
-      <option value="">Select Speciality</option>
-      <option value="Gastroenterologist">Gastroenterologist</option>
-      <option value="General Physician">General Physician</option>
-      <option value="Gynecologist">Gynecologist</option>
-      <option value="Dermatologist">Dermatologist</option>
-      <option value="Pediatricians">Pediatricians</option>
-      <option value="Neurologist">Neurologist</option>
-    </select>
+            <select
+              name="speciality"
+              value={formData.speciality}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded"
+            >
+              <option value="">Select Speciality</option>
+              <option value="Gastroenterologist">Gastroenterologist</option>
+              <option value="General Physician">General Physician</option>
+              <option value="Gynecologist">Gynecologist</option>
+              <option value="Dermatologist">Dermatologist</option>
+              <option value="Pediatricians">Pediatricians</option>
+              <option value="Neurologist">Neurologist</option>
+            </select>
 
             <input
               type="text"
