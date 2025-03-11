@@ -7,7 +7,7 @@ const AppContextProvider = (props) => {
   const [doctors, setDoctors] = useState([]);
   const [patientId, setPatientId] = useState(null);
   const [slotId, setSlotId] = useState(null);
-  const currencySymbol = 'Rs';
+  const currencySymbol = '$';
 
   useEffect(() => {
     const fetchDoctors = async () => {

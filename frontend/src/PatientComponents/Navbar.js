@@ -23,8 +23,8 @@ const Navbar = () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/patient/${email}`);
 
-        setUserData(response.data[0]);
-        setImagePreview(response.data[0].image || assets.profile_pic);
+        setUserData(response.data);
+        setImagePreview(response.data.image || assets.profile_pic);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }

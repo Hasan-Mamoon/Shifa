@@ -120,6 +120,7 @@ import PatientRoutes from './routes/PatientRoutes';
 import DoctorRoutes from './routes/DoctorRoutes';
 import AdminRoutes from './routes/AdminRoutes';  
 import AdminNavbar from './AdminComponents/AdminNavbar'
+import PaymentRoutes from './routes/PaymentRoutes';
 
 const App = () => {
   const location = useLocation();
@@ -144,6 +145,7 @@ const App = () => {
         <Route path="/*" element={<PatientRoutes />} />
         <Route path="/doctor/*" element={<DoctorRoutes />} />
         <Route path="/admin/*" element={<AdminRoutes />} /> {/* Add Admin Routes */}
+        <Route path="/payment/*" element={<PaymentRoutes />} />
       </Routes>
 
       {!isAdminRoute && <Footer />} {/* Hide footer for admin pages if needed */}

@@ -6,6 +6,7 @@ import RelatedDoctors from '../PatientComponents/RelatedDoctors';
 import { useAuth } from '../context/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Checkout from "../PaymentComponents/Checkout";
 
 const Appointment = () => {
   const { docId } = useParams();
@@ -85,7 +86,11 @@ const Appointment = () => {
       date: availableDates[slotIndex],
       time: slotTime,
       type: appointmentType,
-    };
+      amount: docInfo.fees , // Convert to cents
+      currency: "usd", // Ensure currency is provided
+  };
+  Checkout(appointmentData)
+    
 
     if (appointmentType === 'virtual') {
       const jitsiMeetingId = `doctor-${docId}-patient-${user?.id}-${Date.now()}`;
@@ -94,17 +99,19 @@ const Appointment = () => {
 
     try {
       const response = await fetch(
+      
         `${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(appointmentData),
         },
+        
       );
 
       const result = await response.json();
       if (response.ok) {
-        toast.success('Appointment booked successfully!');
+       
       } else {
         toast.error(result.message);
       }
@@ -130,6 +137,11 @@ const Appointment = () => {
               Appointment fee:{' '}
               <span className="text-gray-600">
                 {currencySymbol} {docInfo.fees}
+              </span>
+            </p>
+            <p>
+            <span className="text-neutral-500">
+              {docInfo.about}
               </span>
             </p>
           </div>
@@ -208,3 +220,6 @@ const Appointment = () => {
 };
 
 export default Appointment;
+
+
+
