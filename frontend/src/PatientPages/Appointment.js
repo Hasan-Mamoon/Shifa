@@ -258,21 +258,22 @@ const Appointment = () => {
 
           <p className="mt-4">Booking Slots</p>
           <div className="flex gap-3 items-center w-full overflow-x-auto mt-4">
-            {availableDates.map((date, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  setSlotIndex(index);
-                  getAvailableSlots(date);
-                }}
-                className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
-                  slotIndex === index ? 'bg-primary text-white' : 'border border-gray-200'
-                }`}
-              >
-                <p>{new Date(date).toLocaleDateString()}</p>
-              </div>
-            ))}
-          </div>
+  {availableDates.map((date, index) => (
+    <div
+      key={index}
+      onClick={() => {
+        setSlotIndex(index);
+        getAvailableSlots(date);
+      }}
+      className={`text-center px-5 py-3 min-w-[120px] rounded-full cursor-pointer transition-colors duration-300 ease-in-out ${
+        slotIndex === index ? 'bg-primary text-white' : 'border border-gray-200'
+      }`}
+    >
+      <p>{new Date(date).toLocaleDateString()}</p>
+    </div>
+  ))}
+</div>
+
 
           <div className="flex items-center gap-3 w-full overflow-x-auto mt-4">
             {docSlots.map((item) => (

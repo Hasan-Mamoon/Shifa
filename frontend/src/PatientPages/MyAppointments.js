@@ -15,7 +15,7 @@ const MyAppointments = () => {
         `${process.env.REACT_APP_SERVER_URL}/appointment/appointments?userId=${userId}`,
       );
       const data = await response.json();
-
+console.log (data)
       if (response.ok) {
         setAppointments(data);
       } else {
@@ -37,33 +37,35 @@ const MyAppointments = () => {
   const handleCancelAppointment = async (appointmentId) => {
     const confirmCancel = window.confirm('Are you sure you want to cancel this appointment?');
     if (!confirmCancel) return;
-
+  
     try {
       const response = await fetch(
         `${process.env.REACT_APP_SERVER_URL}/appointment/${appointmentId}`,
         {
-          method: 'PATCH',
+          method: 'DELETE', // Use DELETE method instead of PATCH for deleting the appointment
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
-
+  
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || 'Failed to cancel appointment');
       }
-
+  
+      // Remove the appointment from the state after successful deletion
       setAppointments((prevAppointments) =>
-        prevAppointments.filter((appointment) => appointment._id !== appointmentId),
+        prevAppointments.filter((appointment) => appointment._id !== appointmentId)
       );
-
-      toast.success('Appointment cancelled successfully');
+  
+      toast.success('Appointment cancelled and deleted successfully');
     } catch (error) {
       console.error('Error cancelling appointment:', error);
       toast.error('Failed to cancel appointment. Please try again.');
     }
   };
+  
 
   if (loading) {
     return (
@@ -85,17 +87,16 @@ const MyAppointments = () => {
     <div className="max-w-3xl mx-auto px-4">
       <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">My Appointments</h2>
       <div className="space-y-4">
-        {appointments.map((appointment) => {
-          const imageUrl =
-            appointment.doctorId.image?.length > 1024
-              ? '/path/to/default/image.jpg'
-              : appointment.doctorId.image || '/path/to/default/image.jpg';
-
+        
+      {appointments.map((appointment) => {
+         const imageUrl = appointment.doctorId.image || '/path/to/default/image.jpg';
           return (
+            
             <div
               key={appointment._id}
               className="flex items-center gap-4 p-4 border rounded-lg shadow-sm bg-white"
             >
+              
               <img
                 src={imageUrl}
                 alt={appointment.doctorId.name}
