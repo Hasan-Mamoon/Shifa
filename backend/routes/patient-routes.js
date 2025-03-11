@@ -6,12 +6,7 @@ import sharp from 'sharp';
 
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { patientModel } from '../models/patient.js';
 import { appointmentModel } from '../models/appointment.js';
@@ -145,7 +140,7 @@ router.get('/details', async (req, res) => {
     // Find the appointment based on slotId and patientId
     const appointment = await appointmentModel.findOne({
       slotId: slotObjectId,
-      patientId: patientObjectId
+      patientId: patientObjectId,
     });
     console.log('Appointment:', appointment);
 
@@ -157,19 +152,17 @@ router.get('/details', async (req, res) => {
       type: appointment.type,
       meetingLink: appointment.meetingLink || null,
     });
-
   } catch (error) {
     console.error('Error fetching appointment details:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-
 router.get('/bid/:id', async (req, res) => {
   try {
-    console.log("ID: ", req.params.id);
+    console.log('ID: ', req.params.id);
     const patient = await patientModel.findById(req.params.id);
-    console.log("PATIENT: ", patient);  
+    console.log('PATIENT: ', patient);
     if (!patient) {
       return res.status(404).json({ message: 'Patient not found' });
     }
@@ -178,7 +171,6 @@ router.get('/bid/:id', async (req, res) => {
     return res.status(500).json({ message: 'Error fetching patient details', error });
   }
 });
-
 
 router.get('/:email', async (req, res) => {
   try {
@@ -274,7 +266,6 @@ router.put('/edit-patient/:email', upload.single('image'), async (req, res) => {
   }
 });
 
-
 router.put('/update/:id', async (req, res) => {
   const { id } = req.params; // Patient ID
   const { medicalHistory } = req.body; // Updated medical history
@@ -319,7 +310,5 @@ router.delete('/:email', async (req, res) => {
     res.status(500).json({ message: 'Error deleting patient', error: err.message });
   }
 });
-
-
 
 export { router as patientRouter };

@@ -21,7 +21,6 @@ const s3 = new S3Client({
   },
 });
 
-
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE, // Example: 'gmail'
   auth: {
@@ -43,7 +42,6 @@ const sendEmail = async (to, subject, text) => {
     console.error('Error sending email:', error);
   }
 };
-
 
 router.post('/book-appointment', async (req, res) => {
   const { doctorId, patientId, slotId, date, time, type, meetingLink } = req.body;
@@ -102,14 +100,16 @@ router.post('/book-appointment', async (req, res) => {
       sendEmail(
         doctorEmail,
         'New Appointment Booked',
-        `An appointment has been booked with you on ${date} at ${time}.`
+        `An appointment has been booked with you on ${date} at ${time}.` +
+          (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
       );
 
       // Send email to patient
       sendEmail(
         patientEmail,
         'Appointment Confirmation',
-        `Your appointment with Dr. ${doctor.name} is confirmed for ${date} at ${time}.`
+        `Your appointment with Dr. ${doctor.name} is confirmed for ${date} at ${time}.` +
+          (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
       );
     }
 
@@ -122,34 +122,6 @@ router.post('/book-appointment', async (req, res) => {
     session.endSession();
   }
 });
-
-// router.patch('/:appointmentId', async (req, res) => {
-//   try {
-//     const { appointmentId } = req.params;
-
-//     console.log('Cancel Appointment Request:', appointmentId);
-
-//     const updatedAppointment = await appointmentModel.findByIdAndUpdate(
-//       appointmentId,
-//       { status: 'Cancelled' },
-//       { new: true }
-//     );
-
-//     if (!updatedAppointment) {
-//       return res.status(404).json({ message: 'Appointment not found' });
-//     }
-
-//     console.log('Appointment Cancelled:', updatedAppointment);
-
-//     res.status(200).json({
-//       message: 'Appointment cancelled successfully',
-//       appointment: updatedAppointment,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Error cancelling appointment', error });
-//   }
-// });
 
 router.patch('/:appointmentId', async (req, res) => {
   try {
@@ -259,7 +231,6 @@ router.delete('/:appointmentId', async (req, res) => {
     res.status(500).json({ message: 'Error deleting appointment', error });
   }
 });
-
 
 router.get('/appointments', async (req, res) => {
   const { userId } = req.query;

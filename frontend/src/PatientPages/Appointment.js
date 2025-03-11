@@ -6,7 +6,7 @@ import RelatedDoctors from '../PatientComponents/RelatedDoctors';
 import { useAuth } from '../context/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Checkout from "../PaymentComponents/Checkout";
+import Checkout from '../PaymentComponents/Checkout';
 
 const Appointment = () => {
   const { docId } = useParams();
@@ -132,11 +132,10 @@ const Appointment = () => {
       date: availableDates[slotIndex],
       time: slotTime,
       type: appointmentType,
-      amount: docInfo.fees , // Convert to cents
-      currency: "usd", // Ensure currency is provided
-  };
-  Checkout(appointmentData)
-    
+      amount: docInfo.fees, // Convert to cents
+      currency: 'usd', // Ensure currency is provided
+    };
+    Checkout(appointmentData);
 
     if (appointmentType === 'virtual') {
       const jitsiMeetingId = `doctor-${docId}-patient-${user?.id}-${Date.now()}`;
@@ -145,19 +144,16 @@ const Appointment = () => {
 
     try {
       const response = await fetch(
-      
         `${process.env.REACT_APP_SERVER_URL}/appointment/book-appointment`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(appointmentData),
         },
-        
       );
 
       const result = await response.json();
       if (response.ok) {
-       
       } else {
         toast.error(result.message);
       }
@@ -186,9 +182,7 @@ const Appointment = () => {
               </span>
             </p>
             <p>
-            <span className="text-neutral-500">
-              {docInfo.about}
-              </span>
+              <span className="text-neutral-500">{docInfo.about}</span>
             </p>
 
             {/* Google Maps Button*/}
@@ -264,22 +258,21 @@ const Appointment = () => {
 
           <p className="mt-4">Booking Slots</p>
           <div className="flex gap-3 items-center w-full overflow-x-auto mt-4">
-  {availableDates.map((date, index) => (
-    <div
-      key={index}
-      onClick={() => {
-        setSlotIndex(index);
-        getAvailableSlots(date);
-      }}
-      className={`text-center px-5 py-3 min-w-[120px] rounded-full cursor-pointer transition-colors duration-300 ease-in-out ${
-        slotIndex === index ? 'bg-primary text-white' : 'border border-gray-200'
-      }`}
-    >
-      <p>{new Date(date).toLocaleDateString()}</p>
-    </div>
-  ))}
-</div>
-
+            {availableDates.map((date, index) => (
+              <div
+                key={index}
+                onClick={() => {
+                  setSlotIndex(index);
+                  getAvailableSlots(date);
+                }}
+                className={`text-center px-5 py-3 min-w-[120px] rounded-full cursor-pointer transition-colors duration-300 ease-in-out ${
+                  slotIndex === index ? 'bg-primary text-white' : 'border border-gray-200'
+                }`}
+              >
+                <p>{new Date(date).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
 
           <div className="flex items-center gap-3 w-full overflow-x-auto mt-4">
             {docSlots.map((item) => (
@@ -319,6 +312,3 @@ const Appointment = () => {
 };
 
 export default Appointment;
-
-
-

@@ -4,8 +4,6 @@ import Dashboard from '../DoctorPages/Dashboard';
 import Appointments from '../DoctorPages/Appointments';
 import Profile from '../DoctorPages/Profile';
 import ProtectedRoute from './ProtectedRoutes';
-import BlogList from '../DoctorPages/DoctorBlogDetails';
-import BlogDetail from '../DoctorPages/DoctorBlogs';
 import AddBlog from '../DoctorPages/AddBlog';
 import DoctorBlogs from '../DoctorPages/DoctorBlogs';
 import DoctorBlogDetails from '../DoctorPages/DoctorBlogDetails';

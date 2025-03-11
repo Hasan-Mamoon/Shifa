@@ -125,204 +125,203 @@ const Signup = () => {
   };
 
   return (
-
     <div className="flex h-screen">
-    <div className="max-w-lg mx-auto  bg-white rounded-lg ">
-      <h2 className="text-2xl font-bold mb-2 text-center">
-        {userType === 'doctor' ? 'Doctor' : 'Patient'} Signup
-      </h2>
-      {error && <p className="text-red-500 text-center">{error}</p>}
+      <div className="max-w-lg mx-auto  bg-white rounded-lg ">
+        <h2 className="text-2xl font-bold mb-2 text-center">
+          {userType === 'doctor' ? 'Doctor' : 'Patient'} Signup
+        </h2>
+        {error && <p className="text-red-500 text-center">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-
-        <input
-          type="text"
-          name="address.line1"
-          placeholder="Address Line 1"
-          value={formData.address.line1}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          name="address.line2"
-          placeholder="Address Line 2"
-          value={formData.address.line2}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-
-        {userType === 'patient' && (
-          <>
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            />
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            >
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-            <input
-              type="text"
-              name="medicalHistory"
-              placeholder="Medical History"
-              value={formData.medicalHistory}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            />
-          </>
-        )}
-
-        {userType === 'doctor' && (
-          <>
-            <select
-              name="speciality"
-              value={formData.speciality}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            >
-              <option value="">Select Speciality</option>
-              <option value="Gastroenterologist">Gastroenterologist</option>
-              <option value="General Physician">General Physician</option>
-              <option value="Gynecologist">Gynecologist</option>
-              <option value="Dermatologist">Dermatologist</option>
-              <option value="Pediatricians">Pediatricians</option>
-              <option value="Neurologist">Neurologist</option>
-            </select>
-
-            <input
-              type="text"
-              name="experience"
-              placeholder="Experience (years)"
-              value={formData.experience}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            />
-            <textarea
-              name="about"
-              placeholder="About Yourself"
-              value={formData.about}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            />
-            <input
-              type="number"
-              name="fees"
-              placeholder="Consultation Fees"
-              value={formData.fees}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded"
-            />
-            <label className="block text-sm font-medium text-gray-700">
-              Upload Degree Certificate
-            </label>
-            <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
-              <input
-                type="file"
-                name="degree"
-                accept=".pdf, .jpg, .png"
-                onChange={handleFileChange}
-                required
-                className="hidden"
-                id="degreeUpload"
-              />
-              <label htmlFor="degreeUpload" className="cursor-pointer block text-center">
-                Click to upload (PDF, JPG, PNG)
-              </label>
-            </div>
-          </>
-        )}
-
-        <label className="block text-sm font-medium text-gray-700">Upload Profile Picture</label>
-        <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleFileChange}
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
             required
-            className="hidden"
-            id="fileUpload"
+            className="w-full p-2 border rounded"
           />
-          <label htmlFor="fileUpload" className="cursor-pointer block text-center">
-            Click to upload (PDF, JPG, PNG)
-          </label>
-        </div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border rounded"
+          />
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
-          Register
-        </button>
-      </form>
+          <input
+            type="text"
+            name="address.line1"
+            placeholder="Address Line 1"
+            value={formData.address.line1}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            name="address.line2"
+            placeholder="Address Line 2"
+            value={formData.address.line2}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border rounded"
+          />
 
-      <p className="text-center mt-2">
-        Already have an account?{' '}
-        <Link to="/login" className="text-blue-600 underline">
-          Login here
-        </Link>
-      </p>
+          {userType === 'patient' && (
+            <>
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              >
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              <input
+                type="text"
+                name="medicalHistory"
+                placeholder="Medical History"
+                value={formData.medicalHistory}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+            </>
+          )}
+
+          {userType === 'doctor' && (
+            <>
+              <select
+                name="speciality"
+                value={formData.speciality}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              >
+                <option value="">Select Speciality</option>
+                <option value="Gastroenterologist">Gastroenterologist</option>
+                <option value="General Physician">General Physician</option>
+                <option value="Gynecologist">Gynecologist</option>
+                <option value="Dermatologist">Dermatologist</option>
+                <option value="Pediatricians">Pediatricians</option>
+                <option value="Neurologist">Neurologist</option>
+              </select>
+
+              <input
+                type="text"
+                name="experience"
+                placeholder="Experience (years)"
+                value={formData.experience}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+              <textarea
+                name="about"
+                placeholder="About Yourself"
+                value={formData.about}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+              <input
+                type="number"
+                name="fees"
+                placeholder="Consultation Fees"
+                value={formData.fees}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded"
+              />
+              <label className="block text-sm font-medium text-gray-700">
+                Upload Degree Certificate
+              </label>
+              <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
+                <input
+                  type="file"
+                  name="degree"
+                  accept=".pdf, .jpg, .png"
+                  onChange={handleFileChange}
+                  required
+                  className="hidden"
+                  id="degreeUpload"
+                />
+                <label htmlFor="degreeUpload" className="cursor-pointer block text-center">
+                  Click to upload (PDF, JPG, PNG)
+                </label>
+              </div>
+            </>
+          )}
+
+          <label className="block text-sm font-medium text-gray-700">Upload Profile Picture</label>
+          <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleFileChange}
+              required
+              className="hidden"
+              id="fileUpload"
+            />
+            <label htmlFor="fileUpload" className="cursor-pointer block text-center">
+              Click to upload (PDF, JPG, PNG)
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          >
+            Register
+          </button>
+        </form>
+
+        <p className="text-center mt-2">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-600 underline">
+            Login here
+          </Link>
+        </p>
       </div>
-       <div className="w-1/2 bg-gradient-to-r from-white to-primary flex justify-center items-center">
+      <div className="w-1/2 bg-gradient-to-r from-white to-primary flex justify-center items-center">
         <div className="flex justify-center items-center w-full h-full">
           <img
             src={assets.logo}
             alt="Logo"
-            className="w-full h-full object-contain"  // Stretch image to fill the container
+            className="w-full h-full object-contain" // Stretch image to fill the container
           />
         </div>
       </div>

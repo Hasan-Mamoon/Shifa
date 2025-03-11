@@ -198,5 +198,4 @@ router.get('/stats', async (req, res) => {
   }
 });
 
-
 export { router as slotsRouter };

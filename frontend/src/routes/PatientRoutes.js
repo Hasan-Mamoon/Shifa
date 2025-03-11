@@ -32,16 +32,6 @@ const PatientRoutes = () => {
         element={<ProtectedRoute element={<Appointment />} allowedRoles={['patient']} />}
       />
 
-      {/* <Route
-        path="/blogs"
-        element={
-          <ProtectedRoute
-            element={<HealthBlogs />}
-            allowedRoles={["patient"]}
-          />
-        }
-      /> */}
-
       <Route
         path="/blog/:id"
         element={<ProtectedRoute element={<BlogDetails />} allowedRoles={['patient']} />}

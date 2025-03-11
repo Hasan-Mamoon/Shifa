@@ -12,7 +12,7 @@ const doctorSchema = new mongoose.Schema({
   fees: { type: Number, required: true },
   address: {
     line1: { type: String, required: true },
-    line2: { type: String }, 
+    line2: { type: String },
   },
   reviews: [
     {

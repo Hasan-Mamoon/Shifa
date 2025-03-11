@@ -1,49 +1,3 @@
-// import express from 'express';
-// import bcrypt from 'bcryptjs';
-// import jwt from 'jsonwebtoken';
-// import { Admin } from '../models/Admin.js';
-
-// const router = express.Router();
-
-
-// const DEFAULT_ADMIN = {
-//   email: 'admin@gmail.com',
-//   password: 'Admin@123',
-// };
-
-
-// router.post('/login', async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-  
-//     if (email === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
-//       const token = jwt.sign({ email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
-//       return res.json({ token, userId: email, role: 'admin', email });
-//     }
-
-   
-//     const admin = await Admin.findOne({ email });
-//     if (!admin) return res.status(400).json({ message: 'Invalid credentials' });
-
-   
-//     const isMatch = await bcrypt.compare(password, admin.password);
-//     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
-
-//     const token = jwt.sign({ email: admin.email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
-//     res.json({ token, userId: admin._id, role: 'admin', email: admin.email });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
-
-// export { router as adminRoutes };
-
-
-
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -54,19 +8,12 @@ import { PendingDoctor } from '../models/PendingDoctor.js';
 
 import dotenv from 'dotenv';
 import multer from 'multer';
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
 
 dotenv.config(); // Load environment variables
 
 const router = express.Router();
-
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -107,7 +54,9 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ email: admin.email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ email: admin.email, role: 'admin' }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
 
     res.json({ token, userId: admin._id, role: 'admin', email: admin.email });
   } catch (error) {
@@ -127,7 +76,6 @@ router.get('/count', async (req, res) => {
   }
 });
 
-
 router.get('/pending-doctors', async (req, res) => {
   try {
     const doctors = await PendingDoctor.find({ status: 'pending' });
@@ -136,11 +84,19 @@ router.get('/pending-doctors', async (req, res) => {
     const doctorsWithImages = await Promise.all(
       doctors.map(async (doctor) => {
         const imageUrl = doctor.image
-          ? await getSignedUrl(s3, new GetObjectCommand({ Bucket: bucketName, Key: doctor.image }), { expiresIn: 3600 })
+          ? await getSignedUrl(
+              s3,
+              new GetObjectCommand({ Bucket: bucketName, Key: doctor.image }),
+              { expiresIn: 3600 }
+            )
           : null;
 
         const degreeUrl = doctor.degree
-          ? await getSignedUrl(s3, new GetObjectCommand({ Bucket: bucketName, Key: doctor.degree }), { expiresIn: 3600 })
+          ? await getSignedUrl(
+              s3,
+              new GetObjectCommand({ Bucket: bucketName, Key: doctor.degree }),
+              { expiresIn: 3600 }
+            )
           : null;
 
         return { ...doctor.toObject(), image: imageUrl, degree: degreeUrl };
@@ -160,7 +116,7 @@ router.put('/update-doctor-status/:id', async (req, res) => {
     if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
 
     if (status === 'approved') {
-      const approvedDoctor = new doctormodel({ 
+      const approvedDoctor = new doctormodel({
         email: doctor.email,
         password: doctor.password,
         name: doctor.name,
@@ -170,12 +126,11 @@ router.put('/update-doctor-status/:id', async (req, res) => {
         about: doctor.about,
         fees: doctor.fees,
         degree: doctor.degree,
-        address: doctor.address, 
+        address: doctor.address,
       });
 
       await approvedDoctor.save();
 
-   
       await PendingDoctor.findByIdAndDelete(req.params.id);
     } else {
       // If rejected, just delete the pending doctor
@@ -183,15 +138,12 @@ router.put('/update-doctor-status/:id', async (req, res) => {
     }
 
     res.json({ message: `Doctor ${status === 'approved' ? 'approved' : 'rejected'}` });
-
   } catch (error) {
     console.error('Error updating doctor status:', error);
     res.status(500).json({ message: 'Error updating doctor status', error: error.message });
   }
 });
 
-
 export default router;
-
 
 export { router as adminRoutes };
