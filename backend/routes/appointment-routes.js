@@ -9,7 +9,7 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import nodemailer from 'nodemailer';
 import Stripe from 'stripe';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);// ✅ Load Stripe SDK
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 dotenv.config();
@@ -25,7 +25,7 @@ const s3 = new S3Client({
 });
 
 const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE, // Example: 'gmail'
+  service: process.env.EMAIL_SERVICE,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -46,108 +46,27 @@ const sendEmail = async (to, subject, text) => {
   }
 };
 
-// router.post('/book-appointment', async (req, res) => {
-//   const { doctorId, patientId, slotId, date, time, type, meetingLink } = req.body;
-
-//   console.log('Booking Appointment Request:', req.body);
-
-//   const session = await mongoose.startSession();
-//   try {
-//     session.startTransaction();
-
-//     const slotDocument = await slotModel
-//       .findOne({
-//         doctorId,
-//         date,
-//         slots: { $elemMatch: { _id: slotId, time, isBooked: false } },
-//       })
-//       .session(session);
-
-//     if (!slotDocument) throw new Error('Slot is no longer available.');
-
-//     const updateResult = await slotModel.updateOne(
-//       { doctorId, date, 'slots._id': slotId },
-//       { $set: { 'slots.$.isBooked': true, 'slots.$.patient': patientId } },
-//       { session }
-//     );
-
-//     if (updateResult.nModified === 0) throw new Error('Failed to update slot status.');
-
-//     const newAppointment = new appointmentModel({
-//       doctorId,
-//       patientId,
-//       slotId,
-//       date,
-//       time,
-//       type,
-//       status: 'Booked',
-//       notes: '',
-//       meetingLink,
-//     });
-
-//     await newAppointment.save({ session });
-
-//     await session.commitTransaction();
-
-//     console.log('Appointment Booked:', newAppointment);
-
-//     // Fetch doctor and patient details for email
-//     const doctor = await doctormodel.findById(doctorId);
-//     const patient = await patientModel.findById(patientId);
-
-//     if (doctor && patient) {
-//       const doctorEmail = doctor.email;
-//       const patientEmail = patient.email;
-
-//       // Send email to doctor
-//       sendEmail(
-//         doctorEmail,
-//         'New Appointment Booked',
-//         `An appointment has been booked with you on ${date} at ${time}.` +
-//           (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
-//       );
-
-//       // Send email to patient
-//       sendEmail(
-//         patientEmail,
-//         'Appointment Confirmation',
-//         `Your appointment with Dr. ${doctor.name} is confirmed for ${date} at ${time}.` +
-//           (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
-//       );
-//     }
-
-//     res.status(200).json({ message: 'Appointment booked successfully.' });
-//   } catch (error) {
-//     await session.abortTransaction();
-//     console.error('Error during booking:', error);
-//     res.status(400).json({ message: error.message });
-//   } finally {
-//     session.endSession();
-//   }
-// });
-
-
 router.post('/book-appointment', async (req, res) => {
   const { doctorId, patientId, slotId, date, time, type, meetingLink, sessionId } = req.body;
 
-  console.log("📩 Received Booking Request:", req.body); // ✅ Debugging
+  console.log("Received Booking Request:", req.body);
 
   if (!sessionId) {
-    console.error("❌ Missing session ID");
+    console.error("Missing session ID");
     return res.status(400).json({ message: 'Session ID is required.' });
   }
 
   try {
-    console.log("🔍 Verifying Stripe session:", sessionId);
+    console.log("Verifying Stripe session:", sessionId);
     const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
-    console.log("📝 Stripe Session Data:", stripeSession);
+    console.log("Stripe Session Data:", stripeSession);
 
     if (stripeSession.payment_status !== 'paid') {
-      console.error("❌ Payment NOT completed!");
+      console.error("Payment NOT completed!");
       return res.status(400).json({ message: 'Payment verification failed.' });
     }
 
-    console.log("✅ Payment verified! Proceeding with appointment booking...");
+    console.log("Payment verified! Proceeding with appointment booking...");
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -160,7 +79,7 @@ router.post('/book-appointment', async (req, res) => {
       })
       .session(session);
 
-    if (!slotDocument) throw new Error('⚠️ Slot is no longer available.');
+    if (!slotDocument) throw new Error('Slot is no longer available.');
 
     const updateResult = await slotModel.updateOne(
       { doctorId, date, 'slots._id': slotId },
@@ -168,7 +87,7 @@ router.post('/book-appointment', async (req, res) => {
       { session }
     );
 
-    if (updateResult.nModified === 0) throw new Error('⚠️ Failed to update slot status.');
+    if (updateResult.nModified === 0) throw new Error('Failed to update slot status.');
 
     const newAppointment = new appointmentModel({
       doctorId,
@@ -184,9 +103,8 @@ router.post('/book-appointment', async (req, res) => {
 
     await newAppointment.save({ session });
     await session.commitTransaction();
-    console.log("✅ Appointment Booked:", newAppointment);
-
-    // Fetch doctor and patient details for email
+    console.log("Appointment Booked:", newAppointment);
+    
     const doctor = await doctormodel.findById(doctorId);
     const patient = await patientModel.findById(patientId);
 
@@ -198,21 +116,19 @@ router.post('/book-appointment', async (req, res) => {
       sendEmail(
         doctorEmail,
         'New Appointment Booked',
-        `An appointment has been booked with you on ${date} at ${time}.` +
-          (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
+        `An appointment has been booked with you on ${date} at ${time}.`
       );
 
       sendEmail(
         patientEmail,
         'Appointment Confirmation',
-        `Your appointment with Dr. ${doctor.name} is confirmed for ${date} at ${time}.` +
-          (type === 'virtual' ? `\nClick the link to join: ${meetingLink}` : '')
+        `Your appointment with Dr. ${doctor.name} is confirmed for ${date} at ${time}.`
       );
     }
 
-    res.status(200).json({ success: true, message: '✅ Appointment booked successfully.' });
+    res.status(200).json({ success: true, message: 'Appointment booked successfully.' });
   } catch (error) {
-    console.error('❌ Error during booking:', error);
+    console.error('Error during booking:', error);
     res.status(400).json({ success: false, message: error.message });
   }
 });
@@ -243,7 +159,6 @@ router.patch('/:appointmentId', async (req, res) => {
       else console.log('Slot Updated:', updatedSlot);
     }
 
-    // Fetch doctor and patient details for email
     const doctor = await doctormodel.findById(appointment.doctorId);
     const patient = await patientModel.findById(appointment.patientId);
 
@@ -251,14 +166,13 @@ router.patch('/:appointmentId', async (req, res) => {
       const doctorEmail = doctor.email;
       const patientEmail = patient.email;
 
-      // Send email to doctor
+
       sendEmail(
         doctorEmail,
         'Appointment Cancelled',
         `An appointment scheduled on ${appointment.date} at ${appointment.time} has been cancelled.`
       );
 
-      // Send email to patient
       sendEmail(
         patientEmail,
         'Appointment Cancellation',
@@ -282,7 +196,6 @@ router.delete('/:appointmentId', async (req, res) => {
 
     console.log('Delete Appointment Request:', appointmentId);
 
-    // Step 1: Find the appointment and update its status to 'Cancelled'
     const appointment = await appointmentModel.findByIdAndUpdate(
       appointmentId,
       { $set: { status: 'Cancelled' } },
@@ -293,7 +206,6 @@ router.delete('/:appointmentId', async (req, res) => {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
-    // Step 2: Update the corresponding slot's 'isBooked' status to false
     if (appointment.slotId) {
       const updatedSlot = await slotModel.findOneAndUpdate(
         { 'slots._id': appointment.slotId },
@@ -311,7 +223,6 @@ router.delete('/:appointmentId', async (req, res) => {
       }
     }
 
-    // Step 3: Delete the appointment
     await appointmentModel.findByIdAndDelete(appointmentId);
 
     console.log('Appointment Deleted:', appointment);
@@ -336,7 +247,6 @@ router.get('/appointments', async (req, res) => {
   }
 
   try {
-    // Step 1: Fetch appointments for the user
     const appointments = await appointmentModel
       .find({ patientId: userId })
       .populate('doctorId', 'name speciality image address');
@@ -345,10 +255,8 @@ router.get('/appointments', async (req, res) => {
       return res.status(404).json({ message: 'No appointments found.' });
     }
 
-    // Step 2: Process each appointment
     await Promise.all(
       appointments.map(async (appointment) => {
-        // Add time and date from the slot
         if (appointment.slotId) {
           const slotDocument = await slotModel.findOne(
             { 'slots._id': appointment.slotId },
@@ -372,7 +280,6 @@ router.get('/appointments', async (req, res) => {
               imageKey = url.pathname.split('/').pop(); // Extract the S3 object key
             }
 
-            // Generate a pre-signed URL using the S3 object key
             const getObjectParams = {
               Bucket: process.env.BUCKET_NAME,
               Key: imageKey,
@@ -380,14 +287,13 @@ router.get('/appointments', async (req, res) => {
             const command = new GetObjectCommand(getObjectParams);
 
             const preSignedUrl = await getSignedUrl(s3, command, {
-              expiresIn: 3600, // URL expires in 1 hour
+              expiresIn: 3600, 
             });
 
-            // Assign the pre-signed URL to the doctor's image field
             appointment.doctorId.image = preSignedUrl;
           } catch (error) {
             console.error('Error generating pre-signed URL:', error);
-            // If there's an error, set the image to null or a placeholder
+            
             appointment.doctorId.image = null;
           }
         }

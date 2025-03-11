@@ -29,7 +29,7 @@ router.post('/create-checkout-session', async (req, res) => {
       mode: 'payment',
       success_url: `http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: 'http://localhost:3000',
-      client_reference_id: `${doctorId}-${patientId}`, // ✅ Store doctor & patient info
+      client_reference_id: `${doctorId}-${patientId}`, //Store doctor & patient info
     });
     
 
@@ -43,14 +43,14 @@ router.post('/create-checkout-session', async (req, res) => {
 router.get('/verify', async (req, res) => {
   try {
     const { sessionId } = req.query;
-    console.log("Received session ID for verification:", sessionId); // ✅ Debugging
+    console.log("Received session ID for verification:", sessionId);
 
     if (!sessionId) {
       return res.status(400).json({ error: 'Session ID is required' });
     }
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    console.log("Stripe session data:", session); // ✅ Debugging
+    console.log("Stripe session data:", session); 
 
     if (session.payment_status === 'paid') {
       res.json({ success: true, session });

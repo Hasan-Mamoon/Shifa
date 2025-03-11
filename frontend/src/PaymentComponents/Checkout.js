@@ -21,13 +21,13 @@ const Checkout = async (appointmentData) => {
     if (!data.sessionId) {
       console.error('Error: No session ID received', data);
       alert('Payment failed. Please try again.');
-      return false; // Indicate failure
+      return false; 
     }
 
-    // Redirect to Stripe Checkout
+
     await stripe.redirectToCheckout({ sessionId: data.sessionId });
 
-    // 🚀 We no longer check payment here! Verification happens in `PaymentSuccess.js`
+
   } catch (error) {
     console.error('Error during checkout:', error);
     alert('Payment failed. Please try again.');
