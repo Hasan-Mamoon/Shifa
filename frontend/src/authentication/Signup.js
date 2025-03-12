@@ -228,7 +228,7 @@ const Signup = () => {
                 value={formData.speciality}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded"
+                className="w-full p-1 border rounded"
               >
                 <option value="">Select Speciality</option>
                 <option value="Gastroenterologist">Gastroenterologist</option>
@@ -246,7 +246,7 @@ const Signup = () => {
                 value={formData.experience}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded"
+                className="w-full  border rounded"
               />
               <textarea
                 name="about"
@@ -254,7 +254,7 @@ const Signup = () => {
                 value={formData.about}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded"
+                className="w-full  border rounded"
               />
               <input
                 type="number"
@@ -263,12 +263,12 @@ const Signup = () => {
                 value={formData.fees}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border rounded"
+                className="w-full  border rounded"
               />
               <label className="block text-sm font-medium text-gray-700">
                 Upload Degree Certificate
               </label>
-              <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
+              <div className="border rounded  cursor-pointer bg-gray-100 hover:bg-gray-200">
                 <input
                   type="file"
                   name="degree"
@@ -286,7 +286,7 @@ const Signup = () => {
           )}
 
           <label className="block text-sm font-medium text-gray-700">Upload Profile Picture</label>
-          <div className="border rounded p-2 cursor-pointer bg-gray-100 hover:bg-gray-200">
+          <div className="border rounded  cursor-pointer bg-gray-100 hover:bg-gray-200">
             <input
               type="file"
               name="image"
