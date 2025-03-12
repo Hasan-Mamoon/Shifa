@@ -78,36 +78,58 @@ router.get('/count', async (req, res) => {
 
 router.get('/pending-doctors', async (req, res) => {
   try {
-    const doctors = await PendingDoctor.find({ status: 'pending' });
+    const doctors = await PendingDoctor.find({ status: 'pending' }).lean();
+    console.log('Pending Doctors:', doctors);
 
-    // Generate signed URLs for images
     const doctorsWithImages = await Promise.all(
       doctors.map(async (doctor) => {
-        const imageUrl = doctor.image
-          ? await getSignedUrl(
-              s3,
-              new GetObjectCommand({ Bucket: bucketName, Key: doctor.image }),
-              { expiresIn: 3600 }
-            )
-          : null;
+        try {
+          let imageKey = doctor.image;
+          let degreeKey = doctor.degree;
 
-        const degreeUrl = doctor.degree
-          ? await getSignedUrl(
-              s3,
-              new GetObjectCommand({ Bucket: bucketName, Key: doctor.degree }),
-              { expiresIn: 3600 }
-            )
-          : null;
+          // Extract S3 object key if the image field contains a full URL
+          if (imageKey?.startsWith('https://')) {
+            const url = new URL(imageKey);
+            imageKey = url.pathname.split('/').pop();
+          }
 
-        return { ...doctor.toObject(), image: imageUrl, degree: degreeUrl };
+          if (degreeKey?.startsWith('https://')) {
+            const url = new URL(degreeKey);
+            degreeKey = url.pathname.split('/').pop();
+          }
+
+          const imageUrl = imageKey
+            ? await getSignedUrl(
+                s3,
+                new GetObjectCommand({ Bucket: bucketName, Key: imageKey }),
+                { expiresIn: 3600 }
+              )
+            : null;
+
+          const degreeUrl = degreeKey
+            ? await getSignedUrl(
+                s3,
+                new GetObjectCommand({ Bucket: bucketName, Key: degreeKey }),
+                { expiresIn: 3600 }
+              )
+            : null;
+
+          return { ...doctor, image: imageUrl, degree: degreeUrl };
+        } catch (urlError) {
+          console.error('Error generating signed URLs:', urlError);
+          return { ...doctor, image: null, degree: null }; // Return doctor object with null image/degree if URL fails
+        }
       })
     );
 
     res.json(doctorsWithImages);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching pending doctors', error });
+    console.error('Error fetching pending doctors:', error);
+    res.status(500).json({ message: 'Error fetching pending doctors', error: error.message });
   }
 });
+
+
 router.put('/update-doctor-status/:id', async (req, res) => {
   try {
     const { status } = req.body;
@@ -144,6 +166,6 @@ router.put('/update-doctor-status/:id', async (req, res) => {
   }
 });
 
-export default router;
+
 
 export { router as adminRoutes };
