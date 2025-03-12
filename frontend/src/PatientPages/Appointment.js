@@ -124,7 +124,8 @@ const Appointment = () => {
       toast.warn('Please select a date and time slot before booking.');
       return;
     }
-
+    const jitsiMeetingId = `doctor-${docId}-patient-${user?.id}-${Date.now()}`;
+   
     const appointmentData = {
       doctorId: docId,
       patientId: user?.id,
@@ -133,7 +134,9 @@ const Appointment = () => {
       time: slotTime,
       type: appointmentType,
       amount: docInfo.fees, // Convert to cents
-      currency: 'usd', // Ensure currency is provided
+      currency: 'usd', 
+      meetingLink : `https://meet.jit.si/${jitsiMeetingId}`,// Ensure currency is provided
+      
     };
 
     const result = await Checkout(appointmentData)

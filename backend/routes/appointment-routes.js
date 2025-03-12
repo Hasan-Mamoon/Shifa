@@ -48,6 +48,7 @@ const sendEmail = async (to, subject, text) => {
 
 router.post('/book-appointment', async (req, res) => {
   const { doctorId, patientId, slotId, date, time, type, meetingLink, sessionId } = req.body;
+  console.log(meetingLink)
 
   console.log("Received Booking Request:", req.body);
 
