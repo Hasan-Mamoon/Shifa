@@ -6,12 +6,7 @@ import sharp from 'sharp';
 
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { patientModel } from '../models/patient.js';
 import { appointmentModel } from '../models/appointment.js';

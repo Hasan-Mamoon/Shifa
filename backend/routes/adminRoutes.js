@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import express from 'express';
 // import bcrypt from 'bcryptjs';
 // import jwt from 'jsonwebtoken';
@@ -37,6 +38,8 @@
 
 // export { router as adminRoutes };
 
+=======
+>>>>>>> origin/integration
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -47,12 +50,7 @@ import { PendingDoctor } from '../models/PendingDoctor.js';
 
 import dotenv from 'dotenv';
 import multer from 'multer';
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 dotenv.config(); // Load environment variables

@@ -21,7 +21,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
   const [imagePreview, setImagePreview] = useState(assets.profile_pic);
   const [showPharmacyDropdown, setShowPharmacyDropdown] = useState(false);
   const [showLabDropdown, setShowLabDropdown] = useState(false);
