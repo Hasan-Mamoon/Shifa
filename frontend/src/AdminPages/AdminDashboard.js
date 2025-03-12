@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaUserMd, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaUserMd, FaUser, FaPercentage, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -37,6 +37,12 @@ const AdminDashboard = () => {
               onClick={() => navigate('/admin/manage-doctors')}
             >
               <FaUserMd /> Manage Doctors
+            </li>
+            <li
+              className="flex items-center gap-3 cursor-pointer hover:text-gray-200"
+              onClick={() => navigate('/admin/manage-discounts')}
+            >
+              <FaPercentage /> Manage Discounts
             </li>
 
             <li

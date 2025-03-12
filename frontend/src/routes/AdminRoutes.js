@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoutes';
 import AdminDashboard from '../AdminPages/AdminDashboard';
 import ManageDoctors from '../AdminPages/ManageDoctors';
+import AdminDiscounts from '../AdminPages/AdminDiscounts';
 
 const AdminRoutes = () => {
   return (
@@ -14,6 +15,10 @@ const AdminRoutes = () => {
       <Route
         path="manage-doctors"
         element={<ProtectedRoute element={<ManageDoctors />} allowedRoles={['admin']} />}
+      />
+      <Route
+        path="manage-discounts"
+        element={<ProtectedRoute element={<AdminDiscounts />} allowedRoles={['admin']} />}
       />
     </Routes>
   );
