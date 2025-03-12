@@ -232,7 +232,7 @@ const Signup = () => {
               >
                 <option value="">Select Speciality</option>
                 <option value="Gastroenterologist">Gastroenterologist</option>
-                <option value="General Physician">General Physician</option>
+                <option value="General Physician">General physician</option>
                 <option value="Gynecologist">Gynecologist</option>
                 <option value="Dermatologist">Dermatologist</option>
                 <option value="Pediatricians">Pediatricians</option>
