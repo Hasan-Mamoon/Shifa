@@ -108,14 +108,29 @@ router.post(
     try {
       const { email, password, name, speciality, experience, about, fees } = req.body;
 
-      // Parse address from the request body (handling JSON string case)
-      let address = req.body.address;
-      if (typeof address === 'string') {
-        try {
-          address = JSON.parse(address);
-        } catch (error) {
-          return res.status(400).json({ message: 'Invalid address format' });
+      // Validate required fields
+      if (!email?.trim() || 
+          !password?.trim() || 
+          !name?.trim() || 
+          !speciality?.trim() || 
+          !experience?.trim() || 
+          !about?.trim() || 
+          !fees) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      // Parse and validate address
+      let address;
+      try {
+        address = typeof req.body.address === 'string' 
+          ? JSON.parse(req.body.address) 
+          : req.body.address;
+
+        if (!address?.line1?.trim()) {
+          return res.status(400).json({ message: 'Missing required fields' });
         }
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid address format' });
       }
 
       // Ensure image and degree files exist

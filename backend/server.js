@@ -9,13 +9,16 @@ import { slotsRouter } from './routes/slot-routes.js';
 import { appointmentRouter } from './routes/appointment-routes.js';
 import { blogRouter } from './routes/blogRoutes.js';
 import { calendarRoutes } from './routes/calendar.js';
-
 import { adminRoutes } from './routes/adminRoutes.js';
 import { paymentRoutes } from './routes/paymentRoutes.js';
+
 const app = express();
 dotenv.config();
 
-Connection();
+// Only connect to MongoDB if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  Connection();
+}
 
 app.use(express.json());
 app.use(cookieParser());
@@ -47,6 +50,11 @@ app.use('/calendar', calendarRoutes);
 app.use('/admin', adminRoutes);
 app.use('/payment', paymentRoutes);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server Started on port ${process.env.PORT}`);
-});
+// Only start the server if not being imported for testing
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(process.env.PORT, () => {
+    console.log(`Server Started on port ${process.env.PORT}`);
+  });
+}
+
+export default app;

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../DoctorComponents/Layout';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { FaCheckCircle, FaUserMd } from 'react-icons/fa';
+import { FaCheckCircle, FaUserMd, FaClock, FaCalendarAlt } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const Dashboard = () => {
   const [slots, setSlots] = useState([]);
@@ -11,8 +12,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState({ totalAppointments: 0, availableSlots: 0 });
   const { user } = useAuth();
   const doctorId = user?.id;
-
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const apiCall = async (url, method, data = {}) => {
     try {
@@ -32,9 +33,10 @@ const Dashboard = () => {
   const fetchSlots = async () => {
     if (!date || !doctorId) {
       setSlots([]);
-      setStats({ totalAppointments: 0, availableSlots: 0 }); // Reset stats
+      setStats({ totalAppointments: 0, availableSlots: 0 });
       return;
     }
+    setLoading(true);
     try {
       const data = await apiCall(`${process.env.REACT_APP_SERVER_URL}/slot/appointments`, 'get', {
         doctorId,
@@ -43,7 +45,7 @@ const Dashboard = () => {
 
       if (data.length === 0) {
         setSlots([]);
-        setStats({ totalAppointments: 0, availableSlots: 0 }); // Set stats to zero when no slots exist
+        setStats({ totalAppointments: 0, availableSlots: 0 });
         setMessage('No slots available for this date');
         return;
       }
@@ -59,7 +61,9 @@ const Dashboard = () => {
     } catch (error) {
       setMessage('No slots available for this date');
       setSlots([]);
-      setStats({ totalAppointments: 0, availableSlots: 0 }); // Reset stats on error
+      setStats({ totalAppointments: 0, availableSlots: 0 });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,6 +87,7 @@ const Dashboard = () => {
       setMessage('This slot is already added.');
       return;
     }
+    setLoading(true);
     try {
       await apiCall(`${process.env.REACT_APP_SERVER_URL}/slot/add`, 'post', {
         doctorId,
@@ -94,6 +99,8 @@ const Dashboard = () => {
       fetchSlots();
     } catch (error) {
       setMessage('Error adding new slot. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,97 +123,165 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto p-10 bg-gray-100 shadow-2xl rounded-xl">
-        <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold text-gray-800">Welcome, Doctor</h1>
-          <p className="text-gray-600 text-lg mt-2">
-            Manage your appointments and schedule with ease.
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+            Welcome to Your Dashboard
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Manage your appointments and schedule with ease. View your stats and add new slots for your patients.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Dashboard Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          <div className="bg-blue-100 p-6 rounded-lg flex items-center shadow-md">
-            <FaUserMd className="text-3xl text-blue-500 mr-4" />
-            <div>
-              <p className="text-xl font-semibold">Total Appointments Booked</p>
-              <p className="text-3xl text-blue-700">{stats.totalAppointments}</p>
+        {/* Stats Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12"
+        >
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl text-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div className="flex items-center">
+              <div className="bg-white/20 p-3 rounded-lg">
+                <FaUserMd className="text-3xl" />
+              </div>
+              <div className="ml-4">
+                <p className="text-lg font-medium opacity-90">Total Appointments</p>
+                <p className="text-3xl font-bold">{stats.totalAppointments}</p>
+              </div>
             </div>
           </div>
-          <div className="bg-green-100 p-6 rounded-lg flex items-center shadow-md">
-            <FaCheckCircle className="text-3xl text-green-500 mr-4" />
-            <div>
-              <p className="text-xl font-semibold">Available Slots</p>
-              <p className="text-3xl text-green-700">{stats.availableSlots}</p>
+
+          <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-2xl text-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div className="flex items-center">
+              <div className="bg-white/20 p-3 rounded-lg">
+                <FaCheckCircle className="text-3xl" />
+              </div>
+              <div className="ml-4">
+                <p className="text-lg font-medium opacity-90">Available Slots</p>
+                <p className="text-3xl font-bold">{stats.availableSlots}</p>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="mb-10">
-          <label htmlFor="date" className="block text-lg font-semibold text-gray-700">
-            Select Date
-          </label>
+        {/* Date Selection */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-white rounded-2xl shadow-lg p-6 mb-12"
+        >
+          <div className="flex items-center mb-4">
+            <FaCalendarAlt className="text-2xl text-blue-600 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-800">Select Date</h2>
+          </div>
           <input
-            id="date"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full p-4 border border-gray-300 rounded-lg mt-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
           />
-        </div>
+        </motion.div>
 
-        <div className="mb-10">
-          <h2 className="text-3xl font-semibold text-gray-700 mb-4">Available Slots</h2>
-          {slots.length > 0 ? (
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Available Slots */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-white rounded-2xl shadow-lg p-6 mb-12"
+        >
+          <div className="flex items-center mb-6">
+            <FaClock className="text-2xl text-blue-600 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-800">Available Slots</h2>
+          </div>
+          
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : slots.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {slots.map((slot, index) => (
-                <li
+                <motion.div
                   key={index}
-                  className={`flex justify-between items-center p-4 rounded-lg shadow-md transition-transform transform hover:scale-105 ${
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
+                  className={`p-4 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
                     slot.isBooked
-                      ? 'bg-red-50 text-red-700 border border-red-200'
-                      : 'bg-green-50 text-green-700 border border-green-200'
+                      ? 'bg-red-50 border border-red-200'
+                      : 'bg-green-50 border border-green-200'
                   }`}
                 >
-                  <span className="text-lg">{slot.time}</span>
-                  <span className="text-sm">{slot.isBooked ? 'Booked' : 'Available'}</span>
-                </li>
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium">
+                      {slot.time}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      slot.isBooked
+                        ? 'bg-red-200 text-red-800'
+                        : 'bg-green-200 text-green-800'
+                    }`}>
+                      {slot.isBooked ? 'Booked' : 'Available'}
+                    </span>
+                  </div>
+                </motion.div>
               ))}
-            </ul>
+            </div>
           ) : (
-            <p className="text-gray-500 italic">No slots available for the selected date.</p>
+            <p className="text-gray-500 text-center py-8 italic">
+              No slots available for the selected date.
+            </p>
           )}
-        </div>
+        </motion.div>
 
-        <div className="mb-10">
-          <h2 className="text-3xl font-semibold text-gray-700 mb-4">Add New Slot</h2>
+        {/* Add New Slot */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="bg-white rounded-2xl shadow-lg p-6"
+        >
+          <div className="flex items-center mb-6">
+            <FaClock className="text-2xl text-blue-600 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-800">Add New Slot</h2>
+          </div>
           <form onSubmit={handleAddSlot} className="flex flex-wrap gap-4">
             <input
               type="time"
               value={newSlot}
               onChange={(e) => setNewSlot(e.target.value)}
-              className="flex-1 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               required
             />
             <button
               type="submit"
-              className="bg-primary text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition"
+              disabled={loading}
+              className={`px-8 py-4 bg-blue-600 text-white rounded-xl font-medium shadow-lg 
+                transform transition-all duration-300 hover:shadow-xl hover:bg-blue-700 
+                active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              Add Slot
+              {loading ? 'Adding...' : 'Add Slot'}
             </button>
           </form>
-        </div>
+        </motion.div>
 
+        {/* Toast Message */}
         {message && (
-          <div
-            className={`mt-6 p-4 rounded-lg text-center shadow-lg ${
-              message.includes('success')
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700'
-            }`}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50"
           >
-            {message}
-          </div>
+            <p className="text-gray-800">{message}</p>
+          </motion.div>
         )}
       </div>
     </Layout>

@@ -39,7 +39,7 @@ const TopDoctors = () => {
           navigate('/doctors');
           window.scrollTo(0, 0);
         }}
-        className="bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10"
+        className="bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10 hover:bg-primary hover:text-white transition duration-300"
       >
         more
       </button>
