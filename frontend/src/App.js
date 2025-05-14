@@ -25,7 +25,7 @@ const App = () => {
   console.log('Current Path:', location.pathname);
 
   return (
-    <div className="mx-4 sm:mx-[5%]">
+    <div className="mx-4 sm:mx-[3%]">
       {isAdminRoute ? (
         user?.role === 'admin' ? (
           <AdminNavbar />
