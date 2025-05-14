@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(3); // Default: March
@@ -7,16 +8,34 @@ const Calendar = () => {
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState('');
   const [highlightedDates, setHighlightedDates] = useState(new Set());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+  // Check authentication status
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+  }, []);
 
   // Fetch events for the entire month
   const fetchEventsForMonth = useCallback(async () => {
     const startDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
     const endDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-31`;
+    const token = localStorage.getItem('token');
 
     try {
       const res = await fetch(
         `${process.env.REACT_APP_SERVER_URL}/calendar?start=${startDate}&end=${endDate}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
+      if (res.status === 401) {
+        setIsAuthenticated(false);
+        return;
+      }
       const data = await res.json();
       const eventDates = new Set(data.map((event) => event.date));
       setHighlightedDates(eventDates);
@@ -31,8 +50,20 @@ const Calendar = () => {
 
   // Fetch events for a specific date
   const fetchEvents = async (date) => {
+    const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/calendar/${date}`);
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/calendar/${date}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      if (res.status === 401) {
+        setIsAuthenticated(false);
+        return;
+      }
       const data = await res.json();
       setEvents(data);
     } catch (err) {
@@ -53,18 +84,44 @@ const Calendar = () => {
   // Add a new event
   const handleAddEvent = async () => {
     if (!newEvent || !selectedDate) return;
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    const eventData = { title: newEvent, date: selectedDate };
+    console.log('Sending event data:', eventData);
+    console.log('Token:', token);
+
     try {
       const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/calendar`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newEvent, date: selectedDate }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(eventData),
       });
 
+      const responseData = await res.json();
+      console.log('Server response:', {
+        status: res.status,
+        data: responseData
+      });
+
+      if (res.status === 401) {
+        setIsAuthenticated(false);
+        navigate('/login');
+        return;
+      }
+
       if (res.ok) {
-        const data = await res.json();
-        setEvents([...events, data]);
+        setEvents([...events, responseData]);
         setNewEvent('');
-        setHighlightedDates((prev) => new Set(prev.add(selectedDate))); // Highlight the date
+        setHighlightedDates((prev) => new Set(prev.add(selectedDate)));
+      } else {
+        console.error('Error response:', responseData);
       }
     } catch (err) {
       console.error('Error adding event:', err);
@@ -73,14 +130,28 @@ const Calendar = () => {
 
   // Delete an event
   const handleDeleteEvent = async (id) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${process.env.REACT_APP_SERVER_URL}/calendar/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
+
+      if (res.status === 401) {
+        setIsAuthenticated(false);
+        navigate('/login');
+        return;
+      }
+
       if (res.ok) {
         setEvents(events.filter((event) => event._id !== id));
-
-        // Remove highlight if no more events remain for the date
         if (events.length === 1) {
           setHighlightedDates((prev) => {
             const newSet = new Set(prev);
@@ -181,6 +252,17 @@ const Calendar = () => {
         {selectedDate && (
           <aside className="w-1/3 ml-6 p-4 bg-gray-50 rounded-lg shadow">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">Events on {selectedDate}</h2>
+            {!isAuthenticated && (
+              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+                <p>Please log in to add or manage events.</p>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="mt-2 bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                >
+                  Log In
+                </button>
+              </div>
+            )}
             <ul>
               {events.map((event) => (
                 <li
@@ -197,21 +279,23 @@ const Calendar = () => {
                 </li>
               ))}
             </ul>
-            <div className="mt-4">
-              <input
-                type="text"
-                className="border rounded p-2 w-full focus:outline-none"
-                placeholder="Add new event"
-                value={newEvent}
-                onChange={(e) => setNewEvent(e.target.value)}
-              />
-              <button
-                className="bg-blue-500 text-white px-4 py-2 mt-2 w-full rounded"
-                onClick={handleAddEvent}
-              >
-                Add Event
-              </button>
-            </div>
+            {isAuthenticated && (
+              <div className="mt-4">
+                <input
+                  type="text"
+                  value={newEvent}
+                  onChange={(e) => setNewEvent(e.target.value)}
+                  placeholder="New event"
+                  className="w-full p-2 border rounded"
+                />
+                <button
+                  onClick={handleAddEvent}
+                  className="mt-2 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                >
+                  Add Event
+                </button>
+              </div>
+            )}
           </aside>
         )}
       </div>
