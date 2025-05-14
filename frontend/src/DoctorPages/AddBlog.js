@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 import Layout from '../DoctorComponents/Layout';
 import { useAuth } from '../context/AuthContext';
 import ReactQuill from 'react-quill';
@@ -84,10 +84,10 @@ const AddBlog = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${process.env.REACT_APP_SERVER_URL}/blog/add-blog`,
+      const response = await axiosInstance.post(
+        '/blog/add-blog',
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } },
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
       setMessage(response.data.message || 'Blog published successfully!');
