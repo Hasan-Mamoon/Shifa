@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
       email === process.env.DEFAULT_ADMIN_EMAIL &&
       password === process.env.DEFAULT_ADMIN_PASSWORD
     ) {
-      const token = jwt.sign({ email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      const token = jwt.sign({ email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
       return res.json({ token, userId: email, role: 'admin', email });
     }
@@ -55,7 +55,7 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ email: admin.email, role: 'admin' }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
+      expiresIn: '7d',
     });
 
     res.json({ token, userId: admin._id, role: 'admin', email: admin.email });
