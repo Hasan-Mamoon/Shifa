@@ -12,5 +12,15 @@ export default {
   resetMocks: true,
   restoreMocks: true,
   testMatch: ['**/__tests__/**/*.test.js'],
-  moduleFileExtensions: ['js', 'json', 'node']
+  moduleFileExtensions: ['js', 'json', 'node'],
+  reporters: [
+    "default",
+    [ "jest-html-reporter", {
+      pageTitle: "SHIFA Test Report",
+      outputPath: "test-report.html",
+      includeFailureMsg: true,
+      includeConsoleLog: true
+    }]
+  ],
+
 }; 
