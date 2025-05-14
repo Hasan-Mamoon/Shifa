@@ -256,7 +256,7 @@ const Appointment = () => {
         variants={fadeInUp}
         initial="initial"
         animate="animate"
-        className="max-w-6xl mx-auto mt-10 p-6"
+        className="w-full mx-auto  "
       >
         <AnimatePresence mode="wait">
           {isLoading ? (

@@ -114,7 +114,7 @@ const AddBlog = () => {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="max-w-4xl mx-auto p-8"
+        className="w-full p-3"
       >
         <motion.div 
           variants={fadeInUp}

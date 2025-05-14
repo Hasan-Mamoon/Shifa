@@ -158,10 +158,10 @@ const Profile = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+      <div className="min-h-screen bg-gray-50 py-2 px-2 sm:px-2 lg:px-2">
+        <div className="w-full mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
           {/* Profile Header */}
-          <div className="relative bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-12">
+          <div className="relative bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-20">
             <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-8">
               {/* Profile Image Section */}
               <div className="relative group">
@@ -248,7 +248,7 @@ const Profile = () => {
           )}
 
           {/* Profile Content */}
-          <div className="p-8">
+          <div className="p-20">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div>

@@ -218,12 +218,12 @@ const Calendar = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-col items-center  bg-gray-100 p-4">
       {/* Centered Heading */}
       <h1 className="text-4xl font-extrabold bg-gradient-to-r from-green-500 to-blue-500 text-transparent bg-clip-text mb-6">
         🌿 Health Event Calendar
       </h1>
-      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl flex">
+      <div className="bg-white shadow-lg rounded-lg p-6 w-full flex">
         {/* Calendar Section */}
         <div className="w-2/3">
           <div className="flex justify-between items-center mb-4">
